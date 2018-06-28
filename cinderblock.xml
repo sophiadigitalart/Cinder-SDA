@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<cinder>
+<block
+	name="Cinder-SDA"
+	id="com.sophiadigitalart.sda"
+	author="Bruce Lane"
+	license="MIT"
+	summary="SDA block for Cinder 0.9: utilities for Spout, WebSockets, Watchdog, Shaders"
+	url="https://github.com/sophiadigitalart/Cinder-SDA"
+	git="git://github.com/sophiadigitalart/Cinder-SDA.git"
+	>
+	<supports os="msw" />
+	<requires>com.wk.websocketpp</requires>
+	<includePath>include</includePath>
+	<includePath>src</includePath>
+	<headerPattern>include/*.h</headerPattern>
+	<sourcePattern>src/*.cpp</sourcePattern>
+	<sourcePattern>src/*.c</sourcePattern>
+	<platform os="msw">
+		<libraryPath>lib</libraryPath>
+		<requires>fr.batchass.spout</requires>
+		<requires>mb.cinder.midi2</requires>
+	</platform>
+</block>
+<template>templates/SDA/template.xml</template>
+</cinder>
