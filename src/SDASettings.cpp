@@ -179,6 +179,10 @@ bool SDASettings::save()
 	AssetsPath.setAttribute("value", toString(mAssetsPath));
 	settings.push_back(AssetsPath);
 
+	XmlTree UseAudio("UseAudio", "");
+	UseAudio.setAttribute("value", mUseAudio);
+	settings.push_back(UseAudio);
+
 	XmlTree UseLineIn("UseLineIn", "");
 	UseLineIn.setAttribute("value", mUseLineIn);
 	settings.push_back(UseLineIn);
@@ -319,6 +323,10 @@ bool SDASettings::restore()
 					// reset path
 					mAssetsPath = "";
 				}
+			}
+			if (settings.hasChild("UseAudio")) {
+				XmlTree UseAudio = settings.getChild("UseAudio");
+				mUseAudio = UseAudio.getAttributeValue<bool>("value");
 			}
 			if (settings.hasChild("UseLineIn")) {
 				XmlTree UseLineIn = settings.getChild("UseLineIn");

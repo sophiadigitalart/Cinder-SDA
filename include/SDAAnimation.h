@@ -87,6 +87,9 @@ namespace SophiaDigitalArt
 		float							iFreqs[mWindowSize];
 		void							preventLineInCrash(); // at next launch
 		void							saveLineIn();
+		bool							getUseAudio() {
+			return mSDASettings->mUseAudio;
+		};
 		bool							getUseLineIn() {
 			return mSDASettings->mUseLineIn;
 		};

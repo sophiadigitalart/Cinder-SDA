@@ -258,7 +258,7 @@ namespace SophiaDigitalArt {
 	}
 	void SDAMix::update() {
 		// update audio texture
-		updateAudio();	
+		if (mSDASettings->mUseAudio) updateAudio();	
 
 		// check if xFade changed
 		if (mSDASettings->xFadeChanged) {

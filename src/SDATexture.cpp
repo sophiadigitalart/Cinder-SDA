@@ -837,11 +837,13 @@ namespace SophiaDigitalArt {
 				mLineIn->enable();
 			}
 #endif
-			// also initialize wave monitor
-			auto scopeWaveFmt = audio::MonitorSpectralNode::Format().fftSize(mSDAAnimation->mWindowSize * 2).windowSize(mSDAAnimation->mWindowSize);
-			mMonitorWaveSpectralNode = ctx->makeNode(new audio::MonitorSpectralNode(scopeWaveFmt));
+			if (mSDAAnimation->getUseAudio()) {
+				// also initialize wave monitor
+				auto scopeWaveFmt = audio::MonitorSpectralNode::Format().fftSize(mSDAAnimation->mWindowSize * 2).windowSize(mSDAAnimation->mWindowSize);
+				mMonitorWaveSpectralNode = ctx->makeNode(new audio::MonitorSpectralNode(scopeWaveFmt));
 
-			ctx->enable();
+				ctx->enable();
+			}
 			mLineInInitialized = true;
 		}
 #if (defined( CINDER_MSW ) || defined( CINDER_MAC ))
@@ -850,15 +852,17 @@ namespace SophiaDigitalArt {
 		}
 		else {
 #endif
-			if (mSDAAnimation->isAudioBuffered()) {
-				if (mBufferPlayerNode) {
-					mMagSpectrum = mMonitorWaveSpectralNode->getMagSpectrum();
+			if (mSDAAnimation->getUseAudio()) {
+				if (mSDAAnimation->isAudioBuffered()) {
+					if (mBufferPlayerNode) {
+						mMagSpectrum = mMonitorWaveSpectralNode->getMagSpectrum();
+					}
 				}
-			}
-			else {
-				if (mSamplePlayerNode) {
-					mMagSpectrum = mMonitorWaveSpectralNode->getMagSpectrum();
-					mPosition = mSamplePlayerNode->getReadPosition();
+				else {
+					if (mSamplePlayerNode) {
+						mMagSpectrum = mMonitorWaveSpectralNode->getMagSpectrum();
+						mPosition = mSamplePlayerNode->getReadPosition();
+					}
 				}
 			}
 #if (defined( CINDER_MSW ) || defined( CINDER_MAC ))
