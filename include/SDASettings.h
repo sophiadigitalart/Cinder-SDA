@@ -85,6 +85,7 @@ namespace SophiaDigitalArt {
 		string						mImageFile;
 
 		// shader uniforms	
+		static const int			ITIME = 0;
 		float						iSpeedMultiplier;        // speed multiplier
 		float						iChannelTime[4];
 		bool						iFade;

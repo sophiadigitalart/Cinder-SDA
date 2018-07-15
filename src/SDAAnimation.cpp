@@ -54,7 +54,7 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 	}
 	else {
 		// global time in seconds
-		createFloatUniform("iGlobalTime", 0, 0.0f);
+		createFloatUniform("iGlobalTime", mSDASettings->ITIME, 0.0f);
 		// sliders
 		// red
 		createFloatUniform("iFR", 1, 1.0f);
