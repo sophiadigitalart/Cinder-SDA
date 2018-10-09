@@ -138,7 +138,7 @@ void SDAWebsocket::parseMessage(string msg) {
 						{
 						case 2:
 							// change tempo
-							mVDAnimation->setBpm(jsonElement->getChild("tempo").getValue<float>());
+							mSDAAnimation->setBpm(jsonElement->getChild("tempo").getValue<float>());
 							break;
 						default:
 							break;
