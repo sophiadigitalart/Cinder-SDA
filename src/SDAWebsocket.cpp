@@ -130,35 +130,15 @@ void SDAWebsocket::parseMessage(string msg) {
 						//string evt = json.getChild("event").getValue<string>();
 					}
 				}
-				/*if (json.hasChild("cmd")) {
+				if (json.hasChild("cmd")) {
 					JsonTree jsonCmd = json.getChild("cmd");
 					for (JsonTree::ConstIter jsonElement = jsonCmd.begin(); jsonElement != jsonCmd.end(); ++jsonElement) {
 						receivedType = jsonElement->getChild("type").getValue<int>();
 						switch (receivedType)
 						{
-						case 0:
-							// from changeWarpFboIndex
-							receivedWarpIndex = jsonElement->getChild("warp").getValue<float>(); // TODO int
-							receivedFboIndex = jsonElement->getChild("fbo").getValue<float>(); // TODO int
-							receivedSlot = jsonElement->getChild("slot").getValue<float>(); // TODO int
-							if (receivedSlot == 0) {
-								mSDAMix->setWarpAFboIndex(receivedWarpIndex, receivedFboIndex);
-							}
-							else {
-								mSDAMix->setWarpBFboIndex(receivedWarpIndex, receivedFboIndex);
-							}
-							break;
-						case 1:
-							// from changeWarpShaderIndex
-							receivedWarpIndex = jsonElement->getChild("warp").getValue<float>(); // TODO int
-							receivedShaderIndex = jsonElement->getChild("shader").getValue<float>(); // TODO int
-							receivedSlot = jsonElement->getChild("slot").getValue<float>(); // TODO int
-							if (receivedSlot == 0) {
-								mSDAMix->setWarpAShaderIndex(receivedWarpIndex, receivedShaderIndex);
-							}
-							else {
-								mSDAMix->setWarpBShaderIndex(receivedWarpIndex, receivedShaderIndex);
-							}
+						case 2:
+							// change tempo
+							mVDAnimation->setBpm(jsonElement->getChild("tempo").getValue<float>());
 							break;
 						default:
 							break;
@@ -166,7 +146,7 @@ void SDAWebsocket::parseMessage(string msg) {
 
 					}
 
-				} */
+				}
 			}
 			catch (cinder::JsonTree::Exception exception) {
 				mSDASettings->mWebSocketsMsg += " error jsonparser exception: ";
