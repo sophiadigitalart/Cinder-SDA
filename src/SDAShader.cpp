@@ -61,14 +61,30 @@ bool SDAShader::loadFragmentStringFromFile(string aFileName) {
 
 	CI_LOG_V(mFragFile.string() + " loaded and compiled");
 	return mValid;
-}
+}// aName = fullpath
 bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
+
 	string mOriginalFragmentString = aFragmentShaderString;
+	string mISFString = aFragmentShaderString;
+	string fileName = "";
 	string mCurrentUniformsString = "// active uniforms start\n";
 	string mProcessedShaderString = "";
 	mError = "";
-	// we would like a name
-	if (aName.length() == 0) aName = toString((int)getElapsedSeconds()) + ".frag";
+
+	// we would like a name without extension
+	if (aName.length() == 0) {
+		aName = toString((int)getElapsedSeconds()); // + ".frag" 
+	}
+	else {
+		int dotIndex = aName.find_last_of(".");
+		int slashIndex = aName.find_last_of("\\");
+
+		if (dotIndex != std::string::npos && dotIndex > slashIndex) {
+			aName = aName.substr(slashIndex + 1, dotIndex - slashIndex - 1);
+		}
+
+	}
+
 	string mNotFoundUniformsString = "/* " + aName + "\n";
 	// filename to save
 	mValid = false;
@@ -77,24 +93,11 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 	try
 	{
 		//CI_LOG_V("before regex " + mOriginalFragmentString);
-		// shadertoy: 
-		// change void mainImage( out vec4 fragColor, in vec2 fragCoord ) to void main(void)
-		std::regex pattern{ "mainImage" };
-		std::string replacement{ "main" };
-		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
-		pattern = { " out vec4 fragColor," };
-		replacement = { "void" };
-		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
-		pattern = { " in vec2 fragCoord" };
-		replacement = { "" };
-		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
-		pattern = { " vec2 fragCoord" };
-		replacement = { "" };
-		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
+		
 		// html glslEditor:
 		// change vec2 u_resolution to vec3 iResolution
-		pattern = { "2 u_r" };
-		replacement = { "3 iR" };
+		std::regex pattern{ "2 u_r" };
+		std::string replacement{ "3 iR" };
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
 		pattern = { "u_r" };
 		replacement = { "iR" };
@@ -135,7 +138,48 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		pattern = { "iRenderXY.y" };
 		replacement = { "0.0" };
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
-		//CI_LOG_V("regexed " + mOriginalFragmentString);
+		// ISF file format
+		// change void main(void) to void main(void) { mainImage(gl_FragColor, gl_FragCoord.xy); }
+		mISFString = mOriginalFragmentString;
+		std::regex ISFPattern{ "iResolution" };
+		std::string ISFReplacement{ "RENDERSIZE" };
+		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
+		ISFPattern = { "iTime" };
+		ISFReplacement = { "TIME" };
+		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
+		ISFPattern = { "iGlobalTime" };
+		ISFReplacement = { "TIME" };
+		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
+
+		ISFPattern = { "void main(void)" };
+		ISFReplacement = { "void mainImage( out vec4 fragColor, in vec2 fragCoord )" };
+		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
+		ISFPattern = { "void main( void )" };
+		ISFReplacement = { "void mainImage( out vec4 fragColor, in vec2 fragCoord )" };
+		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
+		ISFPattern = { "gl_FragColor" };
+		ISFReplacement = { "fragColor" };
+		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
+		ISFPattern = { "gl_FragCoord" };
+		ISFReplacement = { "fragCoord" };
+		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
+		mISFString = mISFString + "void main(void) { mainImage(gl_FragColor, gl_FragCoord.xy); }";
+
+
+		// shadertoy: 
+		// change void mainImage( out vec4 fragColor, in vec2 fragCoord ) to void main(void)
+		pattern = { "mainImage" };
+		replacement = { "main" };
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
+		pattern = { " out vec4 fragColor," };
+		replacement = { "void" };
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
+		pattern = { " in vec2 fragCoord" };
+		replacement = { "" };
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
+		pattern = { " vec2 fragCoord" };
+		replacement = { "" };
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);		//CI_LOG_V("regexed " + mOriginalFragmentString);
 
 		// change texture2D to texture for version > 150?	
 
@@ -151,9 +195,18 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		else {
 			aFragmentShaderString = "/* " + aName + " */\n" + mOriginalFragmentString;
 		}
+		// save ISF
+		mISFString = "/*{\"DESCRIPTION\": \"https://www.shadertoy.com/view/\",\"CREDIT\" : \"" + aName + " by Author\",\"CATEGORIES\" : [\"ci\"], \"INPUTS\": [{\"NAME\" :\"iMouse\",\"TYPE\" : \"point2D\",\"DEFAULT\" : [0.0, 0.0],\"MAX\" : [640.0, 480.0],\"MIN\" : [0.0, 0.0]}],}*/" + mISFString;
+		fileName = aName + ".fs";
+		fs::path isfFile = getAssetPath("") / "glsl" / "isf" / fileName;
+		ofstream mISF(isfFile.string(), std::ofstream::binary);
+		mISF << mISFString;
+		mISF.close();
+		CI_LOG_V("ISF file saved:" + isfFile.string());
 
 		// before compilation save .frag file to inspect errors
-		fs::path receivedFile = getAssetPath("") / "glsl" / "received" / aName;
+		fileName = aName + ".frag";
+		fs::path receivedFile = getAssetPath("") / "glsl" / "received" / fileName;
 		ofstream mFragReceived(receivedFile.string(), std::ofstream::binary);
 		mFragReceived << aFragmentShaderString;
 		mFragReceived.close();
@@ -232,7 +285,8 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		mCurrentUniformsString += "// active uniforms end\n";
 		// save .frag file to migrate old shaders
 		mProcessedShaderString = mNotFoundUniformsString + mCurrentUniformsString + mOriginalFragmentString;
-		fs::path processedFile = getAssetPath("") / "glsl" / "processed" / aName;
+		fileName = aName + ".frag";
+		fs::path processedFile = getAssetPath("") / "glsl" / "processed" / fileName;
 		ofstream mFragProcessed(processedFile.string(), std::ofstream::binary);
 		mFragProcessed << mProcessedShaderString;
 		mFragProcessed.close();
