@@ -151,11 +151,14 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		ISFReplacement = { "TIME" };
 		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
 
-		ISFPattern = { "void main(void)" };
-		ISFReplacement = { "void mainImage( out vec4 fragColor, in vec2 fragCoord )" };
+		ISFPattern = { "void main" };
+		ISFReplacement = { "int mainImage" }; //dirty hack!
 		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
-		ISFPattern = { "void main( void )" };
-		ISFReplacement = { "void mainImage( out vec4 fragColor, in vec2 fragCoord )" };
+		ISFPattern = { "void" };
+		ISFReplacement = { "out vec4 fragColor, in vec2 fragCoord" };
+		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
+		ISFPattern = { "int mainImage" };
+		ISFReplacement = { "void mainImage" }; //dirty hack!
 		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
 		ISFPattern = { "gl_FragColor" };
 		ISFReplacement = { "fragColor" };
@@ -179,7 +182,7 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
 		pattern = { " vec2 fragCoord" };
 		replacement = { "" };
-		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);		//CI_LOG_V("regexed " + mOriginalFragmentString);
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);	
 
 		// change texture2D to texture for version > 150?	
 

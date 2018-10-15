@@ -221,28 +221,29 @@ namespace SophiaDigitalArt {
 	
 #pragma endregion warps
 	void SDAMix::renderMix() {
-		gl::ScopedFramebuffer scopedFbo(mMixFbos[0].fbo);
-		gl::clear(Color::black());
-		// render A and B fbos 
-		//CI_LOG_V(" iCrossfade " + toString(mWarps[warpMixToRender]->ABCrossfade) + " getAFboIndex " + toString(mWarps[warpMixToRender]->getAFboIndex()) + " getBFboIndex " + toString(mWarps[warpMixToRender]->getBFboIndex()));
-		/*mFboList[mWarps[warpMixToRender]->getAFboIndex()]->getFboTexture();
-		mFboList[mWarps[warpMixToRender]->getBFboIndex()]->getFboTexture();
-		// texture binding must be before ScopedGlslProg
-		mFboList[mWarps[warpMixToRender]->getAFboIndex()]->getRenderedTexture()->bind(0);
-		mFboList[mWarps[warpMixToRender]->getBFboIndex()]->getRenderedTexture()->bind(1);*/
-		mFboList[0]->getFboTexture();
-		mFboList[1]->getFboTexture();
-		// texture binding must be before ScopedGlslProg
-		mFboList[0]->getRenderedTexture()->bind(0);
-		mFboList[1]->getRenderedTexture()->bind(1);
-		gl::ScopedGlslProg glslScope(mGlslMix);
-		mGlslMix->uniform("iCrossfade", mSDASettings->xFade);
+		if (mFboList.size() > 0) {
+			gl::ScopedFramebuffer scopedFbo(mMixFbos[0].fbo);
+			gl::clear(Color::black());
+			// render A and B fbos 
+			//CI_LOG_V(" iCrossfade " + toString(mWarps[warpMixToRender]->ABCrossfade) + " getAFboIndex " + toString(mWarps[warpMixToRender]->getAFboIndex()) + " getBFboIndex " + toString(mWarps[warpMixToRender]->getBFboIndex()));
+			/*mFboList[mWarps[warpMixToRender]->getAFboIndex()]->getFboTexture();
+			mFboList[mWarps[warpMixToRender]->getBFboIndex()]->getFboTexture();
+			// texture binding must be before ScopedGlslProg
+			mFboList[mWarps[warpMixToRender]->getAFboIndex()]->getRenderedTexture()->bind(0);
+			mFboList[mWarps[warpMixToRender]->getBFboIndex()]->getRenderedTexture()->bind(1);*/
+			mFboList[0]->getFboTexture();
+			mFboList[1]->getFboTexture();
+			// texture binding must be before ScopedGlslProg
+			mFboList[0]->getRenderedTexture()->bind(0);
+			mFboList[1]->getRenderedTexture()->bind(1);
+			gl::ScopedGlslProg glslScope(mGlslMix);
+			mGlslMix->uniform("iCrossfade", mSDASettings->xFade);
 
-		gl::drawSolidRect(Rectf(0, 0, mMixFbos[0].fbo->getWidth(), mMixFbos[0].fbo->getHeight()));
+			gl::drawSolidRect(Rectf(0, 0, mMixFbos[0].fbo->getWidth(), mMixFbos[0].fbo->getHeight()));
 
-		// save to a texture
-		mMixFbos[0].texture = mMixFbos[0].fbo->getColorTexture();
-		
+			// save to a texture
+			mMixFbos[0].texture = mMixFbos[0].fbo->getColorTexture();
+		}		
 	}
 
 	string SDAMix::getMixFboName(unsigned int aMixFboIndex) {
@@ -840,9 +841,9 @@ namespace SophiaDigitalArt {
 				}
 				else {
 					// no slot available, create new shader
-					createShaderFboFromString(loadString(loadFile(mFragFile)), aShaderFilename);
+					rtn = createShaderFboFromString(loadString(loadFile(mFragFile)), aShaderFilename);
 				}
-				mFboList[rtn]->updateThumbFile();
+				if (rtn > 0) mFboList[rtn]->updateThumbFile();
 			}
 		}
 		return rtn;
