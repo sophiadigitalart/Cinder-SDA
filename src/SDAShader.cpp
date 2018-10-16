@@ -93,7 +93,7 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 	try
 	{
 		//CI_LOG_V("before regex " + mOriginalFragmentString);
-		
+
 		// html glslEditor:
 		// change vec2 u_resolution to vec3 iResolution
 		std::regex pattern{ "2 u_r" };
@@ -182,7 +182,7 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
 		pattern = { " vec2 fragCoord" };
 		replacement = { "" };
-		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);	
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
 
 		// change texture2D to texture for version > 150?	
 
@@ -199,7 +199,51 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 			aFragmentShaderString = "/* " + aName + " */\n" + mOriginalFragmentString;
 		}
 		// save ISF
-		mISFString = "/*{\"DESCRIPTION\": \"https://www.shadertoy.com/view/\",\"CREDIT\" : \"" + aName + " by Author\",\"CATEGORIES\" : [\"ci\"], \"INPUTS\": [{\"NAME\" :\"iMouse\",\"TYPE\" : \"point2D\",\"DEFAULT\" : [0.0, 0.0],\"MAX\" : [640.0, 480.0],\"MIN\" : [0.0, 0.0]}],}*/" + mISFString;
+		mISFString = "/*{\n"
+			"	\"CREDIT\" : \"" + aName + " by Author\",\n"
+			"	\"CATEGORIES\" : [\n"
+			"		\"ci\"\n"
+			"	],\n"
+			"	\"DESCRIPTION\": \"https://www.shadertoy.com/view/\",\n"
+			"	\"INPUTS\": [\n"
+			"		{\n"
+			"			\"NAME\": \"iChannel0\",\n"
+			"			\"TYPE\" : \"image\"\n"
+			"		},\n"
+			"		{\n"
+			"			\"NAME\": \"iZoom\",\n"
+			"			\"TYPE\" : \"float\",\n"
+			"			\"MIN\" : 0.0,\n"
+			"			\"MAX\" : 1.0,\n"
+			"			\"DEFAULT\" : 1.0\n"
+			"		},\n"
+			"		{\n"
+			"			\"NAME\": \"iSteps\",\n"
+			"			\"TYPE\" : \"float\",\n"
+			"			\"MIN\" : 2.0,\n"
+			"			\"MAX\" : 75.0,\n"
+			"			\"DEFAULT\" : 19.0\n"
+			"		},\n"
+			"		{\n"
+			"			\"NAME\" :\"iMouse\",\n"
+			"			\"TYPE\" : \"point2D\",\n"
+			"			\"DEFAULT\" : [0.0, 0.0],\n"
+			"			\"MAX\" : [640.0, 480.0],\n"
+			"			\"MIN\" : [0.0, 0.0]\n"
+			"		},\n"
+			"		{\n"
+			"			\"NAME\": \"iColor\", \n"
+			"			\"TYPE\" : \"color\", \n"
+			"			\"DEFAULT\" : [\n"
+			"				0.9, \n"
+			"				0.6, \n"
+			"				0.0, \n"
+			"				1.0\n"
+			"			]\n"
+			"		}\n"
+			"	],\n"
+			"}\n"
+			"*/\n" + mISFString;
 		fileName = aName + ".fs";
 		fs::path isfFile = getAssetPath("") / "glsl" / "isf" / fileName;
 		ofstream mISF(isfFile.string(), std::ofstream::binary);
