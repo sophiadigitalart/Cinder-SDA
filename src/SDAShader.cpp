@@ -66,6 +66,7 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 
 	string mOriginalFragmentString = aFragmentShaderString;
 	string mISFString = aFragmentShaderString;
+	string mOFISFString = "";
 	string fileName = "";
 	string mCurrentUniformsString = "// active uniforms start\n";
 	string mProcessedShaderString = "";
@@ -151,13 +152,15 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		ISFReplacement = { "TIME" };
 		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
 
+		mOFISFString = mISFString;
+
 		ISFPattern = { "void main" };
-		ISFReplacement = { "int mainImage" }; //dirty hack!
+		ISFReplacement = { "dirtyhack mainImage" }; //dirty hack!
 		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
 		ISFPattern = { "void" };
 		ISFReplacement = { "out vec4 fragColor, in vec2 fragCoord" };
 		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
-		ISFPattern = { "int mainImage" };
+		ISFPattern = { "dirtyhack mainImage" };
 		ISFReplacement = { "void mainImage" }; //dirty hack!
 		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
 		ISFPattern = { "gl_FragColor" };
@@ -199,12 +202,12 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 			aFragmentShaderString = "/* " + aName + " */\n" + mOriginalFragmentString;
 		}
 		// save ISF
-		mISFString = "/*{\n"
-			"	\"CREDIT\" : \"" + aName + " by Author\",\n"
+		string mISFHeader = "/*{\n"
+			"	\"CREDIT\" : \"" + aName + " by Unknown\",\n"
 			"	\"CATEGORIES\" : [\n"
 			"		\"ci\"\n"
 			"	],\n"
-			"	\"DESCRIPTION\": \"https://www.shadertoy.com/view/\",\n"
+			"	\"DESCRIPTION\": \"\",\n"
 			"	\"INPUTS\": [\n"
 			"		{\n"
 			"			\"NAME\": \"iChannel0\",\n"
@@ -243,13 +246,26 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 			"		}\n"
 			"	],\n"
 			"}\n"
-			"*/\n" + mISFString;
+			"*/\n";
+		mISFString = mISFHeader + mISFString;
+		mOFISFString = mISFHeader + mOFISFString;
+
+		// ifs for openFrameworks ISFGif projects
+		fileName = aName + ".fs";
+		fs::path OFIsfFile = getAssetPath("") / "glsl" / "osf" / fileName;
+		ofstream mOFISF(OFIsfFile.string(), std::ofstream::binary);
+		mOFISF << mOFISFString;
+		mOFISF.close();
+		CI_LOG_V("OF ISF file saved:" + OFIsfFile.string());
+
+		// ifs
 		fileName = aName + ".fs";
 		fs::path isfFile = getAssetPath("") / "glsl" / "isf" / fileName;
 		ofstream mISF(isfFile.string(), std::ofstream::binary);
 		mISF << mISFString;
 		mISF.close();
 		CI_LOG_V("ISF file saved:" + isfFile.string());
+
 
 		// before compilation save .frag file to inspect errors
 		fileName = aName + ".frag";
