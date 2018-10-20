@@ -152,6 +152,20 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		ISFReplacement = { "TIME" };
 		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
 
+		ISFPattern = { "texture2D" };
+		ISFReplacement = { "IMG_THIS_PIXEL" };
+		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
+		ISFPattern = { "texture" };
+		ISFReplacement = { "IMG_THIS_PIXEL" };
+		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
+
+		ISFPattern = { "iChannel0" };
+		ISFReplacement = { "inputImage" };
+		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
+		ISFPattern = { "iChannel1" };
+		ISFReplacement = { "inputImage" };
+		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
+
 		mOFISFString = mISFString;
 
 		ISFPattern = { "void main" };
@@ -210,7 +224,7 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 			"	\"DESCRIPTION\": \"\",\n"
 			"	\"INPUTS\": [\n"
 			"		{\n"
-			"			\"NAME\": \"iChannel0\",\n"
+			"			\"NAME\": \"inputImage\",\n"
 			"			\"TYPE\" : \"image\"\n"
 			"		},\n"
 			"		{\n"
