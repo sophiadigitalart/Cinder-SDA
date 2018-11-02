@@ -222,6 +222,7 @@ namespace SophiaDigitalArt {
 #pragma endregion warps
 	void SDAMix::renderMix() {
 		if (mFboList.size() > 0) {
+			if (!mMixFbos[0].fbo) mMixFbos[0].fbo = gl::Fbo::create(mSDASettings->mFboWidth, mSDASettings->mFboHeight, fboFmt);
 			gl::ScopedFramebuffer scopedFbo(mMixFbos[0].fbo);
 			gl::clear(Color::black());
 			// render A and B fbos 
