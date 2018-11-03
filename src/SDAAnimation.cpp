@@ -57,13 +57,13 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		createFloatUniform("iGlobalTime", mSDASettings->ITIME, 0.0f);
 		// sliders
 		// red
-		createFloatUniform("iFR", 1, 1.0f);
+		createFloatUniform("iFR", mSDASettings->IFR, 1.0f);
 		// green
-		createFloatUniform("iFG", 2, 0.3f);
+		createFloatUniform("iFG", mSDASettings->IFG, 0.3f);
 		// blue
-		createFloatUniform("iFB", 3, 0.0f);
+		createFloatUniform("iFB", mSDASettings->IFB, 0.0f);
 		// Alpha 
-		createFloatUniform("iAlpha", 4, 1.0f);
+		createFloatUniform("iAlpha", mSDASettings->IFA, 1.0f);
 		// red multiplier 
 		createFloatUniform("iRedMultiplier", 5, 1.0f, 0.0f, 3.0f);
 		// green multiplier 
@@ -76,25 +76,25 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		// RotationSpeed
 		createFloatUniform("iRotationSpeed", 9, 0.0f, -2.0f, 2.0f);
 		// Steps
-		createFloatUniform("iSteps", 10, 16.0f, 1.0f, 128.0f);
+		createFloatUniform("iSteps", mSDASettings->ISTEPS, 16.0f, 1.0f, 128.0f);
 
 		// rotary
 		// ratio
-		createFloatUniform("iRatio", 11, 20.0f, 0.00000000001f, 20.0f);
+		createFloatUniform("iRatio", mSDASettings->IRATIO, 20.0f, 0.00000000001f, 20.0f);
 		// zoom
 		createFloatUniform("iZoom", 12, 1.0f, -3.0f, 3.0f);
 		// Audio multfactor 
 		createFloatUniform("iAudioMult", 13, 1.0f, 0.01f, 12.0f);
 		// exposure
-		createFloatUniform("iExposure", 14, 1.0f, 0.0f, 3.0f);
+		createFloatUniform("iExposure", mSDASettings->IEXPOSURE, 1.0f, 0.0f, 3.0f);
 		// Pixelate
-		createFloatUniform("iPixelate", 15, 1.0f, 0.01f);
+		createFloatUniform("iPixelate", mSDASettings->IPIXELATE, 1.0f, 0.01f);
 		// Trixels
-		createFloatUniform("iTrixels", 16, 0.0f);
+		createFloatUniform("iTrixels", mSDASettings->ITRIXELS, 0.0f);
 		// iChromatic
-		createFloatUniform("iChromatic", 17, 0.0f, 0.000000001f);
+		createFloatUniform("iChromatic", mSDASettings->ICHROMATIC, 0.0f, 0.000000001f);
 		// iCrossfade
-		createFloatUniform("iCrossfade", 18, 1.0f);
+		createFloatUniform("iCrossfade", mSDASettings->IXFADE, 1.0f);
 		// background red
 		createFloatUniform("iBR", 19, 0.1f);
 		// background green
@@ -122,7 +122,7 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		createFloatUniform("iResolutionX", 29, mSDASettings->mFboWidth, 0.01f, 1280.0f);
 		// iResolutionY (should be fboheight)  
 		createFloatUniform("iResolutionY", 30, mSDASettings->mFboHeight, 0.01f, 800.0f);
-		// nanokontrol middle row 31 to 38, bottom row 41 to 88
+		// nanokontrol middle row 31 to 38, bottom row 41 to 48
 		// iFreq0  
 		createFloatUniform("iFreq0", 31, 0.0f, 0.01f, 256.0f);
 		// iFreq1  
@@ -132,9 +132,9 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		// iFreq3  
 		createFloatUniform("iFreq3", 34, 0.0f, 0.01f, 256.0f);
 		// iMouseX  
-		createFloatUniform("iMouseX", 35, 320.0f, 0.0f, 640.0f);
+		createFloatUniform("iMouseX", 35, 320.0f, 0.0f, 1280.0f);
 		// iMouseY  
-		createFloatUniform("iMouseY", 36, 240.0f, 0.0f, 480.0f);
+		createFloatUniform("iMouseY", 36, 240.0f, 0.0f, 800.0f);
 		// iMouseZ  
 		createFloatUniform("iMouseZ", 37, 0.0f, 0.0f, 1.0f);
 
@@ -176,6 +176,15 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 	{
 		createSampler2DUniform("iChannel" + toString(i), 100 + i, i);// TODO verify doesn't mess up type (uint!)
 	}
+	// iRHandX  
+	createFloatUniform("iRHandX", mSDASettings->IRHANDX, 320.0f, 0.0f, 1280.0f);
+	// iRHandY  
+	createFloatUniform("iRHandY", mSDASettings->IRHANDY, 240.0f, 0.0f, 800.0f);
+	// iLHandX  
+	createFloatUniform("iLHandX", mSDASettings->ILHANDX, 320.0f, 0.0f, 1280.0f);
+	// iLHandY  
+	createFloatUniform("iLHandY", mSDASettings->ILHANDY, 240.0f, 0.0f, 800.0f);
+
 	load();
 	loadAnimation();
 	CI_LOG_V("SDAAnimation, iResX:" + toString(getFloatUniformValueByIndex(29)));

@@ -23,7 +23,45 @@ namespace SophiaDigitalArt {
 
 		//! maximum number of fbos, shaders, textures
 		static const int			MAX = 14;
+		// uniform indexes
+		static const int			ITIME = 0;
+		static const int			IFR = 1;
+		static const int			IFG = 2;
+		static const int			IFB = 3;
+		static const int			IFA = 4;
+		static const int			ISTEPS = 10;
+		static const int			IRATIO = 11;
+		static const int			IEXPOSURE = 14;
+		static const int			IPIXELATE = 15;
+		static const int			ITRIXELS = 16;
+		static const int			ICHROMATIC = 17;
+		static const int			IXFADE = 18;
+		static const int			IWEIGHT0 = 19;
+		static const int			IPARAM1 = 20;
+		static const int			IPARAM2 = 21;
+		static const int			ISOBEL = 22;
+		static const int			IWEIGHT1 = 23;
 		static const int			IFPS = 25;
+		static const int			IWEIGHT2 = 27;
+		static const int			IRESX = 29;
+		static const int			IRESY = 30;
+		static const int			IWEIGHT3 = 31;
+		static const int			ISPEED = 32;
+		static const int			IBR = 40;
+		static const int			IBG = 41;
+		static const int			IBB = 42;
+		static const int			IFREQ0 = 43;
+		static const int			IFREQ1 = 44;
+		static const int			IFREQ2 = 45;
+		static const int			IFREQ3 = 46;
+		static const int			IWEIGHT4 = 49;
+		static const int			IGLITCH = 81;
+		static const int			ITOGGLE = 83;
+		static const int			IINVERT = 86;
+		static const int			IRHANDX = 110;
+		static const int			IRHANDY = 111;
+		static const int			ILHANDX = 112;
+		static const int			ILHANDY = 113;
 		// texture modes
 		static const int			TEXTUREMODEMIX = 0;				// mix two shaders
 		static const int			TEXTUREMODEAUDIO = 1;			// audio spectrum
@@ -85,7 +123,6 @@ namespace SophiaDigitalArt {
 		string						mImageFile;
 
 		// shader uniforms	
-		static const int			ITIME = 0;
 		float						iSpeedMultiplier;        // speed multiplier
 		float						iChannelTime[4];
 		bool						iFade;

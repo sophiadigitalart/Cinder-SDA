@@ -85,6 +85,7 @@ void SDAWebsocket::parseMessage(string msg) {
 	mSDASettings->mWebSocketsNewMsg = true;
 	if (!msg.empty()) {
 		mSDASettings->mWebSocketsMsg += ": " + msg;
+		CI_LOG_V("ws msg: ") + msg;
 		string first = msg.substr(0, 1);
 		if (first == "{") {
 			// json
