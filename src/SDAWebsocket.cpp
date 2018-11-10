@@ -428,14 +428,14 @@ void SDAWebsocket::toggleValue(unsigned int aIndex) {
 void SDAWebsocket::resetAutoAnimation(unsigned int aIndex) {
 	// reset
 	mSDAAnimation->resetAutoAnimation(aIndex);
-	// TODO send json	
+	// TODO: send json	
 }
 
 void SDAWebsocket::changeBoolValue(unsigned int aControl, bool aValue) {
 	// check if changed
 	mSDAAnimation->setBoolUniformValueByIndex(aControl, aValue);
 	stringstream sParams;
-	// TODO check boolean value:
+	// TODO: check boolean value:
 	sParams << "{\"params\" :[{\"name\" : " << aControl << ",\"value\" : " << (int)aValue << "}]}";
 	string strParams = sParams.str();
 	sendJSON(strParams);

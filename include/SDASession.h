@@ -80,6 +80,15 @@ namespace SophiaDigitalArt {
 		void							resetAutoAnimation(unsigned int aIndex);
 		float							getMinUniformValueByIndex(unsigned int aIndex);
 		float							getMaxUniformValueByIndex(unsigned int aIndex);
+		vec2							getVec2UniformValueByIndex(unsigned int aIndex) {
+			return mSDAAnimation->getVec2UniformValueByIndex(aIndex);
+		};
+		vec3							getVec3UniformValueByIndex(unsigned int aIndex) {
+			return mSDAAnimation->getVec3UniformValueByIndex(aIndex);
+		};
+		vec4							getVec4UniformValueByIndex(unsigned int aIndex) {
+			return mSDAAnimation->getVec4UniformValueByIndex(aIndex);
+		};
 		int								getSampler2DUniformValueByName(string aName) {
 			return mSDAAnimation->getSampler2DUniformValueByName(aName);
 		};
