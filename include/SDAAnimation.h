@@ -42,7 +42,7 @@ namespace SophiaDigitalArt
 	};
 
 	class SDAAnimation {
-	public:		
+	public:
 		SDAAnimation(SDASettingsRef aSDASettings);
 
 		static SDAAnimationRef			create(SDASettingsRef aSDASettings)
@@ -57,7 +57,7 @@ namespace SophiaDigitalArt
 		float							getExposure() { return mExposure; };
 		void							setExposure(float aExposure);
 		bool							getAutoBeatAnimation() { return mAutoBeatAnimation; };
-		void							setAutoBeatAnimation( bool aAutoBeatAnimation);
+		void							setAutoBeatAnimation(bool aAutoBeatAnimation);
 
 		const int						mBlendModes = 28;
 		void							blendRenderEnable(bool render) { mBlendRender = render; };
@@ -66,15 +66,14 @@ namespace SophiaDigitalArt
 		float							iTimeFactor;
 		bool							mUseTimeWithTempo;
 		float							iTempoTimeBeatPerBar;
-		float							getBpm() { return mBpm; };
-		void							setBpm(float aBpm) { iDeltaTime = 60 / mBpm; mBpm = aBpm; };
+		float							getBpm() { return getFloatUniformValueByIndex(mSDASettings->IBPM); };
+		void							setBpm(float aBpm) { setFloatUniformValueByIndex(mSDASettings->IBPM, aBpm); iDeltaTime = 60 / getFloatUniformValueByIndex(mSDASettings->IBPM); };
 		void							tapTempo();
 		void							setTimeFactor(const int &aTimeFactor);
 		int								getEndFrame() { return mEndFrame; };
 		void							setEndFrame(int frame) { mEndFrame = frame; };
 
-		//int							iBar;
-		//int								iBeatIndex; //1 to beatsperbar
+
 		// animation
 		int								currentScene;
 		//int							getBadTV(int frame);
@@ -82,7 +81,7 @@ namespace SophiaDigitalArt
 		bool							handleKeyDown(KeyEvent &event);
 		bool							handleKeyUp(KeyEvent &event);
 		// audio
-		float							maxVolume;		
+		float							maxVolume;
 		static const int				mWindowSize = 128; // fft window size
 		float							iFreqs[mWindowSize];
 		void							preventLineInCrash(); // at next launch
@@ -96,7 +95,7 @@ namespace SophiaDigitalArt
 		void							setUseLineIn(bool useLineIn) {
 			mSDASettings->mUseLineIn = useLineIn;
 		};
-		void							toggleUseLineIn() { mSDASettings->mUseLineIn =  !mSDASettings->mUseLineIn; };
+		void							toggleUseLineIn() { mSDASettings->mUseLineIn = !mSDASettings->mUseLineIn; };
 
 		// audio
 		bool							isAudioBuffered() { return mAudioBuffered; };
@@ -185,7 +184,9 @@ namespace SophiaDigitalArt
 
 		// timed animation
 		int								mEndFrame;
-		//int								iBeatsPerBar;
+		//int							iBar;
+		//int							iPhaseIndex; //1 to beatsperbar
+		//int							iBeatsPerBar;
 		int								getFreqIndexSize() { return freqIndexes.size(); };
 		int								getFreqIndex(unsigned int aFreqIndex) { return freqIndexes[aFreqIndex]; };
 		void							setFreqIndex(unsigned int aFreqIndex, unsigned int aFreq) { freqIndexes[aFreqIndex] = aFreq; };
@@ -246,7 +247,7 @@ namespace SophiaDigitalArt
 		bool							mFlipV;
 		bool							mBlendRender;
 		// timed animation
-		float							mBpm;
+		//float							mBpm;
 
 	};
 }

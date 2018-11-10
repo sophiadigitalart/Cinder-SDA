@@ -362,7 +362,7 @@ namespace SophiaDigitalArt {
 			mGlslBlend->uniform("iTempoTime", mSDAAnimation->getFloatUniformValueByName("iTempoTime"));
 			mGlslBlend->uniform("iGlitch", (int)mSDAAnimation->getBoolUniformValueByIndex(45));
 			mGlslBlend->uniform("iTrixels", mSDAAnimation->getFloatUniformValueByIndex(16));
-			mGlslBlend->uniform("iBeat", mSDASettings->iBeat);
+			//mGlslBlend->uniform("iPhase", mSDASettings->iPhase);
 			mGlslBlend->uniform("iSeed", mSDASettings->iSeed);
 			mGlslBlend->uniform("iRedMultiplier", mSDAAnimation->getFloatUniformValueByName("iRedMultiplier"));
 			mGlslBlend->uniform("iGreenMultiplier", mSDAAnimation->getFloatUniformValueByName("iGreenMultiplier"));

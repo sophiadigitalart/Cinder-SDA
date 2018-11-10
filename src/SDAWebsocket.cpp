@@ -85,7 +85,7 @@ void SDAWebsocket::parseMessage(string msg) {
 	mSDASettings->mWebSocketsNewMsg = true;
 	if (!msg.empty()) {
 		mSDASettings->mWebSocketsMsg += ": " + msg;
-		CI_LOG_V("ws msg: ") + msg;
+		CI_LOG_V("ws msg: " + msg);
 		string first = msg.substr(0, 1);
 		if (first == "{") {
 			// json
@@ -102,6 +102,19 @@ void SDAWebsocket::parseMessage(string msg) {
 						mSDAAnimation->setFloatUniformValueByIndex(name, value);
 					}
 				}
+
+				if (json.hasChild("k2")) {
+					JsonTree jsonParams = json.getChild("k2");
+					for (JsonTree::ConstIter jsonElement = jsonParams.begin(); jsonElement != jsonParams.end(); ++jsonElement) {
+						int name = jsonElement->getChild("name").getValue<int>();
+						string value = jsonElement->getChild("value").getValue();
+						vector<string> vs = split(value, ",");
+						vec4 v = vec4(strtof((vs[0]).c_str(), 0), strtof((vs[1]).c_str(), 0), strtof((vs[2]).c_str(), 0), strtof((vs[3]).c_str(), 0));
+						// basic name value 
+						mSDAAnimation->setVec4UniformValueByIndex(name, v);
+					}
+				}
+
 				if (json.hasChild("event")) {
 					JsonTree jsonEvent = json.getChild("event");
 					string val = jsonEvent.getValue();

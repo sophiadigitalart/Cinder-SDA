@@ -42,8 +42,10 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 	// init timer
 	mTimer.start();
 	startTime = currentTime = mTimer.getSeconds();
-	mBpm = 166;
-	iDeltaTime = 60 / mBpm;//mTempo;
+	//mBpm = 166;
+	//iDeltaTime = 60 / mBpm;//mTempo;
+	setFloatUniformValueByIndex(mSDASettings->IBPM, 166.0f);
+	iDeltaTime = 60 / getFloatUniformValueByIndex(mSDASettings->IBPM);
 	//iBar = 0;
 	//iBadTvRunning = false;
 	//int ctrl;
@@ -144,7 +146,7 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		// greyscale 
 		createIntUniform("iGreyScale", 51, 0);
 		// current beat
-		createIntUniform("iBeat", 52, 1);
+		createIntUniform("iPhase", mSDASettings->IPHASE, 0);
 		// beats per bar 
 		createIntUniform("iBeatsPerBar", 53, 4);
 
@@ -170,6 +172,35 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		createBoolUniform("iToggle", 46);
 		// vignette
 		createBoolUniform("iVignette", 47);
+
+		// vec4 kinect2
+		createVec4Uniform("iSpineBase", 200, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("SpineMid", 201, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("Neck", 202, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("Head", 203, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("ShldrL", 204, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("ElbowL", 205, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("WristL", 206, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("HandL", 207, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("ShldrR", 208, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("ElbowR", 209, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("WristR", 210, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("HandR", 211, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("HipL", 212, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("KneeL", 213, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("AnkleL", 214, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("FootL", 215, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("HipR", 216, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("KneeR", 217, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("AnkleR", 218, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("FootR", 219, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("SpineShldr", 220, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("HandTipL", 221, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("ThumbL", 222, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("HandTipR", 223, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+		createVec4Uniform("ThumbR", 224, vec4(320.0f, 240.0f, 0.0f, 0.0f));
+
+
 	}
 	// textures
 	for (size_t i = 0; i < 8; i++)
@@ -327,6 +358,7 @@ void SDAAnimation::boolFromJson(const ci::JsonTree &json) {
 //! uniform to json
 JsonTree SDAAnimation::uniformToJson(int i)
 {
+	stringstream svec4;
 	JsonTree		json;
 	string s = controlIndexes[i];
 
@@ -347,6 +379,12 @@ JsonTree SDAAnimation::uniformToJson(int i)
 	case 1:
 		// sampler2d
 		u.addChild(ci::JsonTree("textureindex", shaderUniforms[s].textureIndex));
+		break;
+	case 4:
+		// vec4
+		svec4 << toString(shaderUniforms[s].vec4Value.x) << "," << toString(shaderUniforms[s].vec4Value.y);
+		svec4 << "," << toString(shaderUniforms[s].vec4Value.z) << "," << toString(shaderUniforms[s].vec4Value.w);
+		u.addChild(ci::JsonTree("value", svec4.str()));
 		break;
 	case 5:
 		// int
@@ -659,15 +697,15 @@ void SDAAnimation::update() {
 
 	int time = (currentTime - startTime)*1000000.0;
 	int elapsed = iDeltaTime*1000000.0;
-	int elapsedBeatPerBar = iDeltaTime / shaderUniforms["iBeatsPerBar"].intValue*1000000.0;
+	int elapsedBeatPerBar = iDeltaTime / (shaderUniforms["iBeatsPerBar"].intValue + 1)*1000000.0;
 	if (elapsedBeatPerBar > 0)
 	{
 		double moduloBeatPerBar = (time % elapsedBeatPerBar) / 1000000.0;
 		iTempoTimeBeatPerBar = (float)moduloBeatPerBar;
 		if (iTempoTimeBeatPerBar < previousTimeBeatPerBar)
 		{
-			if (shaderUniforms["iBeat"].intValue > shaderUniforms["iBeatsPerBar"].intValue ) shaderUniforms["iBeat"].intValue = 0;
-			shaderUniforms["iBeat"].intValue++;
+			if (shaderUniforms["iPhase"].intValue > shaderUniforms["iBeatsPerBar"].intValue ) shaderUniforms["iPhase"].intValue = 0;
+			shaderUniforms["iPhase"].intValue++;
 		}
 		previousTimeBeatPerBar = iTempoTimeBeatPerBar;
 	}
@@ -678,7 +716,7 @@ void SDAAnimation::update() {
 		if (shaderUniforms["iTempoTime"].floatValue < previousTime)
 		{
 			//iBar++;
-			if (mAutoBeatAnimation) mSDASettings->iBeat++;
+			//if (mAutoBeatAnimation) mSDASettings->iPhase++;
 		}
 		previousTime = shaderUniforms["iTempoTime"].floatValue;
 

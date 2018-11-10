@@ -551,9 +551,9 @@ namespace SophiaDigitalArt {
 			}
 			else {
 				if (mSyncToBeat) {
-					//newPosition = (int)(((int)(mSDAAnimation->iBar / mSDAAnimation->iBeatIndex)) % mSequenceTextures.size());
-					// TODO newPosition = (int)(((int)(mSDASettings->iBeat / mSDAAnimation->iBeatIndex)) % mSequenceTextures.size());
-					newPosition = (int)(mSDAAnimation->getIntUniformValueByName("iBeat") % mSequenceTextures.size());
+					//newPosition = (int)(((int)(mSDAAnimation->iBar / mSDAAnimation->iPhaseIndex)) % mSequenceTextures.size());
+					// TODO newPosition = (int)(((int)(mSDASettings->iPhase / mSDAAnimation->iPhaseIndex)) % mSequenceTextures.size());
+					newPosition = (int)(mSDAAnimation->getIntUniformValueByName("iPhase") % mSequenceTextures.size());
 				}
 				else {
 					newPosition = mPosition;

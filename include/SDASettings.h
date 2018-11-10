@@ -60,8 +60,12 @@ namespace SophiaDigitalArt {
 		static const int			IINVERT = 86;
 		static const int			IRHANDX = 110;
 		static const int			IRHANDY = 111;
-		static const int			ILHANDX = 112;
-		static const int			ILHANDY = 113;
+		static const int			IRHANDZ = 112;
+		static const int			ILHANDX = 113;
+		static const int			ILHANDY = 114;
+		static const int			ILHANDZ = 115;
+		static const int			IBPM = 220;
+		static const int			IPHASE = 221;
 		// texture modes
 		static const int			TEXTUREMODEMIX = 0;				// mix two shaders
 		static const int			TEXTUREMODEAUDIO = 1;			// audio spectrum
@@ -183,7 +187,7 @@ namespace SophiaDigitalArt {
 		bool						mIsPlaying;
 		bool						mUseAudio;
 		bool						mUseLineIn;
-		int							iBeat;
+		//int							iPhase;
 		int							mFftSize;
 		int							mWindowSize;
 		float						iSeed;
