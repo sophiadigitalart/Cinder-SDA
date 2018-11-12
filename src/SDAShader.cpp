@@ -94,11 +94,24 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 	try
 	{
 		//CI_LOG_V("before regex " + mOriginalFragmentString);
-
+				// shadertoy: 
+		// change void mainImage( out vec4 fragColor, in vec2 fragCoord ) to void main(void)
+		std::regex pattern{ "mainImage" };
+		std::string replacement{ "main" };
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
+		pattern = { " out vec4 fragColor," };
+		replacement = { "void" };
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
+		pattern = { " in vec2 fragCoord" };
+		replacement = { "" };
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
+		pattern = { " vec2 fragCoord" };
+		replacement = { "" };
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
 		// html glslEditor:
 		// change vec2 u_resolution to vec3 iResolution
-		std::regex pattern{ "2 u_r" };
-		std::string replacement{ "3 iR" };
+		pattern = { "2 u_r" };
+		replacement = { "3 iR" };
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
 		pattern = { "u_r" };
 		replacement = { "iR" };

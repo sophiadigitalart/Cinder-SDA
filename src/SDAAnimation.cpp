@@ -84,7 +84,7 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		// ratio
 		createFloatUniform("iRatio", mSDASettings->IRATIO, 20.0f, 0.00000000001f, 20.0f);
 		// zoom
-		createFloatUniform("iZoom", 12, 1.0f, -3.0f, 3.0f);
+		createFloatUniform("iZoom", mSDASettings->IZOOM, 1.0f, -3.0f, 3.0f);
 		// Audio multfactor 
 		createFloatUniform("iAudioMult", 13, 1.0f, 0.01f, 12.0f);
 		// exposure
@@ -97,17 +97,27 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		createFloatUniform("iChromatic", mSDASettings->ICHROMATIC, 0.0f, 0.000000001f);
 		// iCrossfade
 		createFloatUniform("iCrossfade", mSDASettings->IXFADE, 1.0f);
-		// background red
-		createFloatUniform("iBR", 19, 0.1f);
-		// background green
-		createFloatUniform("iBG", 20, 0.5f);
-		// background blue
-		createFloatUniform("iBB", 21, 0.1f);
-
+		// akai faders: 19,23,27,31,49,53,57,61,master:62
+		// weight mix fbo texture 0
+		createFloatUniform("iWeight0", mSDASettings->IWEIGHT0, 1.0f); // 19
+		// slitscan (or other) Param1 
+		createFloatUniform("iParam1", mSDASettings->IPARAM1, 1.0f, 0.01f, 100.0f); // 20
+		// gstnsmk
+		createFloatUniform("iSobel", mSDASettings->ISOBEL, 0.02f, 0.02f, 1.0f); // 22
+		// weight texture 1
+		createFloatUniform("iWeight1", mSDASettings->IWEIGHT1, 0.0f); // 23
+		// slitscan (or other) Param2 
+		createFloatUniform("iParam2", mSDASettings->IPARAM2, 1.0f, 0.01f, 100.0f); // 24
+		// weight texture 2
+		createFloatUniform("iWeight2", mSDASettings->IWEIGHT2, 0.0f); // 27
+		// weight texture 3
+		createFloatUniform("iWeight3", mSDASettings->IWEIGHT3, 0.0f); // 31
+		// weight texture 4
+		createFloatUniform("iWeight4", mSDASettings->IWEIGHT4, 0.0f); // 49
 
 		// top row 21 to 28
 		// Speed 
-		createFloatUniform("iSpeed", 22, 12.0f, 0.01f, 12.0f);
+		createFloatUniform("iSpeed", mSDASettings->ISPEED, 12.0f, 0.01f, 12.0f); // 32
 		// background alpha
 		createFloatUniform("iBA", 23, 0.2f);
 		// tempo time
@@ -139,6 +149,16 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		createFloatUniform("iMouseY", 36, 240.0f, 0.0f, 800.0f);
 		// iMouseZ  
 		createFloatUniform("iMouseZ", 37, 0.0f, 0.0f, 1.0f);
+		// vignette amount
+		createFloatUniform("iVAmount", 38, 0.91f, 0.0f, 1.0f);
+		// vignette falloff
+		createFloatUniform("iVFallOff", 39, 0.31f, 0.0f, 1.0f);
+		// background red
+		createFloatUniform("iBR", mSDASettings->IBR, 0.1f);
+		// background green
+		createFloatUniform("iBG", mSDASettings->IBG, 0.5f);
+		// background blue
+		createFloatUniform("iBB", mSDASettings->IBB, 0.1f);
 
 		// int
 		// blend mode 
