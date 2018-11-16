@@ -273,7 +273,7 @@ namespace SophiaDigitalArt {
 		mGlslMix->uniform("iWeight2", mSDAAnimation->getFloatUniformValueByIndex(37));	// weight of channel 2
    
 		mGlslMix->uniform("iBlendmode", mSDASettings->iBlendmode);
-		mGlslMix->uniform("iGlobalTime", mSDAAnimation->getFloatUniformValueByIndex(0));
+		mGlslMix->uniform("iTime", mSDAAnimation->getFloatUniformValueByIndex(0));
 		// was vec3(mSDASettings->mFboWidth, mSDASettings->mFboHeight, 1.0)):
 		mGlslMix->uniform("iResolution", vec3(mSDAAnimation->getFloatUniformValueByName("iResolutionX"), mSDAAnimation->getFloatUniformValueByName("iResolutionY"), 1.0));
 		//mGlslMix->uniform("iChannelResolution", mSDASettings->iChannelResolution, 4);
@@ -319,7 +319,7 @@ namespace SophiaDigitalArt {
 		if (mSDAAnimation->renderBlend()) {
 			mCurrentBlend = getElapsedFrames() % mSDAAnimation->getBlendModesCount();
 			mGlslBlend->uniform("iBlendmode", mCurrentBlend);
-			mGlslBlend->uniform("iGlobalTime", mSDAAnimation->getFloatUniformValueByIndex(0));
+			mGlslBlend->uniform("iTime", mSDAAnimation->getFloatUniformValueByIndex(0));
 			mGlslBlend->uniform("iResolution", vec3(mSDASettings->mPreviewFboWidth, mSDASettings->mPreviewFboHeight, 1.0));
 			//mGlslBlend->uniform("iChannelResolution", mSDASettings->iChannelResolution, 4);
 			// 20180318 mGlslBlend->uniform("iMouse", mSDAAnimation->getVec4UniformValueByName("iMouse"));

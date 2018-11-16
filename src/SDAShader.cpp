@@ -126,7 +126,7 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		replacement = { "iM" };
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
 		pattern = { "u_time" };
-		replacement = { "iGlobalTime" };
+		replacement = { "iTime" };
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
 		pattern = { "u_" };
 		replacement = { "i" };
@@ -159,9 +159,6 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		std::string ISFReplacement{ "RENDERSIZE" };
 		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
 		ISFPattern = { "iTime" };
-		ISFReplacement = { "TIME" };
-		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
-		ISFPattern = { "iGlobalTime" };
 		ISFReplacement = { "TIME" };
 		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
 

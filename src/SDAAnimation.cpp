@@ -56,7 +56,7 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 	}
 	else {
 		// global time in seconds
-		createFloatUniform("iGlobalTime", mSDASettings->ITIME, 0.0f);
+		createFloatUniform("iTime", mSDASettings->ITIME, 0.0f);
 		// sliders
 		// red
 		createFloatUniform("iFR", mSDASettings->IFR, 1.0f);
@@ -532,7 +532,7 @@ void SDAAnimation::resetAutoAnimation(unsigned int aIndex) {
 
 bool SDAAnimation::setFloatUniformValueByIndex(unsigned int aIndex, float aValue) {
 	bool rtn = false;
-	// we can't change iGlobalTime at index 0
+	// we can't change iTime at index 0
 	if (aIndex > 0) {
 		/*if (aIndex == 31) {
 			CI_LOG_V("old value " + toString(shaderUniforms[getUniformNameForIndex(aIndex)].floatValue) + " newvalue " + toString(aValue));
@@ -694,16 +694,16 @@ void SDAAnimation::update() {
 	mSDASettings->iChannelTime[1] = getElapsedSeconds() - 1;
 	mSDASettings->iChannelTime[2] = getElapsedSeconds() - 2;
 	mSDASettings->iChannelTime[3] = getElapsedSeconds() - 3;
-	// iGlobalTime
+	// iTime
 	if (mUseTimeWithTempo)
 	{
-		shaderUniforms["iGlobalTime"].floatValue = shaderUniforms["iTempoTime"].floatValue*iTimeFactor;
+		shaderUniforms["iTime"].floatValue = shaderUniforms["iTempoTime"].floatValue*iTimeFactor;
 	}
 	else
 	{
-		shaderUniforms["iGlobalTime"].floatValue = getElapsedSeconds();
+		shaderUniforms["iTime"].floatValue = getElapsedSeconds();
 	}
-	shaderUniforms["iGlobalTime"].floatValue *= mSDASettings->iSpeedMultiplier;
+	shaderUniforms["iTime"].floatValue *= mSDASettings->iSpeedMultiplier;
 	// iDate
 	time_t now = time(0);
 	tm *   t = gmtime(&now);
