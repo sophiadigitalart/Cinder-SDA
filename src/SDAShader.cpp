@@ -8,7 +8,7 @@ SDAShader::SDAShader(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation,
 	mValid = false;
 	mActive = true;
 	// shadertoy include
-	shaderInclude = loadString(loadAsset("shadertoy.inc"));
+	shaderInclude = loadString(loadAsset("shadertoy.min"));
 	mSDASettings = aSDASettings;
 	mSDAAnimation = aSDAAnimation;
 	mError = "";
