@@ -2,10 +2,9 @@
 
 using namespace SophiaDigitalArt;
 
-SDAWebsocket::SDAWebsocket(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation, SDAMixRef aSDAMix) {
+SDAWebsocket::SDAWebsocket(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation) {
 	mSDASettings = aSDASettings;
 	mSDAAnimation = aSDAAnimation;
-	mSDAMix = aSDAMix;
 
 	CI_LOG_V("SDAWebsocket constructor");
 	shaderReceived = false;

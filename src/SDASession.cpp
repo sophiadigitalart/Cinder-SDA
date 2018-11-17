@@ -28,10 +28,8 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 	mZoom = 1.0f;
 	mSelectedWarp = 0;
 
-	// Mix
-	mSDAMix = SDAMix::create(mSDASettings, mSDAAnimation);
 	// Websocket
-	mSDAWebsocket = SDAWebsocket::create(mSDASettings, mSDAAnimation, mSDAMix);
+	mSDAWebsocket = SDAWebsocket::create(mSDASettings, mSDAAnimation);
 	// Message router
 	mSDARouter = SDARouter::create(mSDASettings, mSDAAnimation, mSDAWebsocket);
 	// warping
@@ -58,6 +56,32 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 	cmd = -1;
 	mFreqWSSend = false;
 	mEnabledAlphaBlending = true;
+	// mix
+			// initialize the textures list with audio texture
+	mTexturesFilepath = getAssetPath("") / mSDASettings->mAssetsPath / "textures.xml";
+	initTextureList();
+
+	// initialize the shaders list 
+	initShaderList();
+	mMixesFilepath = getAssetPath("") / "mixes.xml";
+	/*if (fs::exists(mMixesFilepath)) {
+		// load textures from file if one exists
+		// TODO readSettings(mSDASettings, mSDAAnimation, loadFile(mMixesFilepath));
+		}*/
+		// render fbo
+	mRenderFbo = gl::Fbo::create(mSDASettings->mRenderWidth, mSDASettings->mRenderHeight, fboFmt);
+
+	mCurrentBlend = 0;
+	for (size_t i = 0; i < mSDAAnimation->getBlendModesCount(); i++)
+	{
+		mBlendFbos[i] = gl::Fbo::create(mSDASettings->mPreviewFboWidth, mSDASettings->mPreviewFboHeight, fboFmt);
+	}
+
+	mGlslMix = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixFragmentShaderString());
+	// 20161209 problem on Mac mGlslMix->setLabel("mixfbo");
+	mGlslBlend = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixFragmentShaderString());
+	// 20161209 problem on Mac mGlslBlend->setLabel("blend mixfbo");
+
 }
 
 SDASessionRef SDASession::create(SDASettingsRef aSDASettings)
@@ -95,7 +119,7 @@ void SDASession::fromXml(const XmlTree &xml) {
 		CI_LOG_V("SDASession got fbo childs");
 		for (XmlTree::ConstIter fboChild = xml.begin("fbo"); fboChild != xml.end(); ++fboChild) {
 			CI_LOG_V("SDASession create fbo ");
-			mSDAMix->createShaderFbo(fboChild->getAttributeValue<string>("shadername", ""), 0);
+			createShaderFbo(fboChild->getAttributeValue<string>("shadername", ""), 0);
 		}
 	}
 }
@@ -119,9 +143,6 @@ float SDASession::getMaxUniformValueByIndex(unsigned int aIndex) {
 	return mSDAAnimation->getMaxUniformValueByIndex(aIndex);
 }
 
-void SDASession::resize() {
-	mSDAMix->resize();
-}
 void SDASession::update(unsigned int aClassIndex) {
 
 	if (aClassIndex == 0) {
@@ -146,13 +167,13 @@ void SDASession::update(unsigned int aClassIndex) {
 
 		// fps calculated in main app
 		mSDASettings->sFps = toString(floor(getFloatUniformValueByIndex(mSDASettings->IFPS)));
-		mSDAMix->update();
+		
 		mSDAAnimation->update();
 
 	}
 	else {
 		// aClassIndex == 1 (audio analysis only)
-		mSDAMix->updateAudio();
+		updateAudio();
 	}
 	// all cases
 	mSDAWebsocket->update();
@@ -165,8 +186,7 @@ void SDASession::update(unsigned int aClassIndex) {
 }
 bool SDASession::save()
 {
-	// save warp settings
-	mSDAMix->save();
+
 	// save uniforms settings
 	mSDAAnimation->save();
 	// save in sessionPath
@@ -201,7 +221,7 @@ bool SDASession::save()
 void SDASession::restore()
 {
 	// save load settings
-	mSDAMix->load();
+	load();
 
 	// check to see if json file exists
 	if (!fs::exists(sessionPath)) {
@@ -320,54 +340,34 @@ void SDASession::fileDrop(FileDropEvent event) {
 }
 #pragma region events
 bool SDASession::handleMouseMove(MouseEvent &event)
-{
-	bool handled = true;
+{	
 	// 20180318 handled in SDAUIMouse mSDAAnimation->setVec4UniformValueByIndex(70, vec4(event.getX(), event.getY(), event.isLeftDown(), event.isRightDown()));
-	// pass this mouse event to the warp editor first
-	if (!mSDAMix->handleMouseMove(event)) {
-		// let your application perform its mouseMove handling here
-		handled = false;
-	}
+	// pass this mouse event to the warp editor first	
+	bool handled = false;	
 	event.setHandled(handled);
 	return event.isHandled();
 }
 
 bool SDASession::handleMouseDown(MouseEvent &event)
 {
-	bool handled = true;
+	bool handled = false;
 	// 20180318 handled in SDAUIMouse mSDAAnimation->setVec4UniformValueByIndex(70, vec4(event.getX(), event.getY(), event.isLeftDown(), event.isRightDown()));
-	// pass this mouse event to the warp editor first
-	if (!mSDAMix->handleMouseDown(event)) {
-		// let your application perform its mouseDown handling here
-		mSDAWebsocket->changeFloatValue(21, event.getX() / getWindowWidth());
-		handled = false;
-	}
 	event.setHandled(handled);
 	return event.isHandled();
 }
 
 bool SDASession::handleMouseDrag(MouseEvent &event)
 {
-	bool handled = true;
+	bool handled = false;
 	// 20180318 handled in SDAUIMouse mSDAAnimation->setVec4UniformValueByIndex(70, vec4(event.getX(), event.getY(), event.isLeftDown(), event.isRightDown()));
-	// pass this mouse event to the warp editor first
-	if (!mSDAMix->handleMouseDrag(event)) {
-		// let your application perform its mouseDrag handling here
-		handled = false;
-	}
 	event.setHandled(handled);
 	return event.isHandled();
 }
 
 bool SDASession::handleMouseUp(MouseEvent &event)
 {
-	bool handled = true;
+	bool handled = false;
 	// 20180318 handled in SDAUIMouse mSDAAnimation->setVec4UniformValueByIndex(70, vec4(event.getX(), event.getY(), event.isLeftDown(), event.isRightDown()));
-	// pass this mouse event to the warp editor first
-	if (!mSDAMix->handleMouseUp(event)) {
-		// let your application perform its mouseUp handling here
-		handled = false;
-	}
 	event.setHandled(handled);
 	return event.isHandled();
 }
@@ -377,8 +377,7 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 	bool handled = true;
 	float newValue;
 
-	// pass this key event to the warp editor first
-	if (!mSDAMix->handleKeyDown(event)) {
+
 		// pass this event to Mix handler
 		if (!mSDAAnimation->handleKeyDown(event)) {
 			switch (event.getCode()) {
@@ -474,7 +473,7 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 				handled = false;
 				break;
 			}
-		}
+
 	}
 	event.setHandled(handled);
 	return event.isHandled();
@@ -482,8 +481,7 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 bool SDASession::handleKeyUp(KeyEvent &event) {
 	bool handled = true;
 
-	// pass this key event to the warp editor first
-	if (!mSDAMix->handleKeyUp(event)) {
+
 		if (!mSDAAnimation->handleKeyUp(event)) {
 			// Animation did not handle the key, so handle it here
 			switch (event.getCode()) {
@@ -519,7 +517,7 @@ bool SDASession::handleKeyUp(KeyEvent &event) {
 				handled = false;
 				break;
 			}
-		}
+		
 	}
 	event.setHandled(handled);
 	return event.isHandled();
@@ -527,41 +525,21 @@ bool SDASession::handleKeyUp(KeyEvent &event) {
 #pragma endregion events
 // fbos
 #pragma region fbos
-bool SDASession::isFlipH() {
-	return mSDAAnimation->isFlipH();
-}
-bool SDASession::isFlipV() {
-	return mSDAAnimation->isFlipV();
-}
-void SDASession::flipH() {
-	mSDAAnimation->flipH();
-}
-void SDASession::flipV() {
-	mSDAAnimation->flipV();
-}
 
-ci::gl::TextureRef SDASession::getMixTexture(unsigned int aMixFboIndex) {
-	return mSDAMix->getMixTexture(aMixFboIndex);
-}
+
+
 int SDASession::loadFragmentShader(string aFilePath) {
 	int rtn = -1;
 	CI_LOG_V("loadFragmentShader " + aFilePath);
-	mSDAMix->createShaderFbo(aFilePath);
+	createShaderFbo(aFilePath);
 
 	return rtn;
 }
 
-string SDASession::getMixFboName(unsigned int aMixFboIndex) {
-	return mSDAMix->getMixFboName(aMixFboIndex);
-}
-
 void SDASession::sendFragmentShader(unsigned int aShaderIndex) {
-	mSDAWebsocket->changeFragmentShader(mSDAMix->getFragmentString(aShaderIndex));
+	mSDAWebsocket->changeFragmentShader(getFragmentString(aShaderIndex));
 }
 
-unsigned int SDASession::getMixFbosCount() {
-	return mSDAMix->getMixFbosCount();
-};
 void SDASession::setFboAIndex(unsigned int aIndex, unsigned int aFboIndex) {
 	/*mSDAMix->setWarpAFboIndex(aIndex, aFboIndex);
 	mSDARouter->setWarpAFboIndex(aIndex, aFboIndex);
@@ -614,3 +592,526 @@ void SDASession::wsWrite(string msg)
 	mSDAWebsocket->wsWrite(msg);
 }
 #pragma endregion websockets
+
+// mix
+#pragma region mix
+void SDASession::setFboFragmentShaderIndex(unsigned int aFboIndex, unsigned int aFboShaderIndex) {
+	CI_LOG_V("setFboFragmentShaderIndex, before, fboIndex: " + toString(aFboIndex) + " shaderIndex " + toString(aFboShaderIndex));
+	if (aFboIndex > mFboList.size() - 1) aFboIndex = mFboList.size() - 1;
+	if (aFboShaderIndex > mShaderList.size() - 1) aFboShaderIndex = mShaderList.size() - 1;
+	CI_LOG_V("setFboFragmentShaderIndex, after, fboIndex: " + toString(aFboIndex) + " shaderIndex " + toString(aFboShaderIndex));
+	mFboList[aFboIndex]->setFragmentShader(aFboShaderIndex, mShaderList[aFboShaderIndex]->getFragmentString(), mShaderList[aFboShaderIndex]->getName());
+	// route message
+	// LOOP! mSDAWebsocket->changeFragmentShader(mShaderList[aFboShaderIndex]->getFragmentString());
+}
+
+unsigned int SDASession::getFboFragmentShaderIndex(unsigned int aFboIndex) {
+	unsigned int rtn = mFboList[aFboIndex]->getShaderIndex();
+	//CI_LOG_V("getFboFragmentShaderIndex, fboIndex: " + toString(aFboIndex)+" shaderIndex: " + toString(rtn));
+	if (rtn > mShaderList.size() - 1) rtn = mShaderList.size() - 1;
+	return rtn;
+}
+string SDASession::getShaderName(unsigned int aShaderIndex) {
+	if (aShaderIndex > mShaderList.size() - 1) aShaderIndex = mShaderList.size() - 1;
+	return mShaderList[aShaderIndex]->getName();
+}
+ci::gl::TextureRef SDASession::getShaderThumb(unsigned int aShaderIndex) {
+	unsigned int found = 0;
+	for (int i = 0; i < mFboList.size(); i++)
+	{
+		if (mFboList[i]->getShaderIndex() == aShaderIndex) found = i;
+	}
+	return getFboRenderedTexture(found);
+}
+void SDASession::updateStream(string * aStringPtr) {
+	int found = -1;
+	for (int i = 0; i < mTextureList.size(); i++)
+	{
+		if (mTextureList[i]->getType() == mTextureList[i]->STREAM) found = i;
+	}
+	if (found < 0) {
+		// create stream texture
+		TextureStreamRef t(new TextureStream(mSDAAnimation));
+		// add texture xml
+		XmlTree			textureXml;
+		textureXml.setTag("texture");
+		textureXml.setAttribute("id", "9");
+		textureXml.setAttribute("texturetype", "stream");
+		t->fromXml(textureXml);
+		mTextureList.push_back(t);
+		found = mTextureList.size() - 1;
+	}
+	mTextureList[found]->loadFromFullPath(*aStringPtr);
+}
+string SDASession::getFragmentShaderString(unsigned int aShaderIndex) {
+	if (aShaderIndex > mShaderList.size() - 1) aShaderIndex = mShaderList.size() - 1;
+	return mShaderList[aShaderIndex]->getFragmentString();
+}
+// shaders
+void SDASession::updateShaderThumbFile(unsigned int aShaderIndex) {
+	for (int i = 0; i < mFboList.size(); i++)
+	{
+		if (mFboList[i]->getShaderIndex() == aShaderIndex) mFboList[i]->updateThumbFile();
+	}
+}
+void SDASession::removeShader(unsigned int aShaderIndex) {
+	if (aShaderIndex > mShaderList.size() - 1) aShaderIndex = mShaderList.size() - 1;
+	mShaderList[aShaderIndex]->removeShader();
+}
+void SDASession::setFragmentShaderString(unsigned int aShaderIndex, string aFragmentShaderString, string aName) {
+	if (aShaderIndex > mShaderList.size() - 1) aShaderIndex = mShaderList.size() - 1;
+	mShaderList[aShaderIndex]->setFragmentString(aFragmentShaderString, aName);
+	// if live coding shader compiles and is used by a fbo reload it
+	for (int i = 0; i < mFboList.size(); i++)
+	{
+		if (mFboList[i]->getShaderIndex() == aShaderIndex) setFboFragmentShaderIndex(i, aShaderIndex);
+	}
+}
+unsigned int SDASession::createShaderFboFromString(string aFragmentShaderString, string aShaderFilename) {
+	unsigned int rtn = 0;
+	// create new shader
+	SDAShaderRef s(new SDAShader(mSDASettings, mSDAAnimation, aShaderFilename, aFragmentShaderString));
+	if (s->isValid()) {
+		mShaderList.push_back(s);
+		rtn = mShaderList.size() - 1;
+		// each shader element has a fbo
+		SDAFboRef f(new SDAFbo(mSDASettings, mSDAAnimation));
+		// create fbo xml
+		XmlTree			fboXml;
+		fboXml.setTag(aShaderFilename);
+		fboXml.setAttribute("id", rtn);
+		fboXml.setAttribute("width", "640");
+		fboXml.setAttribute("height", "480");
+		fboXml.setAttribute("shadername", mShaderList[rtn]->getName());
+		fboXml.setAttribute("inputtextureindex", math<int>::min(rtn, mTextureList.size() - 1));
+		f->fromXml(fboXml);
+		//f->setShaderIndex(rtn);
+		f->setFragmentShader(rtn, mShaderList[rtn]->getFragmentString(), mShaderList[rtn]->getName());
+		mFboList.push_back(f);
+		setFboInputTexture(mFboList.size() - 1, math<int>::min(rtn, mTextureList.size() - 1));
+	}
+	return rtn;
+}
+
+/*string SDASession::getVertexShaderString(unsigned int aShaderIndex) {
+	if (aShaderIndex > mShaderList.size() - 1) aShaderIndex = mShaderList.size() - 1;
+	return mShaderList[aShaderIndex]->getVertexString();
+}*/
+
+
+unsigned int SDASession::createShaderFbo(string aShaderFilename, unsigned int aInputTextureIndex) {
+	// initialize rtn to 0 to force creation
+	unsigned int rtn = 0;
+	string fName = aShaderFilename;
+	if (aShaderFilename.length() > 0) {
+		fs::path mFragFile = getAssetPath("") / mSDASettings->mAssetsPath / aShaderFilename;
+		if (!fs::exists(mFragFile)) {
+			// if file does not exist it may be a full path
+			mFragFile = aShaderFilename;
+		}
+		if (fs::exists(mFragFile)) {
+			// check if mShaderList contains a shader
+			if (mShaderList.size() > 0) {
+				fName = mFragFile.filename().string();
+				// find a removed shader
+				for (int i = mShaderList.size() - 1; i > 0; i--)
+				{
+					if (!mShaderList[i]->isValid() || fName == mShaderList[i]->getName()) { rtn = i; }
+				}
+				// find a not used shader if no removed shader
+				if (rtn == 0) {
+					// first reset all shaders (excluding the first 8 ones)
+					for (int i = mShaderList.size() - 1; i > 8; i--)
+					{
+						mShaderList[i]->setActive(false);
+					}
+
+					// find inactive shader index
+					for (int i = mShaderList.size() - 1; i > 8; i--)
+					{
+						if (!mShaderList[i]->isActive()) rtn = i;
+					}
+				}
+			}
+			// if we found an available slot
+			if (rtn > 0) {
+				if (rtn < mFboList.size()) {
+					if (mShaderList[rtn]->loadFragmentStringFromFile(aShaderFilename)) {
+						mFboList[rtn]->setFragmentShader(rtn, mShaderList[rtn]->getFragmentString(), mShaderList[rtn]->getName());
+					}
+				}
+			}
+			else {
+				// no slot available, create new shader
+				rtn = createShaderFboFromString(loadString(loadFile(mFragFile)), aShaderFilename);
+			}
+			if (rtn > 0) mFboList[rtn]->updateThumbFile();
+		}
+	}
+	return rtn;
+}
+void SDASession::setFboInputTexture(unsigned int aFboIndex, unsigned int aInputTextureIndex) {
+	if (aFboIndex > mFboList.size() - 1) aFboIndex = mFboList.size() - 1;
+	if (aInputTextureIndex > mTextureList.size() - 1) aInputTextureIndex = mTextureList.size() - 1;
+	mFboList[aFboIndex]->setInputTexture(mTextureList, aInputTextureIndex);
+}
+unsigned int SDASession::getFboInputTextureIndex(unsigned int aFboIndex) {
+	if (aFboIndex > mFboList.size() - 1) aFboIndex = mFboList.size() - 1;
+	return mFboList[aFboIndex]->getInputTextureIndex();
+}
+void SDASession::initShaderList() {
+
+	if (mShaderList.size() == 0) {
+		CI_LOG_V("SDASession::init mShaderList");
+		createShaderFboFromString("void main(void){vec2 uv = gl_FragCoord.xy / iResolution.xy;fragColor = vec4(sin(uv.x), sin(uv.y), 0.0, 1.0);}", "tex1");
+		createShaderFboFromString("void main(void){vec2 uv = gl_FragCoord.xy / iResolution.xy;fragColor = texture(iChannel0, uv);}", "tex0");
+		createShaderFboFromString("void main(void){vec2 uv = gl_FragCoord.xy / iResolution.xy;fragColor = texture(iChannel0, uv);}", "tex1");
+	}
+}
+bool SDASession::initTextureList() {
+	bool isFirstLaunch = false;
+	if (mTextureList.size() == 0) {
+		CI_LOG_V("SDASession::init mTextureList");
+		isFirstLaunch = true;
+		// add an audio texture as first texture
+		TextureAudioRef t(new TextureAudio(mSDAAnimation));
+
+		// add texture xml
+		XmlTree			textureXml;
+		textureXml.setTag("texture");
+		textureXml.setAttribute("id", "0");
+		textureXml.setAttribute("texturetype", "audio");
+
+		t->fromXml(textureXml);
+		mTextureList.push_back(t);
+		// then read textures.xml
+		if (fs::exists(mTexturesFilepath)) {
+			// load textures from file if one exists
+			//mTextureList = SDATexture::readSettings(mSDAAnimation, loadFile(mTexturesFilepath));
+			XmlTree			doc;
+			try { doc = XmlTree(loadFile(mTexturesFilepath)); }
+			catch (...) { CI_LOG_V("could not load textures.xml"); }
+			if (doc.hasChild("textures")) {
+				XmlTree xml = doc.getChild("textures");
+				for (XmlTree::ConstIter textureChild = xml.begin("texture"); textureChild != xml.end(); ++textureChild) {
+					CI_LOG_V("texture ");
+
+					string texturetype = textureChild->getAttributeValue<string>("texturetype", "unknown");
+					CI_LOG_V("texturetype " + texturetype);
+					XmlTree detailsXml = textureChild->getChild("details");
+					// read or add the assets path
+					string mFolder = detailsXml.getAttributeValue<string>("folder", "");
+					if (mFolder.length() == 0) detailsXml.setAttribute("folder", mSDASettings->mAssetsPath);
+					// create the texture
+					if (texturetype == "image") {
+						TextureImageRef t(TextureImage::create());
+						t->fromXml(detailsXml);
+						mTextureList.push_back(t);
+					}
+					else if (texturetype == "imagesequence") {
+						TextureImageSequenceRef t(new TextureImageSequence(mSDAAnimation));
+						t->fromXml(detailsXml);
+						mTextureList.push_back(t);
+					}
+					else if (texturetype == "camera") {
+#if (defined(  CINDER_MSW) ) || (defined( CINDER_MAC ))
+						TextureCameraRef t(new TextureCamera());
+						t->fromXml(detailsXml);
+						mTextureList.push_back(t);
+#else
+						// camera not supported on this platform
+						CI_LOG_V("camera not supported on this platform");
+						XmlTree		xml;
+						xml.setTag("details");
+						xml.setAttribute("path", "0.jpg");
+						xml.setAttribute("width", 640);
+						xml.setAttribute("height", 480);
+						t->fromXml(xml);
+						mTextureList.push_back(t);
+#endif
+					}
+					else if (texturetype == "shared") {
+						// TODO CHECK USELESS? #if defined( CINDER_MSW )
+						TextureSharedRef t(new TextureShared());
+						t->fromXml(detailsXml);
+						mTextureList.push_back(t);
+						//#endif
+					}
+					else if (texturetype == "audio") {
+						// audio texture done in initTextures
+					}
+					else if (texturetype == "stream") {
+						// stream texture done when websocket texture received
+					}
+					else {
+						// unknown texture type
+						CI_LOG_V("unknown texture type");
+						TextureImageRef t(new TextureImage());
+						XmlTree		xml;
+						xml.setTag("details");
+						xml.setAttribute("path", "0.jpg");
+						xml.setAttribute("width", 640);
+						xml.setAttribute("height", 480);
+						t->fromXml(xml);
+						mTextureList.push_back(t);
+					}
+				}
+			}
+		}
+	}
+	return isFirstLaunch;
+}
+void SDASession::fboFlipV(unsigned int aFboIndex) {
+	if (aFboIndex > mFboList.size() - 1) aFboIndex = 0;
+	mFboList[aFboIndex]->flipV();
+}
+bool SDASession::isFboFlipV(unsigned int aFboIndex) {
+	if (aFboIndex > mFboList.size() - 1) aFboIndex = 0;
+	return mFboList[aFboIndex]->isFlipV();
+}
+
+#pragma endregion mix
+
+#pragma region textures
+ci::gl::TextureRef SDASession::getInputTexture(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	return mTextureList[aTextureIndex]->getTexture();
+}
+string SDASession::getInputTextureName(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	return mTextureList[aTextureIndex]->getName();
+}
+unsigned int SDASession::getInputTexturesCount() {
+	return mTextureList.size();
+}
+unsigned int SDASession::getInputTextureOriginalWidth(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	return mTextureList[aTextureIndex]->getOriginalWidth();
+}
+unsigned int SDASession::getInputTextureOriginalHeight(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	return mTextureList[aTextureIndex]->getOriginalHeight();
+}
+int SDASession::getInputTextureXLeft(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	return mTextureList[aTextureIndex]->getXLeft();
+}
+void SDASession::setInputTextureXLeft(unsigned int aTextureIndex, int aXLeft) {
+	mTextureList[aTextureIndex]->setXLeft(aXLeft);
+}
+int SDASession::getInputTextureYTop(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	return mTextureList[aTextureIndex]->getYTop();
+}
+void SDASession::setInputTextureYTop(unsigned int aTextureIndex, int aYTop) {
+	mTextureList[aTextureIndex]->setYTop(aYTop);
+}
+int SDASession::getInputTextureXRight(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	return mTextureList[aTextureIndex]->getXRight();
+}
+void SDASession::setInputTextureXRight(unsigned int aTextureIndex, int aXRight) {
+	mTextureList[aTextureIndex]->setXRight(aXRight);
+}
+int SDASession::getInputTextureYBottom(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	return mTextureList[aTextureIndex]->getYBottom();
+}
+void SDASession::setInputTextureYBottom(unsigned int aTextureIndex, int aYBottom) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	mTextureList[aTextureIndex]->setYBottom(aYBottom);
+}
+bool SDASession::isFlipVInputTexture(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	return mTextureList[aTextureIndex]->isFlipV();
+}
+void SDASession::inputTextureFlipV(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	mTextureList[aTextureIndex]->flipV();
+}
+bool SDASession::isFlipHInputTexture(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	return mTextureList[aTextureIndex]->isFlipH();
+}
+void SDASession::inputTextureFlipH(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	mTextureList[aTextureIndex]->flipH();
+}
+
+bool SDASession::getInputTextureLockBounds(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	return mTextureList[aTextureIndex]->getLockBounds();
+}
+void SDASession::toggleInputTextureLockBounds(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	mTextureList[aTextureIndex]->toggleLockBounds();
+}
+void SDASession::togglePlayPause(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	mTextureList[aTextureIndex]->togglePlayPause();
+}
+bool SDASession::loadImageSequence(string aFolder, unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	CI_LOG_V("loadImageSequence " + aFolder + " at textureIndex " + toString(aTextureIndex));
+	// add texture xml
+	XmlTree			textureXml;
+	textureXml.setTag("texture");
+	textureXml.setAttribute("id", "0");
+	textureXml.setAttribute("texturetype", "sequence");
+	textureXml.setAttribute("path", aFolder);
+	TextureImageSequenceRef t(new TextureImageSequence(mSDAAnimation));
+	if (t->fromXml(textureXml)) {
+		mTextureList.push_back(t);
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+void SDASession::loadMovie(string aFile, unsigned int aTextureIndex) {
+
+}
+void SDASession::loadImageFile(string aFile, unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	CI_LOG_V("loadImageFile " + aFile + " at textureIndex " + toString(aTextureIndex));
+	mTextureList[aTextureIndex]->loadFromFullPath(aFile);
+}
+void SDASession::loadAudioFile(string aFile) {
+	mTextureList[0]->loadFromFullPath(aFile);
+}
+bool SDASession::isMovie(unsigned int aTextureIndex) {
+	return false;
+}
+
+// sequence
+bool SDASession::isSequence(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	return (mTextureList[aTextureIndex]->getType() == mTextureList[aTextureIndex]->SEQUENCE);
+}
+bool SDASession::isLoadingFromDisk(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	return (mTextureList[aTextureIndex]->isLoadingFromDisk());
+}
+void SDASession::toggleLoadingFromDisk(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	mTextureList[aTextureIndex]->toggleLoadingFromDisk();
+}
+void SDASession::syncToBeat(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	mTextureList[aTextureIndex]->syncToBeat();
+}
+void SDASession::reverse(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	mTextureList[aTextureIndex]->reverse();
+}
+float SDASession::getSpeed(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	return mTextureList[aTextureIndex]->getSpeed();
+}
+void SDASession::setSpeed(unsigned int aTextureIndex, float aSpeed) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	mTextureList[aTextureIndex]->setSpeed(aSpeed);
+}
+int SDASession::getPosition(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	return mTextureList[aTextureIndex]->getPosition();
+}
+void SDASession::setPlayheadPosition(unsigned int aTextureIndex, int aPosition) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	mTextureList[aTextureIndex]->setPlayheadPosition(aPosition);
+}
+int SDASession::getMaxFrame(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	return mTextureList[aTextureIndex]->getMaxFrame();
+}
+#pragma endregion textures
+void SDASession::load()
+{
+	CI_LOG_V("SDAMix load: ");
+	CI_LOG_V("mMixFbos.size() < mWarps.size(), we create a new mixFbo");
+	mMixFbos[0].fbo = gl::Fbo::create(mSDASettings->mFboWidth, mSDASettings->mFboHeight, fboFmt);
+	mMixFbos[0].texture = gl::Texture2d::create(mSDASettings->mFboWidth, mSDASettings->mFboHeight);
+	mMixFbos[0].name = "new";
+}
+
+// Render the scene into the FBO
+ci::gl::Texture2dRef SDASession::getRenderTexture()
+{
+	gl::ScopedFramebuffer fbScp(mRenderFbo);
+	gl::clear(Color::black());
+	// setup the viewport to match the dimensions of the FBO
+	gl::ScopedViewport scpVp(ivec2(0), mRenderFbo->getSize());
+
+	
+	mRenderedTexture = mRenderFbo->getColorTexture();
+	return mRenderedTexture;
+}
+
+ci::gl::TextureRef SDASession::getMixTexture(unsigned int aMixFboIndex) {
+	if (aMixFboIndex > mMixFbos.size() - 1) aMixFboIndex = 0;
+	if (!mMixFbos[aMixFboIndex].texture) {
+		// should never happen 
+		mMixFbos[aMixFboIndex].texture = gl::Texture2d::create(mSDASettings->mFboWidth, mSDASettings->mFboHeight);
+	}
+	if (!mMixFbos[aMixFboIndex].fbo) {
+		// should never happen
+		mMixFbos[aMixFboIndex].fbo = gl::Fbo::create(mSDASettings->mFboWidth, mSDASettings->mFboHeight, fboFmt);
+	}
+	
+	return mMixFbos[aMixFboIndex].texture;
+}
+
+ci::gl::TextureRef SDASession::getFboTexture(unsigned int aFboIndex) {
+	if (aFboIndex > mFboList.size() - 1) aFboIndex = 0;
+	return mFboList[aFboIndex]->getFboTexture();
+}
+ci::gl::TextureRef SDASession::getFboRenderedTexture(unsigned int aFboIndex) {
+	if (aFboIndex > mFboList.size() - 1) aFboIndex = 0;
+	return mFboList[aFboIndex]->getRenderedTexture();
+}
+
+void SDASession::renderBlend()
+{
+	if (mCurrentBlend > mBlendFbos.size() - 1) mCurrentBlend = 0;
+	gl::ScopedFramebuffer scopedFbo(mBlendFbos[mCurrentBlend]);
+	gl::clear(Color::black());
+	// texture binding must be before ScopedGlslProg
+	mFboList[0]->getRenderedTexture()->bind(0);
+	mFboList[1]->getRenderedTexture()->bind(1);
+	gl::ScopedGlslProg glslScope(mGlslBlend);
+	gl::drawSolidRect(Rectf(0, 0, mBlendFbos[mCurrentBlend]->getWidth(), mBlendFbos[mCurrentBlend]->getHeight()));
+}
+
+void SDASession::renderMix() {
+	if (mFboList.size() > 0) {
+		if (!mMixFbos[0].fbo) mMixFbos[0].fbo = gl::Fbo::create(mSDASettings->mFboWidth, mSDASettings->mFboHeight, fboFmt);
+		gl::ScopedFramebuffer scopedFbo(mMixFbos[0].fbo);
+		gl::clear(Color::black());
+		// render A and B fbos 
+		//CI_LOG_V(" iCrossfade " + toString(mWarps[warpMixToRender]->ABCrossfade) + " getAFboIndex " + toString(mWarps[warpMixToRender]->getAFboIndex()) + " getBFboIndex " + toString(mWarps[warpMixToRender]->getBFboIndex()));
+		/*mFboList[mWarps[warpMixToRender]->getAFboIndex()]->getFboTexture();
+		mFboList[mWarps[warpMixToRender]->getBFboIndex()]->getFboTexture();
+		// texture binding must be before ScopedGlslProg
+		mFboList[mWarps[warpMixToRender]->getAFboIndex()]->getRenderedTexture()->bind(0);
+		mFboList[mWarps[warpMixToRender]->getBFboIndex()]->getRenderedTexture()->bind(1);*/
+		mFboList[0]->getFboTexture();
+		mFboList[1]->getFboTexture();
+		// texture binding must be before ScopedGlslProg
+		mFboList[0]->getRenderedTexture()->bind(0);
+		mFboList[1]->getRenderedTexture()->bind(1);
+		gl::ScopedGlslProg glslScope(mGlslMix);
+		mGlslMix->uniform("iCrossfade", mSDASettings->xFade);
+
+		gl::drawSolidRect(Rectf(0, 0, mMixFbos[0].fbo->getWidth(), mMixFbos[0].fbo->getHeight()));
+
+		// save to a texture
+		mMixFbos[0].texture = mMixFbos[0].fbo->getColorTexture();
+	}
+}
+
+string SDASession::getMixFboName(unsigned int aMixFboIndex) {
+	if (aMixFboIndex > mMixFbos.size() - 1) aMixFboIndex = mMixFbos.size() - 1;
+	mMixFbos[aMixFboIndex].name = mFboList[0]->getShaderName() + "/" + mFboList[1]->getShaderName();
+	return mMixFbos[aMixFboIndex].name;
+}
+

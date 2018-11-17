@@ -7,9 +7,6 @@
 #include "SDASettings.h"
 // Animation
 #include "SDAAnimation.h"
-// Mix
-#include "SDAMix.h"
-
 
 // WebSockets
 #include "WebSocketClient.h"
@@ -28,10 +25,10 @@ namespace SophiaDigitalArt
 	typedef std::shared_ptr<class SDAWebsocket> SDAWebsocketRef;
 	class SDAWebsocket {
 	public:
-		SDAWebsocket(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation, SDAMixRef aSDAMix);
-		static SDAWebsocketRef	create(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation, SDAMixRef aSDAMix)
+		SDAWebsocket(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation);
+		static SDAWebsocketRef	create(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation)
 		{
-			return shared_ptr<SDAWebsocket>(new SDAWebsocket(aSDASettings, aSDAAnimation, aSDAMix));
+			return shared_ptr<SDAWebsocket>(new SDAWebsocket(aSDASettings, aSDAAnimation));
 		}
 		void						update();
         // messages
@@ -64,8 +61,6 @@ namespace SophiaDigitalArt
 		SDASettingsRef				mSDASettings;
 		// Animation
 		SDAAnimationRef				mSDAAnimation;
-		// Mix
-		SDAMixRef					mSDAMix;
 
 		// lights4events
 		void						colorWrite();

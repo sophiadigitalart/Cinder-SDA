@@ -16,8 +16,8 @@
 #include "SDAWebsocket.h"
 // Animation
 #include "SDAAnimation.h"
-// Mix
-#include "SDAMix.h"
+// Fbos
+#include "SDAFbo.h"
 // Logger
 #include "SDALog.h"
 
@@ -29,7 +29,12 @@ namespace SophiaDigitalArt {
 
 	typedef std::shared_ptr<class SDASession> SDASessionRef;
 
-
+	struct SDAMixFbo
+	{
+		ci::gl::FboRef					fbo;
+		ci::gl::Texture2dRef			texture;
+		string							name;
+	};
 	class SDASession {
 	public:
 		SDASession(SDASettingsRef aSDASettings);
@@ -50,7 +55,7 @@ namespace SophiaDigitalArt {
 		bool							handleMouseUp(MouseEvent &event);
 		bool							handleKeyDown(KeyEvent &event);
 		bool							handleKeyUp(KeyEvent &event);
-		void							resize();
+		void							resize(){mRenderFbo = gl::Fbo::create(mSDASettings->mRenderWidth, mSDASettings->mRenderHeight, fboFmt);}
 		void							update(unsigned int aClassIndex = 0);
 		bool							save();
 		void							restore();
@@ -142,24 +147,25 @@ namespace SophiaDigitalArt {
 		void							toggleFreqWSSend() { mFreqWSSend = !mFreqWSSend; };
 		// uniforms
 		void							setMixCrossfade(unsigned int aWarpIndex, float aCrossfade) { mSDASettings->xFade = aCrossfade; mSDASettings->xFadeChanged = true; };
-		float							getMixCrossfade(unsigned int aWarpIndex) { return mSDASettings->xFade; }; // TODO? mSDAMix->getCrossfade(aWarpIndex);
+		float							getMixCrossfade(unsigned int aWarpIndex) { return mSDASettings->xFade; };
 		void							setFboAIndex(unsigned int aIndex, unsigned int aFboIndex);
 		void							setFboBIndex(unsigned int aIndex, unsigned int aFboIndex);
-		unsigned int					getFboAIndex(unsigned int aIndex) { return mSDAMix->getFboAIndex(aIndex); };
-		unsigned int					getFboBIndex(unsigned int aIndex) { return mSDAMix->getFboBIndex(aIndex); };
+		unsigned int					getFboAIndex(unsigned int aIndex) { return 0; };
+		unsigned int					getFboBIndex(unsigned int aIndex) { return 1; };
 
-		void							setFboFragmentShaderIndex(unsigned int aFboIndex, unsigned int aFboShaderIndex) { mSDAMix->setFboFragmentShaderIndex(aFboIndex, aFboShaderIndex); };
-		unsigned int					getFboFragmentShaderIndex(unsigned int aFboIndex) { return mSDAMix->getFboFragmentShaderIndex(aFboIndex); };
+		void							setFboFragmentShaderIndex(unsigned int aFboIndex, unsigned int aFboShaderIndex);
+		unsigned int					getFboFragmentShaderIndex(unsigned int aFboIndex);
 		bool							loadShaderFolder(string aFolder);
 		int								loadFragmentShader(string aFilePath);
-		unsigned int					getShadersCount() { return mSDAMix->getShadersCount(); };
-		string							getShaderName(unsigned int aShaderIndex) { return mSDAMix->getShaderName(aShaderIndex); };
-		ci::gl::TextureRef				getShaderThumb(unsigned int aShaderIndex) { return mSDAMix->getShaderThumb(aShaderIndex); };
-		void							setFragmentShaderString(unsigned int aShaderIndex, string aFragmentShaderString, string aName = "") { mSDAMix->setFragmentShaderString(aShaderIndex, aFragmentShaderString, aName); };
+		unsigned int					getShadersCount() { return mShaderList.size(); };
+		string							getShaderName(unsigned int aShaderIndex);
+		ci::gl::TextureRef				getShaderThumb(unsigned int aShaderIndex);
+		string							getFragmentString(unsigned int aShaderIndex) { return mShaderList[aShaderIndex]->getFragmentString(); };
+		void							setFragmentShaderString(unsigned int aShaderIndex, string aFragmentShaderString, string aName = "");
 		//string							getVertexShaderString(unsigned int aShaderIndex) { return mSDAMix->getVertexShaderString(aShaderIndex); };
-		string							getFragmentShaderString(unsigned int aShaderIndex) { return mSDAMix->getFragmentShaderString(aShaderIndex); };
-		void							updateShaderThumbFile(unsigned int aShaderIndex) { mSDAMix->updateShaderThumbFile(aShaderIndex); };
-		void							removeShader(unsigned int aShaderIndex) { mSDAMix->removeShader(aShaderIndex); };
+		string							getFragmentShaderString(unsigned int aShaderIndex);
+		void							updateShaderThumbFile(unsigned int aShaderIndex);
+		void							removeShader(unsigned int aShaderIndex);
 		// utils
 		int								getWindowsResolution();
 		float							getTargetFps() { return mTargetFps; };
@@ -170,88 +176,91 @@ namespace SophiaDigitalArt {
 		void							fileDrop(FileDropEvent event);
 
 		// fbos
-		void							fboFlipV(unsigned int aFboIndex) { mSDAMix->fboFlipV(aFboIndex); };
-		bool							isFboFlipV(unsigned int aFboIndex) { return mSDAMix->isFboFlipV(aFboIndex); };
-		unsigned int					getFboInputTextureIndex(unsigned int aFboIndex) { return mSDAMix->getFboInputTextureIndex(aFboIndex); };
-		void							setFboInputTexture(unsigned int aFboIndex, unsigned int aInputTextureIndex) { mSDAMix->setFboInputTexture(aFboIndex, aInputTextureIndex); };
-		ci::gl::TextureRef				getFboTexture(unsigned int aFboIndex = 0) { return mSDAMix->getFboTexture(aFboIndex); };
-		ci::gl::TextureRef				getFboRenderedTexture(unsigned int aFboIndex) { return mSDAMix->getFboRenderedTexture(aFboIndex); };
-		ci::gl::TextureRef				getFboThumb(unsigned int aBlendIndex) { return mSDAMix->getFboThumb(aBlendIndex); };
-		string							getFboName(unsigned int aFboIndex) { return mSDAMix->getFboName(aFboIndex); };
+		void							fboFlipV(unsigned int aFboIndex) ;
+		bool							isFboFlipV(unsigned int aFboIndex) ;
+		unsigned int					getFboInputTextureIndex(unsigned int aFboIndex) ;
+		void							setFboInputTexture(unsigned int aFboIndex, unsigned int aInputTextureIndex);
+		ci::gl::TextureRef				getFboTexture(unsigned int aFboIndex = 0);
+		ci::gl::TextureRef				getFboRenderedTexture(unsigned int aFboIndex);
+		ci::gl::TextureRef				getFboThumb(unsigned int aBlendIndex) { return mBlendFbos[aBlendIndex]->getColorTexture(); };
+		unsigned int 					createShaderFbo(string aShaderFilename, unsigned int aInputTextureIndex = 0);
+		unsigned int					createShaderFboFromString(string aFragmentShaderString, string aShaderFilename);
+		string							getFboName(unsigned int aFboIndex) { return mFboList[aFboIndex]->getName(); };
 		//int								getFboTextureWidth(unsigned int aFboIndex);
 		//int								getFboTextureHeight(unsigned int aFboIndex);
-		unsigned int					getFboListSize() { return mSDAMix->getFboListSize(); };
+		unsigned int					getFboListSize() { return mFboList.size(); };
 		//string							getFboFragmentShaderText(unsigned int aFboIndex);
 		// feedback get/set
-		int								getFeedbackFrames() {
+		/*int								getFeedbackFrames() {
 			return mSDAMix->getFeedbackFrames();
 		};
 		void							setFeedbackFrames(int aFeedbackFrames) {
 			mSDAMix->setFeedbackFrames(aFeedbackFrames);
-		};
+		};*/
 		string							getMixFboName(unsigned int aMixFboIndex);
 		ci::gl::TextureRef				getMixTexture(unsigned int aMixFboIndex = 0);
-		unsigned int					getMixFbosCount();
+		unsigned int					getMixFbosCount() { return mMixFbos.size(); };
 		// RTE in release mode ci::gl::Texture2dRef			getRenderedTexture(bool reDraw = true) { return mSDAMix->getRenderedTexture(reDraw); };
-		ci::gl::TextureRef				getRenderTexture() { return mSDAMix->getRenderTexture(); };
+		ci::gl::TextureRef				getRenderTexture();
 		bool							isEnabledAlphaBlending() { return mEnabledAlphaBlending; };
 		void							toggleEnabledAlphaBlending() { mEnabledAlphaBlending = !mEnabledAlphaBlending; }
 		bool							isRenderTexture() { return mRenderTexture; };
 		void							toggleRenderTexture() { mRenderTexture = !mRenderTexture; }
 		bool							isAutoLayout() { return mSDASettings->mAutoLayout; };
 		void							toggleAutoLayout() { mSDASettings->mAutoLayout = !mSDASettings->mAutoLayout; }
-		bool							isFlipH();
-		bool							isFlipV();
-		void							flipH();
-		void							flipV();
+		bool							isFlipH() { return mFlipH; };
+		bool							isFlipV() { return mFlipV; };
+		void							flipH(){mFlipH = !mFlipH;};
+		void							flipV(){mFlipV = !mFlipV;};
+
 		// blendmodes
-		unsigned int					getFboBlendCount() { return mSDAMix->getFboBlendCount(); };
-		void							useBlendmode(unsigned int aBlendIndex) { return mSDAMix->useBlendmode(aBlendIndex); };
+		unsigned int					getFboBlendCount() { return mBlendFbos.size(); };
+		void							useBlendmode(unsigned int aBlendIndex) { mSDASettings->iBlendmode = aBlendIndex; };
 
 		// textures
-		ci::gl::TextureRef				getInputTexture(unsigned int aTextureIndex) { return mSDAMix->getInputTexture(aTextureIndex); };
-		string							getInputTextureName(unsigned int aTextureIndex) { return mSDAMix->getInputTextureName(aTextureIndex); };
-		unsigned int					getInputTexturesCount() { return mSDAMix->getInputTexturesCount(); };
-		void							loadImageFile(string aFile, unsigned int aTextureIndex) { mSDAMix->loadImageFile(aFile, aTextureIndex); };
-		void							loadAudioFile(string aFile) { mSDAMix->loadAudioFile(aFile); };
-		void							loadMovie(string aFile, unsigned int aTextureIndex) { mSDAMix->loadMovie(aFile, aTextureIndex); };
-		bool							loadImageSequence(string aFolder, unsigned int aTextureIndex) { return mSDAMix->loadImageSequence(aFolder, aTextureIndex); };
-		void							toggleSharedOutput(unsigned int aMixFboIndex = 0) { mSDAMix->toggleSharedOutput(aMixFboIndex); };
-		bool							isSharedOutputActive() { return mSDAMix->isSharedOutputActive(); };
-		unsigned int					getSharedMixIndex() { return mSDAMix->getSharedMixIndex(); };
+		ci::gl::TextureRef				getInputTexture(unsigned int aTextureIndex);
+		string							getInputTextureName(unsigned int aTextureIndex);
+		unsigned int					getInputTexturesCount();
+		void							loadImageFile(string aFile, unsigned int aTextureIndex);
+		void							loadAudioFile(string aFile);
+		void							loadMovie(string aFile, unsigned int aTextureIndex);
+		bool							loadImageSequence(string aFolder, unsigned int aTextureIndex);
+		//void							toggleSharedOutput(unsigned int aMixFboIndex = 0);
+		//bool							isSharedOutputActive() { return mSDAMix->isSharedOutputActive(); };
+		//unsigned int					getSharedMixIndex() { return mSDAMix->getSharedMixIndex(); };
 		// move, rotate, zoom methods
 		//void							setPosition(int x, int y);
 		//void							setZoom(float aZoom);
-		int								getInputTextureXLeft(unsigned int aTextureIndex) { return mSDAMix->getInputTextureXLeft(aTextureIndex); };
-		void							setInputTextureXLeft(unsigned int aTextureIndex, int aXLeft) { mSDAMix->setInputTextureXLeft(aTextureIndex, aXLeft); };
-		int								getInputTextureYTop(unsigned int aTextureIndex) { return mSDAMix->getInputTextureYTop(aTextureIndex); };
-		void							setInputTextureYTop(unsigned int aTextureIndex, int aYTop) { mSDAMix->setInputTextureYTop(aTextureIndex, aYTop); };
-		int								getInputTextureXRight(unsigned int aTextureIndex) { return mSDAMix->getInputTextureXRight(aTextureIndex); };
-		void							setInputTextureXRight(unsigned int aTextureIndex, int aXRight) { mSDAMix->setInputTextureXRight(aTextureIndex, aXRight); };
-		int								getInputTextureYBottom(unsigned int aTextureIndex) { return mSDAMix->getInputTextureYBottom(aTextureIndex); };
-		void							setInputTextureYBottom(unsigned int aTextureIndex, int aYBottom) { mSDAMix->setInputTextureYBottom(aTextureIndex, aYBottom); };
-		bool							isFlipVInputTexture(unsigned int aTextureIndex) { return mSDAMix->isFlipVInputTexture(aTextureIndex); };
-		bool							isFlipHInputTexture(unsigned int aTextureIndex) { return mSDAMix->isFlipHInputTexture(aTextureIndex); };
-		void							inputTextureFlipV(unsigned int aTextureIndex) { mSDAMix->inputTextureFlipV(aTextureIndex); };
-		void							inputTextureFlipH(unsigned int aTextureIndex) { mSDAMix->inputTextureFlipH(aTextureIndex); };
-		bool							getInputTextureLockBounds(unsigned int aTextureIndex) { return mSDAMix->getInputTextureLockBounds(aTextureIndex); };
-		void							toggleInputTextureLockBounds(unsigned int aTextureIndex) { mSDAMix->toggleInputTextureLockBounds(aTextureIndex); };
-		unsigned int					getInputTextureOriginalWidth(unsigned int aTextureIndex) { return mSDAMix->getInputTextureOriginalWidth(aTextureIndex); };
-		unsigned int					getInputTextureOriginalHeight(unsigned int aTextureIndex) { return mSDAMix->getInputTextureOriginalHeight(aTextureIndex); };
-		void							togglePlayPause(unsigned int aTextureIndex) { mSDAMix->togglePlayPause(aTextureIndex); };
+		int								getInputTextureXLeft(unsigned int aTextureIndex);
+		void							setInputTextureXLeft(unsigned int aTextureIndex, int aXLeft);
+		int								getInputTextureYTop(unsigned int aTextureIndex);
+		void							setInputTextureYTop(unsigned int aTextureIndex, int aYTop);
+		int								getInputTextureXRight(unsigned int aTextureIndex);
+		void							setInputTextureXRight(unsigned int aTextureIndex, int aXRight);
+		int								getInputTextureYBottom(unsigned int aTextureIndex);
+		void							setInputTextureYBottom(unsigned int aTextureIndex, int aYBottom);
+		bool							isFlipVInputTexture(unsigned int aTextureIndex);
+		bool							isFlipHInputTexture(unsigned int aTextureIndex);
+		void							inputTextureFlipV(unsigned int aTextureIndex);
+		void							inputTextureFlipH(unsigned int aTextureIndex);
+		bool							getInputTextureLockBounds(unsigned int aTextureIndex);
+		void							toggleInputTextureLockBounds(unsigned int aTextureIndex);
+		unsigned int					getInputTextureOriginalWidth(unsigned int aTextureIndex);
+		unsigned int					getInputTextureOriginalHeight(unsigned int aTextureIndex);
+		void							togglePlayPause(unsigned int aTextureIndex);
 		// movie
-		bool							isMovie(unsigned int aTextureIndex) { return mSDAMix->isMovie(aTextureIndex); };
+		bool							isMovie(unsigned int aTextureIndex);
 		// sequence
-		bool							isSequence(unsigned int aTextureIndex) { return mSDAMix->isSequence(aTextureIndex); };
-		bool							isLoadingFromDisk(unsigned int aTextureIndex) { return mSDAMix->isLoadingFromDisk(aTextureIndex); };
-		void							toggleLoadingFromDisk(unsigned int aTextureIndex) { return mSDAMix->toggleLoadingFromDisk(aTextureIndex); };
-		void							syncToBeat(unsigned int aTextureIndex) { return mSDAMix->syncToBeat(aTextureIndex); };
-		void							reverse(unsigned int aTextureIndex) { return mSDAMix->reverse(aTextureIndex); };
-		float							getSpeed(unsigned int aTextureIndex) { return mSDAMix->getSpeed(aTextureIndex); };
-		void							setSpeed(unsigned int aTextureIndex, float aSpeed) { mSDAMix->setSpeed(aTextureIndex, aSpeed); };
-		int								getPosition(unsigned int aTextureIndex) { return mSDAMix->getPosition(aTextureIndex); };
-		void							setPlayheadPosition(unsigned int aTextureIndex, int aPosition) { mSDAMix->setPlayheadPosition(aTextureIndex, aPosition); };
-		int								getMaxFrame(unsigned int aTextureIndex) { return mSDAMix->getMaxFrame(aTextureIndex); };
+		bool							isSequence(unsigned int aTextureIndex);
+		bool							isLoadingFromDisk(unsigned int aTextureIndex);
+		void							toggleLoadingFromDisk(unsigned int aTextureIndex);
+		void							syncToBeat(unsigned int aTextureIndex);
+		void							reverse(unsigned int aTextureIndex);
+		float							getSpeed(unsigned int aTextureIndex);
+		void							setSpeed(unsigned int aTextureIndex, float aSpeed);
+		int								getPosition(unsigned int aTextureIndex);
+		void							setPlayheadPosition(unsigned int aTextureIndex, int aPosition);
+		int								getMaxFrame(unsigned int aTextureIndex);
 		// websockets
 		void							wsConnect();
 		void							wsPing();
@@ -277,6 +286,9 @@ namespace SophiaDigitalArt {
 		int								getCmd() { int rtn = cmd; cmd = -1; return rtn; };
 		// utils
 		float							formatFloat(float f) { return mSDAUtils->formatFloat(f); };
+		
+		void							load();
+		void							updateAudio() {mTextureList[0]->getTexture();}
 
 	private:
 		// Settings
@@ -289,8 +301,6 @@ namespace SophiaDigitalArt {
 		SDAWebsocketRef					mSDAWebsocket;
 		// Animation
 		SDAAnimationRef					mSDAAnimation;
-		// Mix
-		SDAMixRef						mSDAMix;
 		// Log
 		SDALogRef						mSDALog;
 
@@ -337,9 +347,44 @@ namespace SophiaDigitalArt {
 		float							mPosX;
 		float							mPosY;
 		float							mZoom;
-		void							updateStream(string * aStringPtr) { mSDAMix->updateStream(aStringPtr); };
+		void							updateStream(string * aStringPtr);
 		//! window management
 		int								cmd;
+
+		/* 
+			mix
+		*/
+
+		std::string						mFbosPath;
+
+		//! mix shader
+		gl::GlslProgRef					mMixShader;
+
+		//! Fbos
+		map<int, SDAMixFbo>				mMixFbos;
+		//map<int, SDAMixFbo>				mTriangleFbos;
+		// maintain a list of fbos specific to this mix
+		SDAFboList						mFboList;
+		fs::path						mMixesFilepath;
+
+		//! Shaders
+		SDAShaderList					mShaderList;
+		void							initShaderList();
+		//! Textures
+		SDATextureList					mTextureList;
+		fs::path						mTexturesFilepath;
+		bool							initTextureList();
+		// blendmodes fbos
+		map<int, ci::gl::FboRef>		mBlendFbos;
+		int								mCurrentBlend;
+		gl::GlslProgRef					mGlslMix, mGlslBlend, mGlslFeedback;
+		// render
+		void							renderMix();
+		void							renderBlend();
+		// warping
+		gl::FboRef						mRenderFbo;
+		// warp rendered texture
+		ci::gl::Texture2dRef			mRenderedTexture;
 	};
 
 }

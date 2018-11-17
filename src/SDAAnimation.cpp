@@ -4,9 +4,7 @@ using namespace SophiaDigitalArt;
 
 SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 	mSDASettings = aSDASettings;
-	// mix fbo flip
-	mFlipH = true;
-	mFlipV = false;
+
 	mBlendRender = false;
 	//audio
 	mAudioBuffered = false;
@@ -591,9 +589,9 @@ void SDAAnimation::saveAnimation() {
 	doc.pushBack(badtv);
 	doc.write(writeFile(mJsonFilePath), JsonTree::WriteOptions());
 	// backup save
-	string fileName = "animation" + toString(getElapsedFrames()) + ".json";
+	/*string fileName = "animation" + toString(getElapsedFrames()) + ".json";
 	mJsonFilePath = app::getAssetPath("") / mSDASettings->mAssetsPath / fileName;
-	doc.write(writeFile(mJsonFilePath), JsonTree::WriteOptions());
+	doc.write(writeFile(mJsonFilePath), JsonTree::WriteOptions());*/
 }
 void SDAAnimation::loadAnimation() {
 
