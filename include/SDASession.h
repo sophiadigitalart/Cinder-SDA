@@ -134,7 +134,7 @@ namespace SophiaDigitalArt {
 		float							getMaxVolume() { return mSDAAnimation->maxVolume; };
 		float *							getFreqs() { return mSDAAnimation->iFreqs; };
 		int								getFreqIndexSize() { return mSDAAnimation->getFreqIndexSize(); };
-		float							getFreq(unsigned int aFreqIndex) { return mSDAAnimation->getFloatUniformValueByIndex(31 + aFreqIndex); };
+		float							getFreq(unsigned int aFreqIndex) { return mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFREQ0 + aFreqIndex); };
 		int								getFreqIndex(unsigned int aFreqIndex) { return mSDAAnimation->getFreqIndex(aFreqIndex); };
 		void							setFreqIndex(unsigned int aFreqIndex, unsigned int aFreq) { mSDAAnimation->setFreqIndex(aFreqIndex, aFreq); };
 		int								getWindowSize() { return mSDAAnimation->mWindowSize; };
@@ -289,14 +289,15 @@ namespace SophiaDigitalArt {
 		
 		void							load();
 		void							updateAudio() {mTextureList[0]->getTexture();}
-
+		void							updateMixUniforms();
+		void							updateBlendUniforms();
 	private:
 		// Settings
 		SDASettingsRef					mSDASettings;
 		// Utils
 		SDAUtilsRef						mSDAUtils;
 		// Message router
-		SDARouterRef						mSDARouter;
+		SDARouterRef					mSDARouter;
 		// SDAWebsocket
 		SDAWebsocketRef					mSDAWebsocket;
 		// Animation

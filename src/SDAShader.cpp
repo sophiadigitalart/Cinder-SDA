@@ -8,7 +8,7 @@ SDAShader::SDAShader(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation,
 	mValid = false;
 	mActive = true;
 	// shadertoy include
-	shaderInclude = loadString(loadAsset("shadertoy.min"));
+	shaderInclude = loadString(loadAsset("shadertoy.inc"));
 	mSDASettings = aSDASettings;
 	mSDAAnimation = aSDAAnimation;
 	mError = "";
@@ -181,8 +181,8 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		ISFPattern = { "void main" };
 		ISFReplacement = { "dirtyhack mainImage" }; //dirty hack!
 		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
-		ISFPattern = { "void" };
-		ISFReplacement = { "out vec4 fragColor, in vec2 fragCoord" };
+		ISFPattern = { "out vec4 fragColor, in vec2 fragCoord" };
+		ISFReplacement= { "void" };
 		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
 		ISFPattern = { "dirtyhack mainImage" };
 		ISFReplacement = { "void mainImage" }; //dirty hack!

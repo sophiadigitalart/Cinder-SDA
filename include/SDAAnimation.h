@@ -66,8 +66,18 @@ namespace SophiaDigitalArt
 		float							iTimeFactor;
 		bool							mUseTimeWithTempo;
 		float							iTempoTimeBeatPerBar;
-		float							getBpm() { return getFloatUniformValueByIndex(mSDASettings->IBPM); };
-		void							setBpm(float aBpm) { setFloatUniformValueByIndex(mSDASettings->IBPM, aBpm); iDeltaTime = 60 / getFloatUniformValueByIndex(mSDASettings->IBPM); };
+		float							getBpm() {
+			CI_LOG_W("getBpm " + toString(getFloatUniformValueByIndex(mSDASettings->IBPM)));
+			return getFloatUniformValueByIndex(mSDASettings->IBPM);
+		};
+		void							setBpm(float aBpm) {
+			CI_LOG_W("setBpm " + toString(aBpm));
+
+			if (aBpm > 0.0f) {
+				setFloatUniformValueByIndex(mSDASettings->IBPM, aBpm);
+				iDeltaTime = 60 / aBpm;
+			}
+		};
 		void							tapTempo();
 		void							setTimeFactor(const int &aTimeFactor);
 		int								getEndFrame() { return mEndFrame; };
@@ -162,6 +172,11 @@ namespace SophiaDigitalArt
 			return shaderUniforms[getUniformNameForIndex(aIndex)].vec4Value;
 		};
 		float							getFloatUniformValueByIndex(unsigned int aIndex) {
+			if (aIndex == mSDASettings->IBPM) {
+				string s = getUniformNameForIndex(aIndex);
+				float f = shaderUniforms[getUniformNameForIndex(aIndex)].floatValue;
+				CI_LOG_W("Bpm " + toString(f));
+			}
 			return shaderUniforms[getUniformNameForIndex(aIndex)].floatValue;
 		}
 		int								getSampler2DUniformValueByName(string aName) {

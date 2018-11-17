@@ -42,8 +42,8 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 	startTime = currentTime = mTimer.getSeconds();
 	//mBpm = 166;
 	//iDeltaTime = 60 / mBpm;//mTempo;
-	setFloatUniformValueByIndex(mSDASettings->IBPM, 166.0f);
-	iDeltaTime = 60 / getFloatUniformValueByIndex(mSDASettings->IBPM);
+	//setFloatUniformValueByIndex(mSDASettings->IBPM, 166.0f);
+	iDeltaTime = 60.0f / 166.0f;
 	//iBar = 0;
 	//iBadTvRunning = false;
 	//int ctrl;
@@ -226,13 +226,13 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		createSampler2DUniform("iChannel" + toString(i), 100 + i, i);// TODO verify doesn't mess up type (uint!)
 	}
 	// iRHandX  
-	createFloatUniform("iRHandX", mSDASettings->IRHANDX, 320.0f, 0.0f, 1280.0f);
-	// iRHandY  
-	createFloatUniform("iRHandY", mSDASettings->IRHANDY, 240.0f, 0.0f, 800.0f);
-	// iLHandX  
-	createFloatUniform("iLHandX", mSDASettings->ILHANDX, 320.0f, 0.0f, 1280.0f);
-	// iLHandY  
-	createFloatUniform("iLHandY", mSDASettings->ILHANDY, 240.0f, 0.0f, 800.0f);
+	//createFloatUniform("iRHandX", mSDASettings->IRHANDX, 320.0f, 0.0f, 1280.0f);
+	//// iRHandY  
+	//createFloatUniform("iRHandY", mSDASettings->IRHANDY, 240.0f, 0.0f, 800.0f);
+	//// iLHandX  
+	//createFloatUniform("iLHandX", mSDASettings->ILHANDX, 320.0f, 0.0f, 1280.0f);
+	//// iLHandY  
+	//createFloatUniform("iLHandY", mSDASettings->ILHANDY, 240.0f, 0.0f, 800.0f);
 
 	load();
 	loadAnimation();

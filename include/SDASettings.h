@@ -39,11 +39,13 @@ namespace SophiaDigitalArt {
 		static const int			IXFADE = 18;
 		static const int			IWEIGHT0 = 19;
 		static const int			IPARAM1 = 20;
+		static const int			IBPM = 21;
 		static const int			ISOBEL = 22;
 		static const int			IWEIGHT1 = 23;
 		static const int			IPARAM2 = 24;
 		static const int			IFPS = 25;
 		static const int			IWEIGHT2 = 27;
+		static const int			IPHASE = 28;
 		static const int			IRESX = 29;
 		static const int			IRESY = 30;
 		static const int			IWEIGHT3 = 31;
@@ -59,14 +61,12 @@ namespace SophiaDigitalArt {
 		static const int			IGLITCH = 81;
 		static const int			ITOGGLE = 83;
 		static const int			IINVERT = 86;
-		static const int			IRHANDX = 110;
+		/*static const int			IRHANDX = 110;
 		static const int			IRHANDY = 111;
 		static const int			IRHANDZ = 112;
 		static const int			ILHANDX = 113;
 		static const int			ILHANDY = 114;
-		static const int			ILHANDZ = 115;
-		static const int			IBPM = 220;
-		static const int			IPHASE = 221;
+		static const int			ILHANDZ = 115;*/
 		// texture modes
 		static const int			TEXTUREMODEMIX = 0;				// mix two shaders
 		static const int			TEXTUREMODEAUDIO = 1;			// audio spectrum
@@ -260,16 +260,19 @@ namespace SophiaDigitalArt {
 		int							uiElementWidth;
 		int							uiElementHeight;
 
-		int							uiXPos;
 		int							uiXPosCol1;
 		int							uiXPosCol2;
 		int							uiXPosCol3;
-		int							uiYPos;
-		int							uiYPosRow1;
-		int							uiYPosRow2;
+		//int							uiYPos;
+		int							uiYPosRow1; // top
+		int							uiYPosRow2; // details, textures
 		int							uiYPosRow3;
+		int							uiYPosRow4;
+		int							uiYPosRow5;
+		int							uiYPosRow6;
 		int							uiLargeW;
 		int							uiLargeH;
+		int							uiSmallH;
 		int							uiLargePreviewW;
 		int							uiLargePreviewH;
 		int							uiPreviewH;

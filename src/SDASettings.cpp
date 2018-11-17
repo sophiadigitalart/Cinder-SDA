@@ -423,7 +423,7 @@ void SDASettings::resetSomeParams() {
 	//iZoomLeft = iZoomRight = 1.0f;
 	autoInvert = false;
 	// imgui
-	uiXPos = uiMargin = 3;
+	uiMargin = 3;
 	uiElementWidth = mPreviewFboWidth + uiMargin;
 	uiElementHeight = mPreviewFboHeight * 2.3;
 	// mPreviewFboWidth 80 mPreviewFboHeight 60 margin 10 inBetween 15 mPreviewWidth = 160;mPreviewHeight = 120;
@@ -432,13 +432,21 @@ void SDASettings::resetSomeParams() {
 	uiLargeH = (mPreviewFboHeight + uiMargin) * 7;
 	uiLargePreviewW = mPreviewFboWidth * 1.6;
 	uiLargePreviewH = mPreviewHeight * 2.2;
+	
+
 	uiXPosCol1 = uiLargeW + uiMargin * 2;
-	uiXPosCol2 = uiXPosCol1 + uiMargin + uiElementWidth; //largeW + mSDASettings->uiMargin * 2;
+	uiXPosCol2 = uiXPosCol1 + uiMargin + uiElementWidth;
 	uiXPosCol3 = uiXPosCol2 + uiMargin;
 	//uiYPos;
 	uiYPosRow1 = 18;
 	uiYPosRow2 = 160;
-	uiYPosRow3 = uiYPosRow2 + uiLargeH + uiMargin * 1.5;
+	uiYPosRow3 = uiYPosRow2 + uiLargePreviewH + uiMargin * 1.5;
+	uiYPosRow4 = uiYPosRow3 + uiLargePreviewH + uiMargin * 1.5;
+	uiYPosRow5 = uiYPosRow4 + uiLargePreviewH + uiMargin * 1.5;
+	uiYPosRow6 = uiYPosRow5 + uiLargePreviewH + uiMargin * 1.5;
+	
+	uiSmallH = uiYPosRow2 -uiYPosRow1 - uiMargin;
+
 	shaderEditIndex = 0;
 }
 
