@@ -144,9 +144,9 @@ float SDASession::getMaxUniformValueByIndex(unsigned int aIndex) {
 }
 void SDASession::updateMixUniforms() {
 	//vec4 mouse = mSDAAnimation->getVec4UniformValueByName("iMouse");
-	mGlslMix->uniform("iWeight0", mSDAAnimation->getFloatUniformValueByIndex(35));	// weight of channel 0
-	mGlslMix->uniform("iWeight1", mSDAAnimation->getFloatUniformValueByIndex(36));	// weight of channel 1
-	mGlslMix->uniform("iWeight2", mSDAAnimation->getFloatUniformValueByIndex(37));	// weight of channel 2
+	mGlslMix->uniform("iWeight0", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT0));	// weight of channel 0
+	mGlslMix->uniform("iWeight1", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT1));	// weight of channel 1
+	mGlslMix->uniform("iWeight2", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT2));	// weight of channel 2
 
 	mGlslMix->uniform("iBlendmode", mSDASettings->iBlendmode);
 	mGlslMix->uniform("iTime", mSDAAnimation->getFloatUniformValueByIndex(0));
@@ -154,7 +154,7 @@ void SDASession::updateMixUniforms() {
 	mGlslMix->uniform("iResolution", vec3(mSDAAnimation->getFloatUniformValueByName("iResolutionX"), mSDAAnimation->getFloatUniformValueByName("iResolutionY"), 1.0));
 	//mGlslMix->uniform("iChannelResolution", mSDASettings->iChannelResolution, 4);
 	// 20180318 mGlslMix->uniform("iMouse", mSDAAnimation->getVec4UniformValueByName("iMouse"));
-	mGlslMix->uniform("iMouse", vec3(mSDAAnimation->getFloatUniformValueByIndex(35), mSDAAnimation->getFloatUniformValueByIndex(36), mSDAAnimation->getFloatUniformValueByIndex(37)));
+	mGlslMix->uniform("iMouse", vec3(mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IMOUSEX), mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IMOUSEY), mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IMOUSEZ)));
 	mGlslMix->uniform("iDate", mSDAAnimation->getVec4UniformValueByName("iDate"));
 	mGlslMix->uniform("iChannel0", 0);
 	mGlslMix->uniform("iChannel1", 1);
@@ -196,7 +196,7 @@ void SDASession::updateBlendUniforms() {
 	mGlslBlend->uniform("iResolution", vec3(mSDASettings->mPreviewFboWidth, mSDASettings->mPreviewFboHeight, 1.0));
 	//mGlslBlend->uniform("iChannelResolution", mSDASettings->iChannelResolution, 4);
 	// 20180318 mGlslBlend->uniform("iMouse", mSDAAnimation->getVec4UniformValueByName("iMouse"));
-	mGlslBlend->uniform("iMouse", vec3(mSDAAnimation->getFloatUniformValueByIndex(35), mSDAAnimation->getFloatUniformValueByIndex(36), mSDAAnimation->getFloatUniformValueByIndex(37)));
+	mGlslBlend->uniform("iMouse", vec3(mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IMOUSEX), mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IMOUSEY), mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IMOUSEZ)));
 	mGlslBlend->uniform("iDate", mSDAAnimation->getVec4UniformValueByName("iDate"));
 	mGlslBlend->uniform("iChannel0", 0);
 	mGlslBlend->uniform("iChannel1", 1);

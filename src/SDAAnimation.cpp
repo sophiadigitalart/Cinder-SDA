@@ -54,37 +54,36 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 	}
 	else {
 		// global time in seconds
-		createFloatUniform("iTime", mSDASettings->ITIME, 0.0f);
+		createFloatUniform("iTime", mSDASettings->ITIME, 0.0f); // 0
 		// sliders
 		// red
-		createFloatUniform("iFR", mSDASettings->IFR, 1.0f);
+		createFloatUniform("iFR", mSDASettings->IFR, 1.0f); // 1
 		// green
-		createFloatUniform("iFG", mSDASettings->IFG, 0.3f);
+		createFloatUniform("iFG", mSDASettings->IFG, 0.3f); // 2
 		// blue
-		createFloatUniform("iFB", mSDASettings->IFB, 0.0f);
+		createFloatUniform("iFB", mSDASettings->IFB, 0.0f); // 3
 		// Alpha 
-		createFloatUniform("iAlpha", mSDASettings->IFA, 1.0f);
+		createFloatUniform("iAlpha", mSDASettings->IFA, 1.0f); // 4
 		// red multiplier 
-		createFloatUniform("iRedMultiplier", mSDASettings->IFRX, 1.0f, 0.0f, 3.0f);// 5
+		createFloatUniform("iRedMultiplier", mSDASettings->IFRX, 1.0f, 0.0f, 3.0f); // 5
 		// green multiplier 
-		createFloatUniform("iGreenMultiplier", mSDASettings->IFGX, 1.0f, 0.0f, 3.0f);// 6
+		createFloatUniform("iGreenMultiplier", mSDASettings->IFGX, 1.0f, 0.0f, 3.0f); // 6
 		// blue multiplier 
-		createFloatUniform("iBlueMultiplier", mSDASettings->IFBX, 1.0f, 0.0f, 3.0f);// 7
+		createFloatUniform("iBlueMultiplier", mSDASettings->IFBX, 1.0f, 0.0f, 3.0f); // 7
+		// gstnsmk
+		createFloatUniform("iSobel", mSDASettings->ISOBEL, 0.02f, 0.02f, 1.0f); // 8
 		// bad tv
-		createFloatUniform("iBadTv", 8, 0.0f, 0.0f, 5.0f);
-
-		// RotationSpeed
-		createFloatUniform("iRotationSpeed", 9, 0.0f, -2.0f, 2.0f);
+		createFloatUniform("iBadTv", mSDASettings->IBADTV, 0.0f, 0.0f, 5.0f); // 9
 		// Steps
-		createFloatUniform("iSteps", mSDASettings->ISTEPS, 16.0f, 1.0f, 128.0f);
+		createFloatUniform("iSteps", mSDASettings->ISTEPS, 16.0f, 1.0f, 128.0f); // 10
 
 		// rotary
 		// ratio
-		createFloatUniform("iRatio", mSDASettings->IRATIO, 20.0f, 0.00000000001f, 20.0f);
+		createFloatUniform("iRatio", mSDASettings->IRATIO, 20.0f, 0.00000000001f, 20.0f); // 11
 		// zoom
-		createFloatUniform("iZoom", mSDASettings->IZOOM, 1.0f, -3.0f, 3.0f);
+		createFloatUniform("iZoom", mSDASettings->IZOOM, 1.0f, -3.0f, 3.0f); // 12
 		// Audio multfactor 
-		createFloatUniform("iAudioMult", 13, 1.0f, 0.01f, 12.0f);
+		createFloatUniform("iAudioMult", mSDASettings->IAUDIOX, 1.0f, 0.01f, 12.0f); // 13
 		// exposure
 		createFloatUniform("iExposure", mSDASettings->IEXPOSURE, 1.0f, 0.0f, 3.0f); // 14
 		// Pixelate
@@ -95,71 +94,65 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		createFloatUniform("iChromatic", mSDASettings->ICHROMATIC, 0.0f, 0.000000001f); // 17
 		// iCrossfade
 		createFloatUniform("iCrossfade", mSDASettings->IXFADE, 1.0f); // 18
-		// akai faders: master:62
-		// weight mix fbo texture 0
-		createFloatUniform("iWeight0", mSDASettings->IWEIGHT0, 1.0f); // 19
-		// slitscan (or other) Param1 
-		createFloatUniform("iParam1", mSDASettings->IPARAM1, 1.0f, 0.01f, 100.0f); // 20
+		// tempo time
+		createFloatUniform("iTempoTime", mSDASettings->ITEMPOTIME, 0.1f); // 19
+		// fps
+		createFloatUniform("iFps", mSDASettings->IFPS, 60.0f, 0.0f, 500.0f); // 20	
 		// iBpm 
 		createFloatUniform("iBpm", mSDASettings->IBPM, 165.0f, 0.000000001f, 400.0f); // 21
-		// gstnsmk
-		createFloatUniform("iSobel", mSDASettings->ISOBEL, 0.02f, 0.02f, 1.0f); // 22
-				// TODO: double background alpha
-		createFloatUniform("iBA", 23, 0.2f);
-		// tempo time
-		createFloatUniform("iTempoTime", 24, 0.1f);
-		// fps 25
-		createFloatUniform("iFps", mSDASettings->IFPS, 60.0f, 0.0f, 500.0f); // 25
-		// contour
-		createFloatUniform("iContour", 26, 0.0f, 0.0f, 0.5f);
+		// Speed 
+		createFloatUniform("iSpeed", mSDASettings->ISPEED, 12.0f, 0.01f, 12.0f); // 22
 		// slitscan (or other) Param1 
-		createFloatUniform("iParam1", 27, 1.0f, 0.01f, 100.0f);
-		// slitscan (or other) Param2 
-		createFloatUniform("iParam2", 28, 1.0f, 0.01f, 100.0f);
-		// weight texture 1
-		createFloatUniform("iWeight1", mSDASettings->IWEIGHT1, 0.0f); // 23
+		createFloatUniform("iParam1", mSDASettings->IPARAM1, 1.0f, 0.01f, 100.0f); // 23
 		// slitscan (or other) Param2 
 		createFloatUniform("iParam2", mSDASettings->IPARAM2, 1.0f, 0.01f, 100.0f); // 24
-		// TODO: double 
-		// weight texture 2
-		createFloatUniform("iWeight2", mSDASettings->IWEIGHT2, 0.0f); // 27
-		// weight texture 3
-		createFloatUniform("iWeight3", mSDASettings->IWEIGHT3, 0.0f); // 31
-		// weight texture 4
-		createFloatUniform("iWeight4", mSDASettings->IWEIGHT4, 0.0f); // 49
-
-		// top row 21 to 28
-		// Speed 
-		createFloatUniform("iSpeed", mSDASettings->ISPEED, 12.0f, 0.01f, 12.0f); // 32
-		// iResolutionX (should be fbowidth) 
-		createFloatUniform("iResolutionX", 29, mSDASettings->mFboWidth, 0.01f, 1280.0f);
-		// iResolutionY (should be fboheight)  
-		createFloatUniform("iResolutionY", 30, mSDASettings->mFboHeight, 0.01f, 800.0f);
-		// nanokontrol middle row 31 to 38, bottom row 41 to 48
 		// iFreq0  
-		createFloatUniform("iFreq0", 31, 0.0f, 0.01f, 256.0f);
+		createFloatUniform("iFreq0", mSDASettings->IFREQ0, 0.0f, 0.01f, 256.0f); // 25 
 		// iFreq1  
-		createFloatUniform("iFreq1", 32, 0.0f, 0.01f, 256.0f);
+		createFloatUniform("iFreq1", mSDASettings->IFREQ1, 0.0f, 0.01f, 256.0f); // 26
 		// iFreq2  
-		createFloatUniform("iFreq2", 33, 0.0f, 0.01f, 256.0f);
+		createFloatUniform("iFreq2", mSDASettings->IFREQ2, 0.0f, 0.01f, 256.0f); // 27
 		// iFreq3  
-		createFloatUniform("iFreq3", 34, 0.0f, 0.01f, 256.0f);
-		// iMouseX  
-		createFloatUniform("iMouseX", 35, 320.0f, 0.0f, 1280.0f);
-		// iMouseY  
-		createFloatUniform("iMouseY", 36, 240.0f, 0.0f, 800.0f);
-		// iMouseZ  
-		createFloatUniform("iMouseZ", 37, 0.0f, 0.0f, 1.0f);
-		// vignette amount
-		createFloatUniform("iVAmount", 38, 0.91f, 0.0f, 1.0f);
-		// vignette falloff
-		createFloatUniform("iVFallOff", 39, 0.31f, 0.0f, 1.0f);
+		createFloatUniform("iFreq3", mSDASettings->IFREQ3, 0.0f, 0.01f, 256.0f); // 28
+		// iResolutionX (should be fbowidth) 
+		createFloatUniform("iResolutionX", mSDASettings->IRESX, mSDASettings->mFboWidth, 0.01f, 1280.0f); // 29
+		// iResolutionY (should be fboheight)  
+		createFloatUniform("iResolutionY", mSDASettings->IRESY, mSDASettings->mFboHeight, 0.01f, 800.0f); // 30
+
+		// TODO: double 
+		// weight mix fbo texture 0
+		createFloatUniform("iWeight0", mSDASettings->IWEIGHT0, 1.0f); // 31
+		// weight texture 1
+		createFloatUniform("iWeight1", mSDASettings->IWEIGHT1, 0.0f); // 32
+		// weight texture 2
+		createFloatUniform("iWeight2", mSDASettings->IWEIGHT2, 0.0f); // 33
+		// weight texture 3
+		createFloatUniform("iWeight3", mSDASettings->IWEIGHT3, 0.0f); // 34
+		// weight texture 4
+		createFloatUniform("iWeight4", mSDASettings->IWEIGHT4, 0.0f); // 35
 		// background red
-		createFloatUniform("iBR", mSDASettings->IBR, 0.1f);
+		createFloatUniform("iBR", mSDASettings->IBR, 0.1f); // 36
 		// background green
-		createFloatUniform("iBG", mSDASettings->IBG, 0.5f);
+		createFloatUniform("iBG", mSDASettings->IBG, 0.5f); // 37
 		// background blue
-		createFloatUniform("iBB", mSDASettings->IBB, 0.1f);
+		createFloatUniform("iBB", mSDASettings->IBB, 0.1f); // 38
+		// background alpha
+		createFloatUniform("iBA", mSDASettings->IBA, 0.2f); // 39
+		// contour
+		createFloatUniform("iContour", mSDASettings->ICONTOUR, 0.0f, 0.0f, 0.5f); // 40
+		// RotationSpeed
+		createFloatUniform("iRotationSpeed", mSDASettings->IROTATIONSPEED, 0.0f, -2.0f, 2.0f); // 41
+	
+		// iMouseX  
+		createFloatUniform("iMouseX", mSDASettings->IMOUSEX, 320.0f, 0.0f, 1280.0f); // 42
+		// iMouseY  
+		createFloatUniform("iMouseY", mSDASettings->IMOUSEY, 240.0f, 0.0f, 800.0f); // 43
+		// iMouseZ  
+		createFloatUniform("iMouseZ", mSDASettings->IMOUSEZ, 0.0f, 0.0f, 1.0f); // 44
+		// vignette amount
+		createFloatUniform("iVAmount", mSDASettings->IVAMOUNT, 0.91f, 0.0f, 1.0f); // 45
+		// vignette falloff
+		createFloatUniform("iVFallOff", mSDASettings->IVFALLOFF, 0.31f, 0.0f, 1.0f); // 46
 
 		// int
 		// blend mode 
@@ -167,7 +160,7 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		// greyscale 
 		createIntUniform("iGreyScale", 51, 0);
 		// current beat
-		createIntUniform("iPhase", mSDASettings->IPHASE, 0);
+		createIntUniform("iPhase", mSDASettings->IPHASE, 0); // 52
 		// beats per bar 
 		createIntUniform("iBeatsPerBar", 53, 4);
 
@@ -194,16 +187,6 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		createBoolUniform("iXorY", mSDASettings->IXORY); // was 87
 		createBoolUniform("iFlipH", mSDASettings->IFLIPH); // 100 toggle was 90
 		createBoolUniform("iFlipV", mSDASettings->IFLIPV); // 103 toggle was 92
-		/*createBoolUniform("iInvert", 48);
-		createBoolUniform("iFlipH", 81);
-		createBoolUniform("iFlipV", 82);
-		createBoolUniform("iXorY", 83);
-		// glitch
-		createBoolUniform("iGlitch", 45);
-		// toggle
-		createBoolUniform("iToggle", 46);
-		// vignette
-		createBoolUniform("iVignette", 47); */
 
 		// vec4 kinect2
 		createVec4Uniform("iSpineBase", 200, vec4(320.0f, 240.0f, 0.0f, 0.0f));
@@ -768,11 +751,11 @@ void SDAAnimation::update() {
 		}
 
 		// foreground color vec3 update
-		shaderUniforms["iColor"].vec3Value = vec3(shaderUniforms[getUniformNameForIndex(1)].floatValue, shaderUniforms[getUniformNameForIndex(2)].floatValue, shaderUniforms[getUniformNameForIndex(3)].floatValue);
+		shaderUniforms["iColor"].vec3Value = vec3(shaderUniforms[getUniformNameForIndex(mSDASettings->IFR)].floatValue, shaderUniforms[getUniformNameForIndex(mSDASettings->IFG)].floatValue, shaderUniforms[getUniformNameForIndex(mSDASettings->IFB)].floatValue);
 		// background color vec3 update
-		shaderUniforms["iBackgroundColor"].vec3Value = vec3(shaderUniforms[getUniformNameForIndex(19)].floatValue, shaderUniforms[getUniformNameForIndex(20)].floatValue, shaderUniforms[getUniformNameForIndex(21)].floatValue);
+		shaderUniforms["iBackgroundColor"].vec3Value = vec3(shaderUniforms[getUniformNameForIndex(mSDASettings->IBR)].floatValue, shaderUniforms[getUniformNameForIndex(mSDASettings->IBG)].floatValue, shaderUniforms[getUniformNameForIndex(mSDASettings->IBB)].floatValue);
 		// mouse vec4 update
-		shaderUniforms["iMouse"].vec4Value = vec4(shaderUniforms[getUniformNameForIndex(35)].floatValue, shaderUniforms[getUniformNameForIndex(36)].floatValue, shaderUniforms[getUniformNameForIndex(37)].floatValue, 0.0f);
+		shaderUniforms["iMouse"].vec4Value = vec4(shaderUniforms[getUniformNameForIndex(mSDASettings->IMOUSEX)].floatValue, shaderUniforms[getUniformNameForIndex(mSDASettings->IMOUSEY)].floatValue, shaderUniforms[getUniformNameForIndex(mSDASettings->IMOUSEZ)].floatValue, 0.0f);
 		// TODO migrate:
 		if (mSDASettings->autoInvert)
 		{

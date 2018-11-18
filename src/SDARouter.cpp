@@ -238,6 +238,7 @@ void SDARouter::midiListener(midi::Message msg) {
 		//// quick hack!
 		//mSDAAnimation->setFloatUniformValueByIndex(14, 1.0f + midiNormalizedValue);
 		midiPitch = msg.pitch;
+		// midimix solo mode
 		if (midiPitch == 27) midiSticky = true;
 		if (midiSticky) {
 			midiStickyPrevIndex = midiPitch;
@@ -249,6 +250,7 @@ void SDARouter::midiListener(midi::Message msg) {
 		break;
 	case MIDI_NOTE_OFF:
 		midiPitch = msg.pitch;
+		// midimix solo mode
 		if (midiPitch == 27) {
 			midiStickyPrevIndex = 0;
 			midiSticky = false;
