@@ -324,8 +324,6 @@ void SDARouter::updateParams(int iarg0, float farg1) {
 			//mSDASettings->xFade = farg1;
 			//mSDASettings->xFadeChanged = true;
 		}
-		mSDAWebsocket->wsWrite("{\"params\" :[{\"name\":" + toString(iarg0) + ",\"value\":" + toString(mSDAAnimation->getFloatUniformValueByIndex(iarg0)) + "}]}");
-
 	}
 	// buttons
 	if (iarg0 > 20 && iarg0 < 29) {
@@ -340,6 +338,10 @@ void SDARouter::updateParams(int iarg0, float farg1) {
 	if (iarg0 > 40 && iarg0 < 49) {
 		// low row 
 		mSDAAnimation->setFloatUniformValueByIndex(iarg0, farg1);
+	}
+	if (iarg0 > 0 && iarg0 < 49) {
+		// float values 
+		mSDAWebsocket->wsWrite("{\"params\" :[{ \"name\":" + toString(iarg0) + ",\"value\":" + toString(mSDAAnimation->getFloatUniformValueByIndex(iarg0)) + "}]}");
 	}
 }
 

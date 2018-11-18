@@ -99,6 +99,10 @@ void SDAWebsocket::parseMessage(string msg) {
 						float value = jsonElement->getChild("value").getValue<float>();
 						// basic name value 
 						mSDAAnimation->setFloatUniformValueByIndex(name, value);
+						// dispatch to clients
+						if (mSDASettings->mIsWebSocketsServer) {
+							wsWrite(msg);
+						}
 					}
 				}
 
