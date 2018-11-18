@@ -98,6 +98,9 @@ namespace SophiaDigitalArt
 		float						midiNormalizedValue;
 		int							midiValue;
 		int							midiChannel;
+		bool						midiSticky; // midimix solo
+		bool						midiStickyPrevValue;
+		int							midiStickyPrevIndex;
 
 		int							mSelectedWarp;
 		int							mSelectedFboA;

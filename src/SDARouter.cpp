@@ -238,13 +238,29 @@ void SDARouter::midiListener(midi::Message msg) {
 		//// quick hack!
 		//mSDAAnimation->setFloatUniformValueByIndex(14, 1.0f + midiNormalizedValue);
 		midiPitch = msg.pitch;
+		if (midiPitch == 27) midiSticky = true;
+		if (midiSticky) {
+			midiStickyPrevIndex = midiPitch;
+			midiStickyPrevValue = mSDAAnimation->getBoolUniformValueByIndex(midiPitch + 80);
+		}
 		mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80, true);
 		ss << "MIDI noteon Chn: " << midiChannel << " Pitch: " << midiPitch << std::endl;
 		CI_LOG_V("Midi: " + ss.str());
 		break;
 	case MIDI_NOTE_OFF:
 		midiPitch = msg.pitch;
-		mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80, false);
+		if (midiPitch == 27) {
+			midiStickyPrevIndex = 0;
+			midiSticky = false;
+		}
+		if (!midiSticky) {
+			mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80, false);
+		}
+		else {
+			if (midiPitch == midiStickyPrevIndex) {
+				mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80, !midiStickyPrevValue);
+			}
+		}
 		ss << "MIDI noteoff Chn: " << midiChannel << " Pitch: " << midiPitch << std::endl;
 		CI_LOG_V("Midi: " + ss.str());
 		/*midiControlType = "/off";
