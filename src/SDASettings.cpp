@@ -589,8 +589,8 @@ void SDASettings::reset()
 	mMidiMsg = "";
 	InfoMsg = "";
 	mIsOSCSender = false;
-	xFade = 1.0f;
-	xFadeChanged = false;
+	/*xFade = 1.0f;
+	xFadeChanged = false;*/
 	// web sockets
 	mIsRouter = false;
 	mAreWebSocketsEnabledAtStartup = true;

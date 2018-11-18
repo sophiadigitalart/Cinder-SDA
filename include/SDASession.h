@@ -146,8 +146,14 @@ namespace SophiaDigitalArt {
 		bool							getFreqWSSend() { return mFreqWSSend; };
 		void							toggleFreqWSSend() { mFreqWSSend = !mFreqWSSend; };
 		// uniforms
-		void							setMixCrossfade(unsigned int aWarpIndex, float aCrossfade) { mSDASettings->xFade = aCrossfade; mSDASettings->xFadeChanged = true; };
-		float							getMixCrossfade(unsigned int aWarpIndex) { return mSDASettings->xFade; };
+		//void							setMixCrossfade(unsigned int aWarpIndex, float aCrossfade) { mSDASettings->xFade = aCrossfade; mSDASettings->xFadeChanged = true; };
+		//float							getMixCrossfade(unsigned int aWarpIndex) { return mSDASettings->xFade; };
+		float							getCrossfade() {
+			return mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE);
+		};
+		void							setCrossfade(float aCrossfade) {
+			mSDAAnimation->setFloatUniformValueByIndex(mSDASettings->IXFADE, aCrossfade);
+		};
 		void							setFboAIndex(unsigned int aIndex, unsigned int aFboIndex);
 		void							setFboBIndex(unsigned int aIndex, unsigned int aFboIndex);
 		unsigned int					getFboAIndex(unsigned int aIndex) { return 0; };
@@ -208,10 +214,10 @@ namespace SophiaDigitalArt {
 		void							toggleRenderTexture() { mRenderTexture = !mRenderTexture; }
 		bool							isAutoLayout() { return mSDASettings->mAutoLayout; };
 		void							toggleAutoLayout() { mSDASettings->mAutoLayout = !mSDASettings->mAutoLayout; }
-		bool							isFlipH() { return mFlipH; };
-		bool							isFlipV() { return mFlipV; };
-		void							flipH(){mFlipH = !mFlipH;};
-		void							flipV(){mFlipV = !mFlipV;};
+		bool							isFlipH() { return mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPH); };
+		bool							isFlipV() { return mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPV); };
+		void							flipH(){mSDAAnimation->setBoolUniformValueByIndex(mSDASettings->IFLIPH, !mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPH));};
+		void							flipV(){ mSDAAnimation->setBoolUniformValueByIndex(mSDASettings->IFLIPV, !mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPV));};
 
 		// blendmodes
 		unsigned int					getFboBlendCount() { return mBlendFbos.size(); };
@@ -331,8 +337,8 @@ namespace SophiaDigitalArt {
 		//SDAFboList						mFboList;
 		fs::path						mFbosFilepath;
 		// fbo 
-		bool							mFlipV;
-		bool							mFlipH;
+		//bool							mFlipV;
+		//bool							mFlipH;
 		gl::Texture::Format				fmt;
 		gl::Fbo::Format					fboFmt;
 		bool							mEnabledAlphaBlending;

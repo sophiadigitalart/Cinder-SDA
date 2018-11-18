@@ -65,11 +65,11 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		// Alpha 
 		createFloatUniform("iAlpha", mSDASettings->IFA, 1.0f);
 		// red multiplier 
-		createFloatUniform("iRedMultiplier", 5, 1.0f, 0.0f, 3.0f);
+		createFloatUniform("iRedMultiplier", mSDASettings->IFRX, 1.0f, 0.0f, 3.0f);// 5
 		// green multiplier 
-		createFloatUniform("iGreenMultiplier", 6, 1.0f, 0.0f, 3.0f);
+		createFloatUniform("iGreenMultiplier", mSDASettings->IFGX, 1.0f, 0.0f, 3.0f);// 6
 		// blue multiplier 
-		createFloatUniform("iBlueMultiplier", 7, 1.0f, 0.0f, 3.0f);
+		createFloatUniform("iBlueMultiplier", mSDASettings->IFBX, 1.0f, 0.0f, 3.0f);// 7
 		// bad tv
 		createFloatUniform("iBadTv", 8, 0.0f, 0.0f, 5.0f);
 
@@ -86,26 +86,41 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		// Audio multfactor 
 		createFloatUniform("iAudioMult", 13, 1.0f, 0.01f, 12.0f);
 		// exposure
-		createFloatUniform("iExposure", mSDASettings->IEXPOSURE, 1.0f, 0.0f, 3.0f);
+		createFloatUniform("iExposure", mSDASettings->IEXPOSURE, 1.0f, 0.0f, 3.0f); // 14
 		// Pixelate
-		createFloatUniform("iPixelate", mSDASettings->IPIXELATE, 1.0f, 0.01f);
+		createFloatUniform("iPixelate", mSDASettings->IPIXELATE, 1.0f, 0.01f); // 15
 		// Trixels
-		createFloatUniform("iTrixels", mSDASettings->ITRIXELS, 0.0f);
+		createFloatUniform("iTrixels", mSDASettings->ITRIXELS, 0.0f); // 16
 		// iChromatic
-		createFloatUniform("iChromatic", mSDASettings->ICHROMATIC, 0.0f, 0.000000001f);
+		createFloatUniform("iChromatic", mSDASettings->ICHROMATIC, 0.0f, 0.000000001f); // 17
 		// iCrossfade
-		createFloatUniform("iCrossfade", mSDASettings->IXFADE, 1.0f);
-		// akai faders: 19,23,27,31,49,53,57,61,master:62
+		createFloatUniform("iCrossfade", mSDASettings->IXFADE, 1.0f); // 18
+		// akai faders: master:62
 		// weight mix fbo texture 0
 		createFloatUniform("iWeight0", mSDASettings->IWEIGHT0, 1.0f); // 19
 		// slitscan (or other) Param1 
 		createFloatUniform("iParam1", mSDASettings->IPARAM1, 1.0f, 0.01f, 100.0f); // 20
+		// iBpm 
+		createFloatUniform("iBpm", mSDASettings->IBPM, 165.0f, 0.000000001f, 400.0f); // 21
 		// gstnsmk
 		createFloatUniform("iSobel", mSDASettings->ISOBEL, 0.02f, 0.02f, 1.0f); // 22
+				// TODO: double background alpha
+		createFloatUniform("iBA", 23, 0.2f);
+		// tempo time
+		createFloatUniform("iTempoTime", 24, 0.1f);
+		// fps 25
+		createFloatUniform("iFps", mSDASettings->IFPS, 60.0f, 0.0f, 500.0f); // 25
+		// contour
+		createFloatUniform("iContour", 26, 0.0f, 0.0f, 0.5f);
+		// slitscan (or other) Param1 
+		createFloatUniform("iParam1", 27, 1.0f, 0.01f, 100.0f);
+		// slitscan (or other) Param2 
+		createFloatUniform("iParam2", 28, 1.0f, 0.01f, 100.0f);
 		// weight texture 1
 		createFloatUniform("iWeight1", mSDASettings->IWEIGHT1, 0.0f); // 23
 		// slitscan (or other) Param2 
 		createFloatUniform("iParam2", mSDASettings->IPARAM2, 1.0f, 0.01f, 100.0f); // 24
+		// TODO: double 
 		// weight texture 2
 		createFloatUniform("iWeight2", mSDASettings->IWEIGHT2, 0.0f); // 27
 		// weight texture 3
@@ -116,18 +131,6 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		// top row 21 to 28
 		// Speed 
 		createFloatUniform("iSpeed", mSDASettings->ISPEED, 12.0f, 0.01f, 12.0f); // 32
-		// background alpha
-		createFloatUniform("iBA", 23, 0.2f);
-		// tempo time
-		createFloatUniform("iTempoTime", 24, 0.1f);
-		// fps 25
-		createFloatUniform("iFps", mSDASettings->IFPS, 60.0f, 0.0f, 500.0f);
-		// contour
-		createFloatUniform("iContour", 26, 0.0f, 0.0f, 0.5f);
-		// slitscan (or other) Param1 
-		createFloatUniform("iParam1", 27, 1.0f, 0.01f, 100.0f);
-		// slitscan (or other) Param2 
-		createFloatUniform("iParam2", 28, 1.0f, 0.01f, 100.0f);
 		// iResolutionX (should be fbowidth) 
 		createFloatUniform("iResolutionX", 29, mSDASettings->mFboWidth, 0.01f, 1280.0f);
 		// iResolutionY (should be fboheight)  
@@ -180,7 +183,18 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 
 		// boolean
 		// invert
-		createBoolUniform("iInvert", 48);
+		// glitch
+		createBoolUniform("iGlitch", mSDASettings->IGLITCH); // 81
+		// vignette
+		createBoolUniform("iVignette", mSDASettings->IVIGN); // 82 toggle
+		// toggle
+		createBoolUniform("iToggle", mSDASettings->ITOGGLE); // 83
+		// invert
+		createBoolUniform("iInvert", mSDASettings->IINVERT); // 86
+		createBoolUniform("iXorY", mSDASettings->IXORY); // was 87
+		createBoolUniform("iFlipH", mSDASettings->IFLIPH); // 100 toggle was 90
+		createBoolUniform("iFlipV", mSDASettings->IFLIPV); // 103 toggle was 92
+		/*createBoolUniform("iInvert", 48);
 		createBoolUniform("iFlipH", 81);
 		createBoolUniform("iFlipV", 82);
 		createBoolUniform("iXorY", 83);
@@ -189,7 +203,7 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		// toggle
 		createBoolUniform("iToggle", 46);
 		// vignette
-		createBoolUniform("iVignette", 47);
+		createBoolUniform("iVignette", 47); */
 
 		// vec4 kinect2
 		createVec4Uniform("iSpineBase", 200, vec4(320.0f, 240.0f, 0.0f, 0.0f));
@@ -223,7 +237,7 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 	// textures
 	for (size_t i = 0; i < 8; i++)
 	{
-		createSampler2DUniform("iChannel" + toString(i), 100 + i, i);// TODO verify doesn't mess up type (uint!)
+		createSampler2DUniform("iChannel" + toString(i), 300 + i, i);// TODO verify doesn't mess up type (uint!)
 	}
 	// iRHandX  
 	//createFloatUniform("iRHandX", mSDASettings->IRHANDX, 320.0f, 0.0f, 1280.0f);

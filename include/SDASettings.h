@@ -29,6 +29,9 @@ namespace SophiaDigitalArt {
 		static const int			IFG = 2;
 		static const int			IFB = 3;
 		static const int			IFA = 4;
+		static const int			IFRX = 5;
+		static const int			IFGX = 6;
+		static const int			IFBX = 7;
 		static const int			ISTEPS = 10;
 		static const int			IRATIO = 11;
 		static const int			IZOOM = 12;
@@ -58,9 +61,14 @@ namespace SophiaDigitalArt {
 		static const int			IFREQ2 = 45;
 		static const int			IFREQ3 = 46;
 		static const int			IWEIGHT4 = 49;
+		// booleans 80 to 110
 		static const int			IGLITCH = 81;
+		static const int			IVIGN = 82;
 		static const int			ITOGGLE = 83;
 		static const int			IINVERT = 86;
+		static const int			IFLIPH = 100;
+		static const int			IXORY = 101;
+		static const int			IFLIPV = 103;
 		/*static const int			IRHANDX = 110;
 		static const int			IRHANDY = 111;
 		static const int			IRHANDZ = 112;
@@ -244,8 +252,8 @@ namespace SophiaDigitalArt {
 		bool						mWebSocketsNewMsg;
 		// midi
 		std::string					mMidiMsg;
-		float						xFade;
-		bool						xFadeChanged;
+		//float						xFade;
+		//bool						xFadeChanged;
 
 		// abp
 		float						mBend;

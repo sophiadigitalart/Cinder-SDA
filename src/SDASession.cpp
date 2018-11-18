@@ -165,22 +165,22 @@ void SDASession::updateMixUniforms() {
 	mGlslMix->uniform("iAlpha", mSDAAnimation->getFloatUniformValueByIndex(4) * mSDASettings->iAlpha);
 	mGlslMix->uniform("iChromatic", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ICHROMATIC));
 	mGlslMix->uniform("iRotationSpeed", mSDAAnimation->getFloatUniformValueByIndex(9));
-	mGlslMix->uniform("iCrossfade", mSDASettings->xFade);
+	mGlslMix->uniform("iCrossfade", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE)); //xFade);
 	mGlslMix->uniform("iPixelate", mSDAAnimation->getFloatUniformValueByIndex(15));
 	mGlslMix->uniform("iExposure", mSDAAnimation->getFloatUniformValueByIndex(14));
 	mGlslMix->uniform("iToggle", (int)mSDAAnimation->getBoolUniformValueByIndex(46));
 	mGlslMix->uniform("iGreyScale", (int)mSDASettings->iGreyScale);
 	mGlslMix->uniform("iBackgroundColor", mSDAAnimation->getVec3UniformValueByName("iBackgroundColor"));// vec3(mSDAAnimation->getFloatUniformValueByIndex(5), mSDAAnimation->getFloatUniformValueByIndex(6), mSDAAnimation->getFloatUniformValueByIndex(7)));
-	mGlslMix->uniform("iVignette", (int)mSDAAnimation->getBoolUniformValueByIndex(47));
-	mGlslMix->uniform("iInvert", (int)mSDAAnimation->getBoolUniformValueByIndex(48));
+	mGlslMix->uniform("iVignette", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IVIGN));
+	mGlslMix->uniform("iInvert", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IINVERT));
 	mGlslMix->uniform("iTempoTime", mSDAAnimation->getFloatUniformValueByName("iTempoTime"));
-	mGlslMix->uniform("iGlitch", (int)mSDAAnimation->getBoolUniformValueByIndex(45));
+	mGlslMix->uniform("iGlitch", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IGLITCH));
 	mGlslMix->uniform("iTrixels", mSDAAnimation->getFloatUniformValueByIndex(16));
 	mGlslMix->uniform("iRedMultiplier", mSDAAnimation->getFloatUniformValueByName("iRedMultiplier"));
 	mGlslMix->uniform("iGreenMultiplier", mSDAAnimation->getFloatUniformValueByName("iGreenMultiplier"));
 	mGlslMix->uniform("iBlueMultiplier", mSDAAnimation->getFloatUniformValueByName("iBlueMultiplier"));
-	mGlslMix->uniform("iFlipV", mFlipV);
-	mGlslMix->uniform("iFlipH", mFlipH);
+	mGlslMix->uniform("iFlipH", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPH));
+	mGlslMix->uniform("iFlipV", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPV));
 	mGlslMix->uniform("iParam1", mSDASettings->iParam1);
 	mGlslMix->uniform("iParam2", mSDASettings->iParam2);
 	mGlslMix->uniform("iXorY", mSDASettings->iXorY);
@@ -228,20 +228,20 @@ void SDASession::updateBlendUniforms() {
 	mGlslBlend->uniform("iAnim", mSDASettings->iAnim.value());
 	mGlslBlend->uniform("iRepeat", (int)mSDASettings->iRepeat);
 	mGlslBlend->uniform("iVignette", (int)mSDAAnimation->getBoolUniformValueByIndex(47));
-	mGlslBlend->uniform("iInvert", (int)mSDAAnimation->getBoolUniformValueByIndex(48));
+	mGlslBlend->uniform("iInvert", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IINVERT));
 	mGlslBlend->uniform("iDebug", (int)mSDASettings->iDebug);
 	mGlslBlend->uniform("iShowFps", (int)mSDASettings->iShowFps);
 	mGlslBlend->uniform("iFps", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFPS));
 	mGlslBlend->uniform("iTempoTime", mSDAAnimation->getFloatUniformValueByName("iTempoTime"));
-	mGlslBlend->uniform("iGlitch", (int)mSDAAnimation->getBoolUniformValueByIndex(45));
+	mGlslBlend->uniform("iGlitch", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IGLITCH));
 	mGlslBlend->uniform("iTrixels", mSDAAnimation->getFloatUniformValueByIndex(16));
 	//mGlslBlend->uniform("iPhase", mSDASettings->iPhase);
 	mGlslBlend->uniform("iSeed", mSDASettings->iSeed);
 	mGlslBlend->uniform("iRedMultiplier", mSDAAnimation->getFloatUniformValueByName("iRedMultiplier"));
 	mGlslBlend->uniform("iGreenMultiplier", mSDAAnimation->getFloatUniformValueByName("iGreenMultiplier"));
 	mGlslBlend->uniform("iBlueMultiplier", mSDAAnimation->getFloatUniformValueByName("iBlueMultiplier"));
-	mGlslBlend->uniform("iFlipH", 0);
-	mGlslBlend->uniform("iFlipV", 0);
+	mGlslBlend->uniform("iFlipH", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPH));
+	mGlslBlend->uniform("iFlipV", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPV));
 	mGlslBlend->uniform("iParam1", mSDASettings->iParam1);
 	mGlslBlend->uniform("iParam2", mSDASettings->iParam2);
 	mGlslBlend->uniform("iXorY", mSDASettings->iXorY);
@@ -255,7 +255,7 @@ void SDASession::update(unsigned int aClassIndex) {
 			updateStream(mSDAWebsocket->getBase64Image());
 		}
 		if (mSDAWebsocket->hasReceivedShader()) {
-			if (mSDASettings->xFade < 0.5) {
+			if (mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) < 0.5) {
 				setFragmentShaderString(2, mSDAWebsocket->getReceivedShader());
 			}
 			else {
@@ -287,9 +287,9 @@ void SDASession::update(unsigned int aClassIndex) {
 		mSDAWebsocket->changeFloatValue(34, getFreq(3), true);
 	}
 	// check if xFade changed
-	if (mSDASettings->xFadeChanged) {
+	/*if (mSDASettings->xFadeChanged) {
 		mSDASettings->xFadeChanged = false;
-	}
+	}*/
 	updateMixUniforms();
 	renderMix();
 	// blendmodes preview
@@ -346,7 +346,12 @@ void SDASession::restore()
 		JsonTree doc(loadFile(sessionPath));
 		if (doc.hasChild("settings")) {
 			JsonTree settings(doc.getChild("settings"));
-			if (settings.hasChild("bpm")) { mOriginalBpm = settings.getValueForKey<float>("bpm", 166.0f); mSDAAnimation->setBpm(mOriginalBpm); };
+			if (settings.hasChild("bpm")) { 
+				mOriginalBpm = settings.getValueForKey<float>("bpm", 166.0f); 
+				CI_LOG_W("getBpm" + toString(mSDAAnimation->getBpm()) + " mOriginalBpm " + toString(mOriginalBpm));
+				mSDAAnimation->setBpm(mOriginalBpm); 
+				CI_LOG_W("getBpm" + toString(mSDAAnimation->getBpm()) );
+			};
 			if (settings.hasChild("beatsperbar")) mSDAAnimation->setIntUniformValueByName("iBeatsPerBar", settings.getValueForKey<int>("beatsperbar"));
 			if (mSDAAnimation->getIntUniformValueByName("iBeatsPerBar") < 1) mSDAAnimation->setIntUniformValueByName("iBeatsPerBar", 4);
 			if (settings.hasChild("fadeindelay")) mFadeInDelay = settings.getValueForKey<int>("fadeindelay");
@@ -385,8 +390,8 @@ void SDASession::resetSomeParams() {
 void SDASession::reset()
 {
 	// parameters exposed in json file
-	mFlipV = false;
-	mFlipH = false;
+	//mFlipV = false;
+	//mFlipH = false;
 	mOriginalBpm = 166;
 	mWaveFileName = "";
 	mWavePlaybackDelay = 10;
@@ -554,11 +559,11 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 				break;
 			case KeyEvent::KEY_t:
 				// glitch
-				mSDAWebsocket->changeBoolValue(45, true);
+				mSDAWebsocket->changeBoolValue(mSDASettings->IGLITCH, true);
 				break;
 			case KeyEvent::KEY_i:
 				// invert
-				mSDAWebsocket->changeBoolValue(48, true);
+				mSDAWebsocket->changeBoolValue(mSDASettings->IINVERT, true);
 				break;
 			case KeyEvent::KEY_o:
 				// toggle
@@ -1215,7 +1220,7 @@ void SDASession::renderMix() {
 		mFboList[0]->getRenderedTexture()->bind(0);
 		mFboList[1]->getRenderedTexture()->bind(1);
 		gl::ScopedGlslProg glslScope(mGlslMix);
-		mGlslMix->uniform("iCrossfade", mSDASettings->xFade);
+		mGlslMix->uniform("iCrossfade", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE));// mSDASettings->xFade);
 
 		gl::drawSolidRect(Rectf(0, 0, mMixFbos[0].fbo->getWidth(), mMixFbos[0].fbo->getHeight()));
 

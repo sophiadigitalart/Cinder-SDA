@@ -93,9 +93,6 @@ void SDARouter::midiSetup() {
 
 void SDARouter::openMidiInPort(int i) {
 
-	// HACK Push2 has 2 midi ports, we keep the internal one not useable 
-	if (mMidiIn0.getPortName(i) != "Ableton Push 2 1") {
-
 		stringstream ss;
 		if (i < mMidiIn0.getNumPorts()) {
 			if (i == 0) {
@@ -115,8 +112,6 @@ void SDARouter::openMidiInPort(int i) {
 		ss << "Opening MIDI in port " << i << " " << mMidiInputs[i].portName << std::endl;
 		mSDASettings->mMsg = ss.str();
 		mSDASettings->mNewMsg = true;
-	}
-
 }
 void SDARouter::closeMidiInPort(int i) {
 
@@ -236,18 +231,26 @@ void SDARouter::midiListener(midi::Message msg) {
 		//mWebSockets->write("{\"params\" :[{" + controlType);
 		break;
 	case MIDI_NOTE_ON:
-		midiControlType = "/on";
+		//midiControlType = "/on";
+		//midiPitch = msg.pitch;
+		//midiVelocity = msg.velocity;
+		//midiNormalizedValue = lmap<float>(midiVelocity, 0.0, 127.0, 0.0, 1.0);
+		//// quick hack!
+		//mSDAAnimation->setFloatUniformValueByIndex(14, 1.0f + midiNormalizedValue);
 		midiPitch = msg.pitch;
-		midiVelocity = msg.velocity;
-		midiNormalizedValue = lmap<float>(midiVelocity, 0.0, 127.0, 0.0, 1.0);
-		// quick hack!
-		mSDAAnimation->setFloatUniformValueByIndex(14, 1.0f + midiNormalizedValue);
+		mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80, true);
+		ss << "MIDI noteon Chn: " << midiChannel << " Pitch: " << midiPitch << std::endl;
+		CI_LOG_V("Midi: " + ss.str());
 		break;
 	case MIDI_NOTE_OFF:
-		midiControlType = "/off";
+		midiPitch = msg.pitch;
+		mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80, false);
+		ss << "MIDI noteoff Chn: " << midiChannel << " Pitch: " << midiPitch << std::endl;
+		CI_LOG_V("Midi: " + ss.str());
+		/*midiControlType = "/off";
 		midiPitch = msg.pitch;
 		midiVelocity = msg.velocity;
-		midiNormalizedValue = lmap<float>(midiVelocity, 0.0, 127.0, 0.0, 1.0);
+		midiNormalizedValue = lmap<float>(midiVelocity, 0.0, 127.0, 0.0, 1.0);*/
 		break;
 	default:
 		break;
@@ -298,9 +301,10 @@ void SDARouter::updateParams(int iarg0, float farg1) {
 		// exposure
 		if (iarg0 == 14) mSDAAnimation->setFloatUniformValueByIndex(iarg0, (farg1 + 0.01) * mSDAAnimation->getMaxUniformValueByIndex(14));
 		// xfade
-		if (iarg0 == 18) {
-			mSDASettings->xFade = farg1;
-			mSDASettings->xFadeChanged = true;
+		if (iarg0 == mSDASettings->IXFADE) {//18
+			mSDAAnimation->setFloatUniformValueByIndex(iarg0, farg1);
+			//mSDASettings->xFade = farg1;
+			//mSDASettings->xFadeChanged = true;
 		}
 		mSDAWebsocket->wsWrite("{\"params\" :[{\"name\":" + toString(iarg0) + ",\"value\":" + toString(mSDAAnimation->getFloatUniformValueByIndex(iarg0)) + "}]}");
 
