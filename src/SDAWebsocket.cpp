@@ -392,6 +392,7 @@ void SDAWebsocket::wsWrite(string msg)
 
 	if (mSDASettings->mAreWebSocketsEnabledAtStartup)
 	{
+		CI_LOG_V("wsWrite send: " + msg);
 		if (mSDASettings->mIsWebSocketsServer)
 		{
 			mServer.write(msg);
@@ -461,6 +462,7 @@ void SDAWebsocket::changeFloatValue(unsigned int aControl, float aValue, bool fo
 		}
 		sParams << "{\"params\" :[{\"name\" : " << aControl << ",\"value\" : " << mSDAAnimation->getFloatUniformValueByIndex(aControl) << "}]}";
 		string strParams = sParams.str();
+		
 		sendJSON(strParams);
 	}
 }

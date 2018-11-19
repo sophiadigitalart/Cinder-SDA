@@ -81,7 +81,8 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 	// 20161209 problem on Mac mGlslMix->setLabel("mixfbo");
 	mGlslBlend = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixFragmentShaderString());
 	// 20161209 problem on Mac mGlslBlend->setLabel("blend mixfbo");
-
+	mAFboIndex = 0;
+	mBFboIndex = 1;
 }
 
 SDASessionRef SDASession::create(SDASettingsRef aSDASettings)
@@ -662,11 +663,23 @@ void SDASession::sendFragmentShader(unsigned int aShaderIndex) {
 }
 
 void SDASession::setFboAIndex(unsigned int aIndex, unsigned int aFboIndex) {
+	if (aFboIndex < mFboList.size()) {
+		mAFboIndex = aFboIndex;
+	}
+	else {
+		mAFboIndex = mFboList.size() - 1;
+	}
 	/*mSDAMix->setWarpAFboIndex(aIndex, aFboIndex);
 	mSDARouter->setWarpAFboIndex(aIndex, aFboIndex);
 	mSDAWebsocket->changeWarpFboIndex(aIndex, aFboIndex, 0);*/
 }
 void SDASession::setFboBIndex(unsigned int aIndex, unsigned int aFboIndex) {
+	if (aFboIndex < mFboList.size()) {
+		mBFboIndex = aFboIndex;
+	}
+	else {
+		mBFboIndex = mFboList.size() - 1;
+	}
 	/*mSDAMix->setWarpBFboIndex(aIndex, aFboIndex);
 	mSDARouter->setWarpBFboIndex(aIndex, aFboIndex);
 	mSDAWebsocket->changeWarpFboIndex(aIndex, aFboIndex, 1);*/
@@ -884,6 +897,21 @@ void SDASession::initShaderList() {
 
 	if (mShaderList.size() == 0) {
 		CI_LOG_V("SDASession::init mShaderList");
+		createShaderFboFromString("void main(void){vec2 uv = gl_FragCoord.xy / iResolution.xy;uv = abs(2.0*(uv - 0.5));vec4 t1 = texture2D(iChannel0, vec2(uv[0], 0.1));vec4 t2 = texture2D(iChannel0, vec2(uv[1], 0.1));float fft = t1[0] * t2[0];gl_FragColor = vec4(sin(fft*3.141*2.5), sin(fft*3.141*2.0), sin(fft*3.141*1.0), 1.0);}",  "fftMatrixProduct.glsl");
+		createShaderFboFromString("void main(void){vec2 uv = fragCoord.xy / iResolution.xy;vec4 tex = texture(iChannel0, uv);fragColor = vec4(vec3( tex.r, tex.g, tex.b ),1.0);}",  "0.glsl");
+		createShaderFboFromString("void main(void){vec2 uv = fragCoord.xy / iResolution.xy;vec4 tex = texture(iChannel0, uv);fragColor = vec4(vec3( tex.r, tex.g, tex.b ),1.0);}",  "1.glsl");
+		createShaderFboFromString("void main(void) {vec2 uv = 2 * (gl_FragCoord.xy / iResolution.xy - vec2(0.5));float radius = length(uv);float angle = atan(uv.y, uv.x);float col = .0;col += 1.5*sin(iTime + 13.0 * angle + uv.y * 20);col += cos(.9 * uv.x * angle * 60.0 + radius * 5.0 - iTime * 2.);fragColor = (1.2 - radius) * vec4(vec3(col), 1.0);}",  "hexler330.glsl");
+
+		createShaderFboFromString("void main(void){vec2 uv = 2 * (fragCoord.xy / iResolution.xy - vec2(0.5));float specx = texture2D( iChannel0, vec2(0.25,5.0/100.0) ).x;float specy = texture2D( iChannel0, vec2(0.5,5.0/100.0) ).x;float specz = 1.0*texture2D( iChannel0, vec2(0.7,5.0/100.0) ).x;float r = length(uv); float p = atan(uv.y/uv.x); uv = abs(uv);float col = 0.0;float amp = (specx+specy+specz)/3.0;uv.y += sin(uv.y*3.0*specx-iTime/5.0*specy+r*10.);uv.x += cos((iTime/5.0)+specx*30.0*uv.x);col += abs(1.0/uv.y/30.0) * (specx+specz)*15.0;col += abs(1.0/uv.x/60.0) * specx*8. ; fragColor=vec4(vec3( col ),1.0);}", "Hexler2.glsl");
+		createShaderFboFromString("void main(void){vec2 uv = 2 * (gl_FragCoord.xy / iResolution.xy - vec2(0.5));vec2 spec = 1.0*texture2D(iChannel0, vec2(0.25, 5.0 / 100.0)).xx;float col = 0.0;uv.x += sin(iTime * 6.0 + uv.y*1.5)*spec.y;col += abs(0.8 / uv.x) * spec.y;gl_FragColor = vec4(col, col, col, 1.0);}",  "SoundVizVert.glsl");
+		createShaderFboFromString("void main(void){vec2 uv = 2 * (gl_FragCoord.xy / iResolution.xy - vec2(0.5));vec2 spec = 1.0*texture2D(iChannel0, vec2(0.25, 5.0 / 100.0)).yy;float col = 0.0;uv.y += sin(iTime * 6.0 + uv.x*1.5)*spec.x;col += abs(0.8/uv.y) * spec.x;gl_FragColor = vec4(col, col, col, 1.0);}",  "SoundVizHoriz.glsl");
+		//createShaderFboFromString("#define f(a,b)sin(50.3*length(fragCoord.xy/iResolution.xy*4.-vec2(cos(a),sin(b))-3.)) \n void main(){float t=iTime;fragColor=vec4(f(t,t)*f(1.4*t,.7*t));}", "Hyper-lightweight2XOR", "Hyper-lightweight2XOR.glsl");
+		createShaderFboFromString("void main(void) {float d = pow(dot(fragCoord.xy, iResolution.xy ), 0.52); d =  d * 0.5;float x = sin(6.0+0.1*d + iTime*-6.0) * 10.0;fragColor = vec4( x, x, x, 1 );}",  "WallSide.glsl");
+
+		createShaderFboFromString("void main(void){float d = distance(fragCoord.xy, iResolution.xy * vec2(0.5,0.5).xy);float x = sin(5.0+0.1*d + iTime*-4.0) * 5.0;x = clamp( x, 0.0, 1.0 );fragColor = vec4(x, x, x, 1.0);}",  "Circular.glsl");
+		createShaderFboFromString("void main(void){vec4 p = vec4(fragCoord.xy,0.,1.)/iResolution.y - vec4(.9,.5,0,0), c=p-p;float t=iTime,r=length(p.xy+=sin(t+sin(t*.8))*.4),a=atan(p.y,p.x);for (float i = 0.;i<60.;i++) c = c*.98 + (sin(i+vec4(5,3,2,1))*.5+.5)*smoothstep(.99, 1., sin(log(r+i*.05)-t-i+sin(a +=t*.01)));fragColor = c*r;}",  "2TweetsChallenge.glsl");
+		createShaderFboFromString("void main(void){vec2 p = -1.0+2.0*fragCoord.xy/iResolution.xy;float w = sin(iTime+6.5*sqrt(dot(p,p))*cos(p.x));float x = cos(int(iRatio*10.0)*atan(p.y,p.x) + 1.8*w);vec3 col = iColor*15.0;fragColor = vec4(col*x,1.0);}",  "gunstonSmoke.glsl");
+		createShaderFboFromString("void main(void) {vec2  px = 4.0*(-iResolution.xy + 2.0*fragCoord.xy)/iResolution.y;float id = 0.5 + 0.5*cos(iTime + sin(dot(floor(px+0.5),vec2(113.1,17.81)))*43758.545);vec3 co = 0.5 + 0.5*cos(iTime + 3.5*id + vec3(0.0,1.57,3.14) );vec2 pa = smoothstep( 0.0, 0.2, id*(0.5 + 0.5*cos(6.2831*px)) );fragColor = vec4( co*pa.x*pa.y, 1.0 );}",  "ColorGrid.glsl");
 		createShaderFboFromString("void main(void){vec2 uv = gl_FragCoord.xy / iResolution.xy;fragColor = texture(iChannel0, uv);}", "tex0");
 		createShaderFboFromString("void main(void){vec2 uv = gl_FragCoord.xy / iResolution.xy;fragColor = texture(iChannel0, uv);}", "tex1");
 	}
@@ -1208,19 +1236,13 @@ void SDASession::renderMix() {
 		gl::ScopedFramebuffer scopedFbo(mMixFbos[0].fbo);
 		gl::clear(Color::black());
 		// render A and B fbos 
-		//CI_LOG_V(" iCrossfade " + toString(mWarps[warpMixToRender]->ABCrossfade) + " getAFboIndex " + toString(mWarps[warpMixToRender]->getAFboIndex()) + " getBFboIndex " + toString(mWarps[warpMixToRender]->getBFboIndex()));
-		/*mFboList[mWarps[warpMixToRender]->getAFboIndex()]->getFboTexture();
-		mFboList[mWarps[warpMixToRender]->getBFboIndex()]->getFboTexture();
+		mFboList[mAFboIndex]->getFboTexture();
+		mFboList[mBFboIndex]->getFboTexture();
 		// texture binding must be before ScopedGlslProg
-		mFboList[mWarps[warpMixToRender]->getAFboIndex()]->getRenderedTexture()->bind(0);
-		mFboList[mWarps[warpMixToRender]->getBFboIndex()]->getRenderedTexture()->bind(1);*/
-		mFboList[0]->getFboTexture();
-		mFboList[1]->getFboTexture();
-		// texture binding must be before ScopedGlslProg
-		mFboList[0]->getRenderedTexture()->bind(0);
-		mFboList[1]->getRenderedTexture()->bind(1);
+		mFboList[mAFboIndex]->getRenderedTexture()->bind(0);
+		mFboList[mBFboIndex]->getRenderedTexture()->bind(1);
 		gl::ScopedGlslProg glslScope(mGlslMix);
-		mGlslMix->uniform("iCrossfade", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE));// mSDASettings->xFade);
+		mGlslMix->uniform("iCrossfade", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE));
 
 		gl::drawSolidRect(Rectf(0, 0, mMixFbos[0].fbo->getWidth(), mMixFbos[0].fbo->getHeight()));
 
