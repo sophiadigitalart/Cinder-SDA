@@ -366,6 +366,7 @@ namespace SophiaDigitalArt {
 
 		//! mix shader
 		gl::GlslProgRef					mMixShader;
+		string							mError;
 
 		//! Fbos
 		map<int, SDAMixFbo>				mMixFbos;

@@ -172,7 +172,7 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 
 		// vec4
 		createVec4Uniform("iMouse", 70, vec4(320.0f, 240.0f, 0.0f, 0.0f));
-		createVec4Uniform("iDate", 71, vec4(2016.0f, 12.0f, 1.0f, 5.0f));
+		createVec4Uniform("iDate", 71, vec4(2018.0f, 12.0f, 1.0f, 5.0f));
 
 		// boolean
 		// invert
