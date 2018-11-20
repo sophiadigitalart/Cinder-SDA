@@ -77,10 +77,23 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 		mBlendFbos[i] = gl::Fbo::create(mSDASettings->mPreviewFboWidth, mSDASettings->mPreviewFboHeight, fboFmt);
 	}
 
-	mGlslMix = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixFragmentShaderString());
-	// 20161209 problem on Mac mGlslMix->setLabel("mixfbo");
-	mGlslBlend = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixFragmentShaderString());
-	// 20161209 problem on Mac mGlslBlend->setLabel("blend mixfbo");
+	try
+	{
+		mGlslMix = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixFragmentShaderString());
+		mGlslBlend = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixFragmentShaderString());		
+	}
+	catch (gl::GlslProgCompileExc &exc)
+	{
+		mError = "mix error:" + string(exc.what());
+		CI_LOG_V("setFragmentString, unable to compile live fragment shader:" + mError);
+	}
+	catch (const std::exception &e)
+	{
+		mError = "mix error:" + string(e.what());
+		CI_LOG_V("setFragmentString, error on live fragment shader:" + mError);
+	}
+	mSDASettings->mMsg = mError;
+	
 	mAFboIndex = 0;
 	mBFboIndex = 1;
 }
