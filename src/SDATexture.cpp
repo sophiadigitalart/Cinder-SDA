@@ -835,6 +835,7 @@ namespace SophiaDigitalArt {
 				mMonitorLineInSpectralNode = ctx->makeNode(new audio::MonitorSpectralNode(scopeLineInFmt));
 				mLineIn >> mMonitorLineInSpectralNode;
 				mLineIn->enable();
+				mLineInInitialized = true;
 			}
 #endif
 			if (mSDAAnimation->getUseAudio()) {
@@ -844,7 +845,6 @@ namespace SophiaDigitalArt {
 
 				ctx->enable();
 			}
-			mLineInInitialized = true;
 		}
 #if (defined( CINDER_MSW ) || defined( CINDER_MAC ))
 		if (mSDAAnimation->getUseLineIn()) {

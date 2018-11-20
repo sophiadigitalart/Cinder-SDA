@@ -158,9 +158,6 @@ float SDASession::getMaxUniformValueByIndex(unsigned int aIndex) {
 }
 void SDASession::updateMixUniforms() {
 	//vec4 mouse = mSDAAnimation->getVec4UniformValueByName("iMouse");
-	mGlslMix->uniform("iWeight0", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT0));	// weight of channel 0
-	mGlslMix->uniform("iWeight1", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT1));	// weight of channel 1
-	mGlslMix->uniform("iWeight2", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT2));	// weight of channel 2
 
 	mGlslMix->uniform("iBlendmode", mSDASettings->iBlendmode);
 	mGlslMix->uniform("iTime", mSDAAnimation->getFloatUniformValueByIndex(0));
@@ -170,9 +167,17 @@ void SDASession::updateMixUniforms() {
 	// 20180318 mGlslMix->uniform("iMouse", mSDAAnimation->getVec4UniformValueByName("iMouse"));
 	mGlslMix->uniform("iMouse", vec3(mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IMOUSEX), mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IMOUSEY), mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IMOUSEZ)));
 	mGlslMix->uniform("iDate", mSDAAnimation->getVec4UniformValueByName("iDate"));
-	mGlslMix->uniform("iChannel0", 0);
-	mGlslMix->uniform("iChannel1", 1);
-	mGlslMix->uniform("iChannel2", 2);
+	mGlslMix->uniform("iWeight0", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT0));	// weight of channel 0
+	mGlslMix->uniform("iWeight1", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT1));	// weight of channel 1
+	mGlslMix->uniform("iWeight2", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT2));	// weight of channel 2
+	mGlslMix->uniform("iWeight3", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT3)); // texture
+	mGlslMix->uniform("iWeight4", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT4)); // texture
+	mGlslMix->uniform("iChannel0", 0); // fbo shader 
+	mGlslMix->uniform("iChannel1", 1); // fbo shader
+	mGlslMix->uniform("iChannel2", 2); // texture 1
+	mGlslMix->uniform("iChannel3", 3); // texture 2
+	mGlslMix->uniform("iChannel4", 4); // texture 3
+
 	mGlslMix->uniform("iRatio", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IRATIO));//check if needed: +1;
 	mGlslMix->uniform("iRenderXY", mSDASettings->mRenderXY);
 	mGlslMix->uniform("iZoom", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IZOOM));
@@ -213,8 +218,16 @@ void SDASession::updateBlendUniforms() {
 	// 20180318 mGlslBlend->uniform("iMouse", mSDAAnimation->getVec4UniformValueByName("iMouse"));
 	mGlslBlend->uniform("iMouse", vec3(mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IMOUSEX), mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IMOUSEY), mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IMOUSEZ)));
 	mGlslBlend->uniform("iDate", mSDAAnimation->getVec4UniformValueByName("iDate"));
-	mGlslBlend->uniform("iChannel0", 0);
-	mGlslBlend->uniform("iChannel1", 1);
+	mGlslBlend->uniform("iWeight0", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT0));	// weight of channel 0
+	mGlslBlend->uniform("iWeight1", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT1));	// weight of channel 1
+	mGlslBlend->uniform("iWeight2", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT2));	// weight of channel 2
+	mGlslBlend->uniform("iWeight3", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT3)); // texture
+	mGlslBlend->uniform("iWeight4", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT4)); // texture
+	mGlslBlend->uniform("iChannel0", 0); // fbo shader 
+	mGlslBlend->uniform("iChannel1", 1); // fbo shader
+	mGlslBlend->uniform("iChannel2", 2); // texture 1
+	mGlslBlend->uniform("iChannel3", 3); // texture 2
+	mGlslBlend->uniform("iChannel4", 4); // texture 3
 	mGlslBlend->uniform("iAudio0", 0);
 	mGlslBlend->uniform("iFreq0", mSDAAnimation->getFloatUniformValueByName("iFreq0"));
 	mGlslBlend->uniform("iFreq1", mSDAAnimation->getFloatUniformValueByName("iFreq1"));
