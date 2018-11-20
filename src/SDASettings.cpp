@@ -429,7 +429,7 @@ void SDASettings::resetSomeParams() {
 	// mPreviewFboWidth 80 mPreviewFboHeight 60 margin 10 inBetween 15 mPreviewWidth = 160;mPreviewHeight = 120;
 	uiPreviewH = mPreviewHeight + uiMargin;
 	uiLargeW = (mPreviewFboWidth + uiMargin) * 3;
-	uiLargeH = (mPreviewFboHeight + uiMargin) * 7;
+	uiLargeH = (mPreviewFboHeight + uiMargin) * 7 + 13;
 	uiLargePreviewW = mPreviewFboWidth * 1.6;
 	uiLargePreviewH = mPreviewHeight * 2.2;
 	
