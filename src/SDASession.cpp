@@ -201,6 +201,7 @@ void SDASession::updateMixUniforms() {
 	mGlslMix->uniform("iBadTv", mSDAAnimation->getFloatUniformValueByName("iBadTv"));
 	mGlslMix->uniform("iFps", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFPS));
 	mGlslMix->uniform("iContour", mSDAAnimation->getFloatUniformValueByName("iContour"));
+	mGlslMix->uniform("iSobel", mSDAAnimation->getFloatUniformValueByName("iSobel"));
 
 }
 void SDASession::updateBlendUniforms() {
@@ -261,6 +262,8 @@ void SDASession::updateBlendUniforms() {
 	mGlslBlend->uniform("iXorY", mSDASettings->iXorY);
 	mGlslBlend->uniform("iBadTv", mSDAAnimation->getFloatUniformValueByName("iBadTv"));
 	mGlslBlend->uniform("iContour", mSDAAnimation->getFloatUniformValueByName("iContour"));
+	mGlslBlend->uniform("iSobel", mSDAAnimation->getFloatUniformValueByName("iSobel"));
+
 }
 void SDASession::update(unsigned int aClassIndex) {
 	
