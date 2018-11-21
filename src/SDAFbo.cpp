@@ -27,6 +27,7 @@ namespace SophiaDigitalArt {
 		// init the fbo whatever happens next
 		fboFmt.setColorTextureFormat(fmt);
 		mFbo = gl::Fbo::create(mSDASettings->mFboWidth, mSDASettings->mFboHeight, fboFmt);
+		mThumbFbo = gl::Fbo::create(mSDASettings->mPreviewWidth, mSDASettings->mPreviewHeight, fboFmt);
 		mError = "";
 		// init with passthru shader
 		mShaderName = "0";
@@ -224,6 +225,7 @@ namespace SophiaDigitalArt {
 		if (!isReady) {
 			// render once for init
 			getFboTexture();
+			updateThumbFile();
 			isReady = true;
 		}
 		return mRenderedTexture;
@@ -232,10 +234,8 @@ namespace SophiaDigitalArt {
 	ci::gl::Texture2dRef SDAFbo::getFboTexture() {
 		// TODO move this:
 		getShader();
-		//iChannelResolution0 = vec3(mPosX, mPosY, 0.5);
 		gl::ScopedFramebuffer fbScp(mFbo);
 		gl::clear(Color::black());
-		// TODO check mTextureList size for bounds
 		if (mInputTextureIndex > mTextureList.size() - 1) mInputTextureIndex = 0;
 		mTextureList[mInputTextureIndex]->getTexture()->bind(0);
 
@@ -253,8 +253,21 @@ namespace SophiaDigitalArt {
 
 			if (!fs::exists(fr)) {
 				CI_LOG_V(fr.string() + " does not exist, creating");
-				getFboTexture();
-				Surface s8(mRenderedTexture->createSource());
+				// TODO move this:
+				getShader();
+				ci::gl::Texture2dRef mThumbTexture;
+				gl::ScopedFramebuffer fbScp(mThumbFbo);
+				gl::clear(Color::black());
+				gl::ScopedViewport scpVp(ivec2(0), mThumbFbo->getSize());
+				if (mInputTextureIndex > mTextureList.size() - 1) mInputTextureIndex = 0;
+				mTextureList[mInputTextureIndex]->getTexture()->bind(0);
+				mFboTextureShader->uniform("iResolution", vec3(mSDASettings->mPreviewWidth, mSDASettings->mPreviewHeight, 1.0));
+
+				gl::ScopedGlslProg glslScope(mFboTextureShader);
+				gl::drawSolidRect(Rectf(0, 0, mSDASettings->mPreviewWidth, mSDASettings->mPreviewHeight));
+				
+				mThumbTexture = mThumbFbo->getColorTexture();
+				Surface s8(mThumbTexture->createSource());
 				writeImage(writeFile(fr), s8);				
 			}
 		}

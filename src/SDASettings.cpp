@@ -476,8 +476,9 @@ void SDASettings::reset()
 	mFboHeight = mFboWidth * mAspectRatio;
 	mPreviewFboWidth = 70;
 	mPreviewFboHeight = mPreviewFboWidth* mAspectRatio;
+	// jpg / gif thumb for HeavyM ShaderLibrary
 	mPreviewWidth = 120;
-	mPreviewHeight = mPreviewWidth * mAspectRatio;
+	mPreviewHeight = 68; // mPreviewWidth * mAspectRatio;
 	mRenderCodeEditorXY.x = 0;
 	mRenderCodeEditorXY.y = 0;
 	mCodeEditorWidth = 800;
