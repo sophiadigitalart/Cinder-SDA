@@ -181,8 +181,11 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		ISFPattern = { "void main" };
 		ISFReplacement = { "dirtyhack mainImage" }; //dirty hack!
 		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
-		ISFPattern = { "out vec4 fragColor, in vec2 fragCoord" };
-		ISFReplacement= { "void" };
+		ISFPattern = { "out vec4 fragColor," };
+		ISFReplacement = { "" };
+		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
+		ISFPattern = { "in vec2 fragCoord" };
+		ISFReplacement = { "void" };
 		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
 		ISFPattern = { "dirtyhack mainImage" };
 		ISFReplacement = { "void mainImage" }; //dirty hack!
@@ -201,10 +204,10 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		pattern = { "mainImage" };
 		replacement = { "main" };
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
-		pattern = { " out vec4 fragColor," };
+		pattern = { "out vec4 fragColor," };
 		replacement = { "void" };
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
-		pattern = { " in vec2 fragCoord" };
+		pattern = { "in vec2 fragCoord" };
 		replacement = { "" };
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
 		pattern = { " vec2 fragCoord" };
