@@ -258,63 +258,67 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 			"			]\n"
 			"		}\n";
 		auto &uniforms = mShader->getActiveUniforms();
+		string uniformName;
 		for (const auto &uniform : uniforms) {
-			CI_LOG_V(aName + ", uniform name:" + uniform.getName());
+			uniformName = uniform.getName();
+			CI_LOG_V(aName + ", uniform name:" + uniformName);
 			// if uniform is handled
-			if (mSDAAnimation->isExistingUniform(uniform.getName())) {
-				int uniformType = mSDAAnimation->getUniformType(uniform.getName());
+			if (mSDAAnimation->isExistingUniform(uniformName)) {
+				int uniformType = mSDAAnimation->getUniformType(uniformName);
 				switch (uniformType)
 				{
 				case 0:
 					// float
-					mShader->uniform(uniform.getName(), mSDAAnimation->getFloatUniformValueByName(uniform.getName()));
-					mCurrentUniformsString += "uniform float " + uniform.getName() + "; // " + toString(mSDAAnimation->getFloatUniformValueByName(uniform.getName())) + "\n";
-					mISFUniforms += ",\n"
-						"		{\n"
-						"			\"NAME\": \"" + uniform.getName() + "\", \n"
-						"			\"TYPE\" : \"float\", \n"
-						"			\"MIN\" : " + toString(mSDAAnimation->getMinUniformValueByName(uniform.getName())) + ",\n"
-						"			\"MAX\" : " + toString(mSDAAnimation->getMaxUniformValueByName(uniform.getName())) + ",\n"
-						"			\"DEFAULT\" : " + toString(mSDAAnimation->getFloatUniformValueByName(uniform.getName())) + "\n"
-						"		}\n";
+					mShader->uniform(uniformName, mSDAAnimation->getFloatUniformValueByName(uniformName));
+					mCurrentUniformsString += "uniform float " + uniformName + "; // " + toString(mSDAAnimation->getFloatUniformValueByName(uniformName)) + "\n";
+					if (uniformName != "iTime") {
+						mISFUniforms += ",\n"
+							"		{\n"
+							"			\"NAME\": \"" + uniformName + "\", \n"
+							"			\"TYPE\" : \"float\", \n"
+							"			\"MIN\" : " + toString(mSDAAnimation->getMinUniformValueByName(uniformName)) + ",\n"
+							"			\"MAX\" : " + toString(mSDAAnimation->getMaxUniformValueByName(uniformName)) + ",\n"
+							"			\"DEFAULT\" : " + toString(mSDAAnimation->getFloatUniformValueByName(uniformName)) + "\n"
+							"		}\n";
+					}
 					break;
 				case 1:
 					// sampler2D
-					mShader->uniform(uniform.getName(), mSDAAnimation->getSampler2DUniformValueByName(uniform.getName()));
-					mCurrentUniformsString += "uniform sampler2D " + uniform.getName() + "; // " + toString(mSDAAnimation->getSampler2DUniformValueByName(uniform.getName())) + "\n";
+					mShader->uniform(uniformName, mSDAAnimation->getSampler2DUniformValueByName(uniformName));
+					mCurrentUniformsString += "uniform sampler2D " + uniformName + "; // " + toString(mSDAAnimation->getSampler2DUniformValueByName(uniformName)) + "\n";
 					break;
 				case 2:
 					// vec2
-					mShader->uniform(uniform.getName(), mSDAAnimation->getVec2UniformValueByName(uniform.getName()));
-					mCurrentUniformsString += "uniform vec2 " + uniform.getName() + "; // " + toString(mSDAAnimation->getVec2UniformValueByName(uniform.getName())) + "\n";
+					mShader->uniform(uniformName, mSDAAnimation->getVec2UniformValueByName(uniformName));
+					mCurrentUniformsString += "uniform vec2 " + uniformName + "; // " + toString(mSDAAnimation->getVec2UniformValueByName(uniformName)) + "\n";
 					break;
 				case 3:
 					// vec3
-					mShader->uniform(uniform.getName(), mSDAAnimation->getVec3UniformValueByName(uniform.getName()));
-					mCurrentUniformsString += "uniform vec3 " + uniform.getName() + "; // " + toString(mSDAAnimation->getVec3UniformValueByName(uniform.getName())) + "\n";
+					mShader->uniform(uniformName, mSDAAnimation->getVec3UniformValueByName(uniformName));
+					mCurrentUniformsString += "uniform vec3 " + uniformName + "; // " + toString(mSDAAnimation->getVec3UniformValueByName(uniformName)) + "\n";
 					break;
 				case 4:
 					// vec4
-					mShader->uniform(uniform.getName(), mSDAAnimation->getVec4UniformValueByName(uniform.getName()));
-					mCurrentUniformsString += "uniform vec4 " + uniform.getName() + "; // " + toString(mSDAAnimation->getVec4UniformValueByName(uniform.getName())) + "\n";
+					mShader->uniform(uniformName, mSDAAnimation->getVec4UniformValueByName(uniformName));
+					mCurrentUniformsString += "uniform vec4 " + uniformName + "; // " + toString(mSDAAnimation->getVec4UniformValueByName(uniformName)) + "\n";
 					break;
 				case 5:
 					// int
-					mShader->uniform(uniform.getName(), mSDAAnimation->getIntUniformValueByName(uniform.getName()));
-					mCurrentUniformsString += "uniform int " + uniform.getName() + "; // " + toString(mSDAAnimation->getIntUniformValueByName(uniform.getName())) + "\n";
+					mShader->uniform(uniformName, mSDAAnimation->getIntUniformValueByName(uniformName));
+					mCurrentUniformsString += "uniform int " + uniformName + "; // " + toString(mSDAAnimation->getIntUniformValueByName(uniformName)) + "\n";
 					break;
 				case 6:
 					// bool
-					mShader->uniform(uniform.getName(), mSDAAnimation->getBoolUniformValueByName(uniform.getName()));
-					mCurrentUniformsString += "uniform bool " + uniform.getName() + "; // " + toString(mSDAAnimation->getBoolUniformValueByName(uniform.getName())) + "\n";
+					mShader->uniform(uniformName, mSDAAnimation->getBoolUniformValueByName(uniformName));
+					mCurrentUniformsString += "uniform bool " + uniformName + "; // " + toString(mSDAAnimation->getBoolUniformValueByName(uniformName)) + "\n";
 					break;
 				default:
 					break;
 				}
 			}
 			else {
-				if (uniform.getName() != "ciModelViewProjection") {
-					mNotFoundUniformsString += "not found " + uniform.getName() + "\n";
+				if (uniformName != "ciModelViewProjection") {
+					mNotFoundUniformsString += "not found " + uniformName + "\n";
 				}
 			}
 		}
@@ -331,13 +335,13 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 			"			\"NAME\": \"inputImage\",\n"
 			"			\"TYPE\" : \"image\"\n"
 			"		},\n"
-			"		{\n"
+			/*"		{\n"
 			"			\"NAME\": \"iZoom\",\n"
 			"			\"TYPE\" : \"float\",\n"
 			"			\"MIN\" : 0.0,\n"
 			"			\"MAX\" : 1.0,\n"
 			"			\"DEFAULT\" : 1.0\n"
-			"		},\n"
+			"		},\n"*/
 			"		{\n"
 			"			\"NAME\": \"iSteps\",\n"
 			"			\"TYPE\" : \"float\",\n"
@@ -354,10 +358,10 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 			"		}\n";
 
 
-			string mISFFooter = "	],\n"
+		string mISFFooter = "	],\n"
 			"}\n"
 			"*/\n";
-			
+
 
 		mISFString = mISFHeader + mISFUniforms + mISFFooter + mISFString;
 		mOFISFString = mISFHeader + mOFISFString;
