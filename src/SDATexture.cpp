@@ -820,7 +820,6 @@ namespace SophiaDigitalArt {
 
 		auto fmt = gl::Texture2d::Format().swizzleMask(GL_RED, GL_RED, GL_RED, GL_ONE).internalFormat(GL_RED);
 		if (!mLineInInitialized) {
-			CI_LOG_V("TextureAudio::getTexture() init");
 			auto ctx = audio::Context::master();
 #if (defined( CINDER_MSW ) || defined( CINDER_MAC ))
 			if (mSDAAnimation->getUseLineIn()) {

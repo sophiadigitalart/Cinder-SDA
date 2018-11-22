@@ -159,6 +159,14 @@ namespace SophiaDigitalArt
 		float							getMaxUniformValueByIndex(unsigned int aIndex) {
 			return shaderUniforms[getUniformNameForIndex(aIndex)].maxValue;
 		}
+		float							getMinUniformValueByName(string aName) {
+			return shaderUniforms[aName].minValue;
+		}
+		float							getMaxUniformValueByName(string aName) {
+			return shaderUniforms[aName].maxValue;
+		}
+
+
 		bool							getBoolUniformValueByName(string aName) {
 			return shaderUniforms[aName].boolValue;
 		}
@@ -175,7 +183,6 @@ namespace SophiaDigitalArt
 			if (aIndex == mSDASettings->IBPM) {
 				string s = getUniformNameForIndex(aIndex);
 				float f = shaderUniforms[getUniformNameForIndex(aIndex)].floatValue;
-				CI_LOG_W("Bpm " + toString(f));
 			}
 			return shaderUniforms[getUniformNameForIndex(aIndex)].floatValue;
 		}

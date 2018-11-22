@@ -99,10 +99,10 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		std::regex pattern{ "mainImage" };
 		std::string replacement{ "main" };
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
-		pattern = { " out vec4 fragColor," };
+		pattern = { "out vec4 fragColor," };
 		replacement = { "void" };
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
-		pattern = { " in vec2 fragCoord" };
+		pattern = { "in vec2 fragCoord" };
 		replacement = { "" };
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
 		pattern = { " vec2 fragCoord" };
@@ -178,30 +178,30 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 
 		mOFISFString = mISFString;
 
-		ISFPattern = { "void main" };
-		ISFReplacement = { "dirtyhack mainImage" }; //dirty hack!
-		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
+		//ISFPattern = { "void main" };
+		//ISFReplacement = { "dirtyhack mainImage" }; //dirty hack!
+		//mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
 		ISFPattern = { "out vec4 fragColor," };
-		ISFReplacement = { "" };
-		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
-		ISFPattern = { "in vec2 fragCoord" };
 		ISFReplacement = { "void" };
 		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
-		ISFPattern = { "dirtyhack mainImage" };
-		ISFReplacement = { "void mainImage" }; //dirty hack!
+		ISFPattern = { "in vec2 fragCoord" };
+		ISFReplacement = { "" };
 		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
-		ISFPattern = { "gl_FragColor" };
-		ISFReplacement = { "fragColor" };
-		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
-		ISFPattern = { "gl_FragCoord" };
-		ISFReplacement = { "fragCoord" };
-		mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
-		mISFString = mISFString + "void main(void) { mainImage(gl_FragColor, gl_FragCoord.xy); }";
+		//ISFPattern = { "dirtyhack mainImage" };
+		//ISFReplacement = { "void mainImage" }; //dirty hack!
+		//mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
+		//ISFPattern = { "gl_FragColor" };
+		//ISFReplacement = { "fragColor" };
+		//mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
+		//ISFPattern = { "gl_FragCoord" };
+		//ISFReplacement = { "fragCoord" };
+		//mISFString = std::regex_replace(mISFString, ISFPattern, ISFReplacement);
+		//mISFString = mISFString + "void main(void) { mainImage(gl_FragColor, gl_FragCoord.xy); }";
 
 
 		// shadertoy: 
 		// change void mainImage( out vec4 fragColor, in vec2 fragCoord ) to void main(void)
-		pattern = { "mainImage" };
+		/*pattern = { "mainImage" };
 		replacement = { "main" };
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
 		pattern = { "out vec4 fragColor," };
@@ -212,7 +212,7 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
 		pattern = { " vec2 fragCoord" };
 		replacement = { "" };
-		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);*/
 
 		// change texture2D to texture for version > 150?	
 
@@ -228,70 +228,6 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		else {
 			aFragmentShaderString = "/* " + aName + " */\n" + mOriginalFragmentString;
 		}
-		// save ISF
-		string mISFHeader = "/*{\n"
-			"	\"CREDIT\" : \"" + aName + " by Unknown\",\n"
-			"	\"CATEGORIES\" : [\n"
-			"		\"ci\"\n"
-			"	],\n"
-			"	\"DESCRIPTION\": \"\",\n"
-			"	\"INPUTS\": [\n"
-			"		{\n"
-			"			\"NAME\": \"inputImage\",\n"
-			"			\"TYPE\" : \"image\"\n"
-			"		},\n"
-			"		{\n"
-			"			\"NAME\": \"iZoom\",\n"
-			"			\"TYPE\" : \"float\",\n"
-			"			\"MIN\" : 0.0,\n"
-			"			\"MAX\" : 1.0,\n"
-			"			\"DEFAULT\" : 1.0\n"
-			"		},\n"
-			"		{\n"
-			"			\"NAME\": \"iSteps\",\n"
-			"			\"TYPE\" : \"float\",\n"
-			"			\"MIN\" : 2.0,\n"
-			"			\"MAX\" : 75.0,\n"
-			"			\"DEFAULT\" : 19.0\n"
-			"		},\n"
-			"		{\n"
-			"			\"NAME\" :\"iMouse\",\n"
-			"			\"TYPE\" : \"point2D\",\n"
-			"			\"DEFAULT\" : [0.0, 0.0],\n"
-			"			\"MAX\" : [640.0, 480.0],\n"
-			"			\"MIN\" : [0.0, 0.0]\n"
-			"		},\n"
-			"		{\n"
-			"			\"NAME\": \"iColor\", \n"
-			"			\"TYPE\" : \"color\", \n"
-			"			\"DEFAULT\" : [\n"
-			"				0.9, \n"
-			"				0.6, \n"
-			"				0.0, \n"
-			"				1.0\n"
-			"			]\n"
-			"		}\n"
-			"	],\n"
-			"}\n"
-			"*/\n";
-		mISFString = mISFHeader + mISFString;
-		mOFISFString = mISFHeader + mOFISFString;
-
-		// ifs for openFrameworks ISFGif projects
-		fileName = aName + ".fs";
-		fs::path OFIsfFile = getAssetPath("") / "glsl" / "osf" / fileName;
-		ofstream mOFISF(OFIsfFile.string(), std::ofstream::binary);
-		mOFISF << mOFISFString;
-		mOFISF.close();
-		CI_LOG_V("OF ISF file saved:" + OFIsfFile.string());
-
-		// ifs
-		fileName = aName + ".fs";
-		fs::path isfFile = getAssetPath("") / "glsl" / "isf" / fileName;
-		ofstream mISF(isfFile.string(), std::ofstream::binary);
-		mISF << mISFString;
-		mISF.close();
-		CI_LOG_V("ISF file saved:" + isfFile.string());
 
 
 		// before compilation save .frag file to inspect errors
@@ -310,7 +246,17 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		// name of the shader
 		mName = aName;
 		mValid = true;
-
+		string mISFUniforms = ",\n"
+			"		{\n"
+			"			\"NAME\": \"iColor\", \n"
+			"			\"TYPE\" : \"color\", \n"
+			"			\"DEFAULT\" : [\n"
+			"				0.9, \n"
+			"				0.6, \n"
+			"				0.0, \n"
+			"				1.0\n"
+			"			]\n"
+			"		}\n";
 		auto &uniforms = mShader->getActiveUniforms();
 		for (const auto &uniform : uniforms) {
 			CI_LOG_V(aName + ", uniform name:" + uniform.getName());
@@ -323,6 +269,14 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 					// float
 					mShader->uniform(uniform.getName(), mSDAAnimation->getFloatUniformValueByName(uniform.getName()));
 					mCurrentUniformsString += "uniform float " + uniform.getName() + "; // " + toString(mSDAAnimation->getFloatUniformValueByName(uniform.getName())) + "\n";
+					mISFUniforms += ",\n"
+						"		{\n"
+						"			\"NAME\": \"" + uniform.getName() + "\", \n"
+						"			\"TYPE\" : \"float\", \n"
+						"			\"MIN\" : " + toString(mSDAAnimation->getMinUniformValueByName(uniform.getName())) + ",\n"
+						"			\"MAX\" : " + toString(mSDAAnimation->getMaxUniformValueByName(uniform.getName())) + ",\n"
+						"			\"DEFAULT\" : " + toString(mSDAAnimation->getFloatUniformValueByName(uniform.getName())) + "\n"
+						"		}\n";
 					break;
 				case 1:
 					// sampler2D
@@ -364,6 +318,67 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 				}
 			}
 		}
+
+		// save ISF
+		string mISFHeader = "/*{\n"
+			"	\"CREDIT\" : \"" + aName + " by \",\n"
+			"	\"CATEGORIES\" : [\n"
+			"		\"ci\"\n"
+			"	],\n"
+			"	\"DESCRIPTION\": \"\",\n"
+			"	\"INPUTS\": [\n"
+			"		{\n"
+			"			\"NAME\": \"inputImage\",\n"
+			"			\"TYPE\" : \"image\"\n"
+			"		},\n"
+			"		{\n"
+			"			\"NAME\": \"iZoom\",\n"
+			"			\"TYPE\" : \"float\",\n"
+			"			\"MIN\" : 0.0,\n"
+			"			\"MAX\" : 1.0,\n"
+			"			\"DEFAULT\" : 1.0\n"
+			"		},\n"
+			"		{\n"
+			"			\"NAME\": \"iSteps\",\n"
+			"			\"TYPE\" : \"float\",\n"
+			"			\"MIN\" : 2.0,\n"
+			"			\"MAX\" : 75.0,\n"
+			"			\"DEFAULT\" : 19.0\n"
+			"		},\n"
+			"		{\n"
+			"			\"NAME\" :\"iMouse\",\n"
+			"			\"TYPE\" : \"point2D\",\n"
+			"			\"DEFAULT\" : [0.0, 0.0],\n"
+			"			\"MAX\" : [640.0, 480.0],\n"
+			"			\"MIN\" : [0.0, 0.0]\n"
+			"		}\n";
+
+
+			string mISFFooter = "	],\n"
+			"}\n"
+			"*/\n";
+			
+
+		mISFString = mISFHeader + mISFUniforms + mISFFooter + mISFString;
+		mOFISFString = mISFHeader + mOFISFString;
+
+		// ifs for openFrameworks ISFGif project
+		fileName = aName + ".fs";
+		fs::path OFIsfFile = getAssetPath("") / "glsl" / "osf" / fileName;
+		ofstream mOFISF(OFIsfFile.string(), std::ofstream::binary);
+		mOFISF << mOFISFString;
+		mOFISF.close();
+		CI_LOG_V("OF ISF file saved:" + OFIsfFile.string());
+
+		// ifs for HeavyM
+		fileName = aName + ".fs";
+		fs::path isfFile = getAssetPath("") / "glsl" / "isf" / fileName;
+		ofstream mISF(isfFile.string(), std::ofstream::binary);
+		mISF << mISFString;
+		mISF.close();
+		CI_LOG_V("ISF file saved:" + isfFile.string());
+
+
 		// add "out vec4 fragColor" if necessary
 		std::size_t foundFragColorDeclaration = mOriginalFragmentString.find("out vec4 fragColor;");
 		if (foundFragColorDeclaration == std::string::npos) {
