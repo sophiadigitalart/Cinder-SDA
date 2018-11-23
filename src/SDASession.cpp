@@ -446,7 +446,7 @@ void SDASession::blendRenderEnable(bool render) {
 
 void SDASession::fileDrop(FileDropEvent event) {
 	string ext = "";
-	string fileName = "";
+	//string fileName = "";
 
 	unsigned int index = (int)(event.getX() / (mSDASettings->uiLargePreviewW + mSDASettings->uiMargin));
 	int y = (int)(event.getY());
@@ -459,7 +459,7 @@ void SDASession::fileDrop(FileDropEvent event) {
 
 	if (dotIndex != std::string::npos && dotIndex > slashIndex) {
 		ext = absolutePath.substr(dotIndex + 1);
-		fileName = absolutePath.substr(slashIndex + 1, dotIndex - slashIndex - 1);
+		//fileName = absolutePath.substr(slashIndex + 1, dotIndex - slashIndex - 1);
 
 
 		if (ext == "wav" || ext == "mp3") {
@@ -470,7 +470,7 @@ void SDASession::fileDrop(FileDropEvent event) {
 			if (index > 3) index = 3;
 			loadImageFile(absolutePath, index);
 		}
-		else if (ext == "glsl" || ext == "frag") {
+		else if (ext == "glsl" || ext == "frag" || ext == "fs") {
 			loadFragmentShader(absolutePath);
 		}
 		else if (ext == "xml") {
@@ -866,6 +866,9 @@ unsigned int SDASession::createShaderFbo(string aShaderFilename, unsigned int aI
 	// initialize rtn to 0 to force creation
 	unsigned int rtn = 0;
 	string fName = aShaderFilename;
+	string ext = "";
+	int dotIndex = fName.find_last_of(".");
+	int slashIndex = fName.find_last_of("\\");
 	if (aShaderFilename.length() > 0) {
 		fs::path mFragFile = getAssetPath("") / mSDASettings->mAssetsPath / aShaderFilename;
 		if (!fs::exists(mFragFile)) {
@@ -876,6 +879,12 @@ unsigned int SDASession::createShaderFbo(string aShaderFilename, unsigned int aI
 			// check if mShaderList contains a shader
 			if (mShaderList.size() > 0) {
 				fName = mFragFile.filename().string();
+				dotIndex = fName.find_last_of(".");
+				slashIndex = fName.find_last_of("\\");
+
+				if (dotIndex != std::string::npos && dotIndex > slashIndex) {
+					ext = fName.substr(dotIndex + 1);
+				}
 				// find a removed shader
 				for (int i = mShaderList.size() - 1; i > 0; i--)
 				{

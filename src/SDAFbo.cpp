@@ -30,7 +30,8 @@ namespace SophiaDigitalArt {
 		mThumbFbo = gl::Fbo::create(mSDASettings->mPreviewWidth, mSDASettings->mPreviewHeight, fboFmt);
 		mError = "";
 		// init with passthru shader
-		mShaderName = "0";
+		//mShaderName = "0";
+		mFboName = "default";
 
 		// load feedback fragment shader
 		try {
@@ -45,7 +46,6 @@ namespace SophiaDigitalArt {
 			mError = string(e.what());
 			CI_LOG_V("fbo unable to load vtx-frag shader:" + string(e.what()));
 		}
-		mFboName = "default";
 		if (mError.length() > 0) mSDASettings->mMsg = mError;
 	}
 	SDAFbo::~SDAFbo(void) {
@@ -57,7 +57,7 @@ namespace SophiaDigitalArt {
 		xml.setAttribute("path", mFilePathOrText);
 		xml.setAttribute("width", mSDASettings->mFboWidth);
 		xml.setAttribute("height", mSDASettings->mFboHeight);
-		xml.setAttribute("shadername", mShaderName);
+		xml.setAttribute("shadername", mFboName);
 		xml.setAttribute("inputtextureindex", mInputTextureIndex);
 		return xml;
 	}
@@ -69,7 +69,7 @@ namespace SophiaDigitalArt {
 		mHeight = xml.getAttributeValue<int>("height", mSDASettings->mFboHeight);
 		mInputTextureIndex = xml.getAttributeValue<int>("inputtextureindex", 0);
 		CI_LOG_V("fbo id " + mId + "fbo shadername " + mGlslPath);
-		mShaderName = mGlslPath;
+		mFboName = mGlslPath;
 		// 20161209 problem on Mac mFboTextureShader->setLabel(mShaderName);
 		return true;
 	}
@@ -113,13 +113,13 @@ namespace SophiaDigitalArt {
 		return mFbo->getId();
 	}
 
-	std::string SDAFbo::getName() {
-		return mShaderName + " fb:" + mId;
-		//return mShaderName + " " + mId;
-	}
-	std::string SDAFbo::getShaderName() {
-		return mShaderName;
-	}
+	//std::string SDAFbo::getName() {
+	//	return mShaderName + " fb:" + mId;
+	//	//return mShaderName + " " + mId;
+	//}
+	//std::string SDAFbo::getShaderName() {
+	//	return mShaderName;
+	//}
 	void SDAFbo::setInputTexture(SDATextureList aTextureList, unsigned int aTextureIndex) {
 		mTextureList = aTextureList;
 		if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
@@ -167,7 +167,7 @@ namespace SophiaDigitalArt {
 			}
 			else {
 				if (uniform.getName() != "ciModelViewProjection") {
-					mSDASettings->mMsg = mShaderName + ", uniform not found:" + uniform.getName();
+					mSDASettings->mMsg = mFboName + ", uniform not found:" + uniform.getName();
 					CI_LOG_V(mSDASettings->mMsg);
 				}
 			}
@@ -248,7 +248,7 @@ namespace SophiaDigitalArt {
 
 	void SDAFbo::updateThumbFile() {
 		if (mRenderedTexture) {
-			string filename = getShaderName() + ".jpg";
+			string filename = getName() + ".jpg";
 			fs::path fr = getAssetPath("") / "thumbs" / "jpg" / filename;
 
 			if (!fs::exists(fr)) {

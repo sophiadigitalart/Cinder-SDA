@@ -46,8 +46,8 @@ namespace SophiaDigitalArt
 		GLuint							getId();
 		//! returns the type
 		TextureType						getType() { return mType; };
-		std::string						getName();
-		std::string						getShaderName();
+		std::string						getName() { return mFboName; };
+		//std::string						getShaderName();
 		void							setLabel(string aLabel) { mFboTextureShader->setLabel(aLabel); };
 		bool							isFlipH() { return mFlipH; };
 		bool							isFlipV() { return mFlipV; };
@@ -103,7 +103,7 @@ namespace SophiaDigitalArt
 		SDATextureList					mTextureList;
 		unsigned int					mInputTextureIndex;
 		//! Shaders
-		string							mShaderName;
+		//string							mShaderName;
 		unsigned int					mShaderIndex;
 		string							mId;
 		// Output texture
