@@ -884,10 +884,10 @@ namespace SophiaDigitalArt {
 					}
 					mSDAAnimation->iFreqs[i] = f;
 					// update iFreq uniforms 
-					if (i == mSDAAnimation->getFreqIndex(0)) mSDAAnimation->setFloatUniformValueByIndex(31, f);
-					if (i == mSDAAnimation->getFreqIndex(1)) mSDAAnimation->setFloatUniformValueByIndex(32, f);
-					if (i == mSDAAnimation->getFreqIndex(2)) mSDAAnimation->setFloatUniformValueByIndex(33, f);
-					if (i == mSDAAnimation->getFreqIndex(3)) mSDAAnimation->setFloatUniformValueByIndex(34, f);
+					if (i == mSDAAnimation->getFreqIndex(0)) mSDAAnimation->setFloatUniformValueByName("iFreq0", f);
+					if (i == mSDAAnimation->getFreqIndex(1)) mSDAAnimation->setFloatUniformValueByName("iFreq1", f);
+					if (i == mSDAAnimation->getFreqIndex(2)) mSDAAnimation->setFloatUniformValueByName("iFreq2", f);
+					if (i == mSDAAnimation->getFreqIndex(3)) mSDAAnimation->setFloatUniformValueByName("iFreq3", f);
 
 					if (i < 16) {
 						int ger = f;

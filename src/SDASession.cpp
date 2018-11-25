@@ -311,10 +311,10 @@ void SDASession::update(unsigned int aClassIndex) {
 	// all cases
 	mSDAWebsocket->update();
 	if (mFreqWSSend) {
-		mSDAWebsocket->changeFloatValue(31, getFreq(0), true);
-		mSDAWebsocket->changeFloatValue(32, getFreq(1), true);
-		mSDAWebsocket->changeFloatValue(33, getFreq(2), true);
-		mSDAWebsocket->changeFloatValue(34, getFreq(3), true);
+		mSDAWebsocket->changeFloatValue(mSDASettings->IFREQ0, getFreq(0), true);
+		mSDAWebsocket->changeFloatValue(mSDASettings->IFREQ1, getFreq(1), true);
+		mSDAWebsocket->changeFloatValue(mSDASettings->IFREQ2, getFreq(2), true);
+		mSDAWebsocket->changeFloatValue(mSDASettings->IFREQ3, getFreq(3), true);
 	}
 	// check if xFade changed
 	/*if (mSDASettings->xFadeChanged) {
