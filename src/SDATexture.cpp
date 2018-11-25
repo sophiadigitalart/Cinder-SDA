@@ -721,7 +721,7 @@ namespace SophiaDigitalArt {
 		mTexture = mSpoutIn.receiveTexture();
 		// set name for UI
 		mName = mSpoutIn.getSenderName();
-
+		
 #endif
 #if defined( CINDER_MAC )
 		mClientSyphon.draw(vec2(0.f, 0.f));

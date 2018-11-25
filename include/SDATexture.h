@@ -14,6 +14,11 @@
 #include "CiSpoutIn.h"
 #endif
 
+#if defined( NDI_RECEIVER )
+// ndi
+#include "CinderNDIReceiver.h"
+#endif
+
 #if defined( CINDER_MAC )
 // syphon
 #include "cinderSyphon.h"
@@ -292,6 +297,7 @@ namespace SophiaDigitalArt
 #if defined( CINDER_MSW )
 		// -------- SPOUT -------------
 		SpoutIn							mSpoutIn;
+		//CinderNDIReceiver				mReceiver;
 #endif
 #if defined( CINDER_MAC )
 		syphonClient					mClientSyphon;
