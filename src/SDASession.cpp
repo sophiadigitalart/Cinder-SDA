@@ -1291,7 +1291,7 @@ void SDASession::renderMix() {
 
 string SDASession::getMixFboName(unsigned int aMixFboIndex) {
 	if (aMixFboIndex > mMixFbos.size() - 1) aMixFboIndex = mMixFbos.size() - 1;
-	mMixFbos[aMixFboIndex].name = mFboList[0]->getShaderName() + "/" + mFboList[1]->getShaderName();
+	mMixFbos[aMixFboIndex].name = mFboList[0]->getName() + "/" + mFboList[1]->getName();
 	return mMixFbos[aMixFboIndex].name;
 }
 
