@@ -247,6 +247,7 @@ namespace SophiaDigitalArt {
 	}
 
 	void SDAFbo::updateThumbFile() {
+		getFboTexture();
 		if (mRenderedTexture) {
 			string filename = getName() + ".jpg";
 			fs::path fr = getAssetPath("") / "thumbs" / "jpg" / filename;

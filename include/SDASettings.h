@@ -18,8 +18,8 @@ namespace SophiaDigitalArt {
 	class SDASettings
 	{
 	public:
-		SDASettings();
-		static SDASettingsRef create();
+		SDASettings(string filename);
+		static SDASettingsRef create(string filename);
 
 		//! maximum number of fbos, shaders, textures
 		static const int			MAX = 14;
@@ -301,11 +301,11 @@ namespace SophiaDigitalArt {
 		std::string					getDefaultFragmentShaderString() { return mDefaultFragmentShaderString; };
 		std::string					getMixFragmentShaderString() { return mMixFragmentShaderString; };
 	private:
-		const string settingsFileName = "SDASettings.xml";
+		std::string					settingsFileName = "SDA";
 		//! default vertex shader
-		std::string						mDefaultVextexShaderString;
-		std::string						mDefaultFragmentShaderString;
-		std::string						mMixFragmentShaderString;
+		std::string					mDefaultVextexShaderString;
+		std::string					mDefaultFragmentShaderString;
+		std::string					mMixFragmentShaderString;
 
 	};
 

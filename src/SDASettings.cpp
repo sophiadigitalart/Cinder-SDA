@@ -8,11 +8,11 @@ using namespace ci;
 using namespace std;
 using namespace SophiaDigitalArt;
 
-SDASettings::SDASettings()
+SDASettings::SDASettings(string filename)
 {
 	// reset no matter what, so we don't miss anything
 	reset();
-
+	settingsFileName = "SDA" + filename + ".xml";
 	// check to see if Settings.xml file exists and restore if it does
 	fs::path params = getAppPath() / settingsFileName;
 	if (fs::exists(params))
@@ -25,9 +25,9 @@ SDASettings::SDASettings()
 	}
 }
 
-SDASettingsRef SDASettings::create()
+SDASettingsRef SDASettings::create(string filename)
 {
-	return shared_ptr<SDASettings>(new SDASettings());
+	return shared_ptr<SDASettings>(new SDASettings(filename));
 }
 
 bool SDASettings::save()
