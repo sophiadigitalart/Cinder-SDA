@@ -292,13 +292,13 @@ void SDASession::update(unsigned int aClassIndex) {
 				setFragmentShaderString(1, mSDAWebsocket->getReceivedShader());
 			}
 		}
-		if (mSDASettings->iGreyScale)
+		/* TODO: CHECK index if (mSDASettings->iGreyScale)
 		{
 			mSDAWebsocket->changeFloatValue(1, mSDAAnimation->getFloatUniformValueByIndex(3));
 			mSDAWebsocket->changeFloatValue(2, mSDAAnimation->getFloatUniformValueByIndex(3));
 			mSDAWebsocket->changeFloatValue(5, mSDAAnimation->getFloatUniformValueByIndex(7));
 			mSDAWebsocket->changeFloatValue(6, mSDAAnimation->getFloatUniformValueByIndex(7));
-		}
+		}*/
 
 		// fps calculated in main app
 		mSDASettings->sFps = toString(floor(getFloatUniformValueByIndex(mSDASettings->IFPS)));		
@@ -420,8 +420,6 @@ void SDASession::resetSomeParams() {
 void SDASession::reset()
 {
 	// parameters exposed in json file
-	//mFlipV = false;
-	//mFlipH = false;
 	mOriginalBpm = 166;
 	mWaveFileName = "";
 	mWavePlaybackDelay = 10;
@@ -547,45 +545,45 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 				break;
 			case KeyEvent::KEY_x:
 				// trixels
-				mSDAWebsocket->changeFloatValue(16, mSDAAnimation->getFloatUniformValueByIndex(16) + 0.05f);
+				mSDAWebsocket->changeFloatValue(mSDASettings->ITRIXELS, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ITRIXELS) + 0.05f);
 				break;
 			case KeyEvent::KEY_r:
-				newValue = mSDAAnimation->getFloatUniformValueByIndex(1) + 0.1f;
+				newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFR) + 0.1f;
 				if (newValue > 1.0f) newValue = 0.0f;
-				mSDAWebsocket->changeFloatValue(1, newValue);
+				mSDAWebsocket->changeFloatValue(mSDASettings->IFR, newValue);
 				break;
 			case KeyEvent::KEY_g:
-				newValue = mSDAAnimation->getFloatUniformValueByIndex(2) + 0.1f;
+				newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFG) + 0.1f;
 				if (newValue > 1.0f) newValue = 0.0f;
-				mSDAWebsocket->changeFloatValue(2, newValue);
+				mSDAWebsocket->changeFloatValue(mSDASettings->IFG, newValue);
 				break;
 			case KeyEvent::KEY_b:
-				newValue = mSDAAnimation->getFloatUniformValueByIndex(3) + 0.1f;
+				newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFB) + 0.1f;
 				if (newValue > 1.0f) newValue = 0.0f;
-				mSDAWebsocket->changeFloatValue(3, newValue);
+				mSDAWebsocket->changeFloatValue(mSDASettings->IFB, newValue);
 				break;
 			case KeyEvent::KEY_e:
-				newValue = mSDAAnimation->getFloatUniformValueByIndex(1) - 0.1f;
+				newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFR) - 0.1f;
 				if (newValue < 0.0f) newValue = 1.0;
-				mSDAWebsocket->changeFloatValue(1, newValue);
+				mSDAWebsocket->changeFloatValue(mSDASettings->IFR, newValue);
 				break;
 			case KeyEvent::KEY_f:
-				newValue = mSDAAnimation->getFloatUniformValueByIndex(2) - 0.1f;
+				newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFG) - 0.1f;
 				if (newValue < 0.0f) newValue = 1.0;
-				mSDAWebsocket->changeFloatValue(2, newValue);
+				mSDAWebsocket->changeFloatValue(mSDASettings->IFG, newValue);
 				break;
 			case KeyEvent::KEY_v:
-				newValue = mSDAAnimation->getFloatUniformValueByIndex(3) - 0.1f;
+				newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFB) - 0.1f;
 				if (newValue < 0.0f) newValue = 1.0;
-				mSDAWebsocket->changeFloatValue(3, newValue);
+				mSDAWebsocket->changeFloatValue(mSDASettings->IFB, newValue);
 				break;
 			case KeyEvent::KEY_c:
 				// chromatic
-				mSDAWebsocket->changeFloatValue(10, mSDAAnimation->getFloatUniformValueByIndex(10) + 0.05f);
+				mSDAWebsocket->changeFloatValue(mSDASettings->ICHROMATIC, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ICHROMATIC) + 0.05f);
 				break;
 			case KeyEvent::KEY_p:
 				// pixelate
-				mSDAWebsocket->changeFloatValue(15, mSDAAnimation->getFloatUniformValueByIndex(15) + 0.05f);
+				mSDAWebsocket->changeFloatValue(mSDASettings->IPIXELATE, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IPIXELATE) + 0.05f);
 				break;
 			case KeyEvent::KEY_t:
 				// glitch
@@ -597,11 +595,11 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 				break;
 			case KeyEvent::KEY_o:
 				// toggle
-				mSDAWebsocket->toggleValue(46);
+				mSDAWebsocket->toggleValue(mSDASettings->ITOGGLE);
 				break;
 			case KeyEvent::KEY_z:
 				// zoom
-				mSDAWebsocket->changeFloatValue(12, mSDAAnimation->getFloatUniformValueByIndex(12) - 0.05f);
+				mSDAWebsocket->changeFloatValue(mSDASettings->IZOOM, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IZOOM) - 0.05f);
 				break;
 				/* removed temp for Sky Project case KeyEvent::KEY_LEFT:
 					//mSDATextures->rewindMovie();
@@ -613,11 +611,11 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 					break;*/
 			case KeyEvent::KEY_PAGEDOWN:
 				// crossfade right
-				if (mSDAAnimation->getFloatUniformValueByIndex(18) < 1.0f) mSDAWebsocket->changeFloatValue(21, mSDAAnimation->getFloatUniformValueByIndex(18) + 0.1f);
+				if (mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) < 1.0f) mSDAWebsocket->changeFloatValue(mSDASettings->IXFADE, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) + 0.1f);
 				break;
 			case KeyEvent::KEY_PAGEUP:
 				// crossfade left
-				if (mSDAAnimation->getFloatUniformValueByIndex(18) > 0.0f) mSDAWebsocket->changeFloatValue(21, mSDAAnimation->getFloatUniformValueByIndex(18) - 0.1f);
+				if (mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) > 0.0f) mSDAWebsocket->changeFloatValue(mSDASettings->IXFADE, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) - 0.1f);
 				break;
 
 			default:
@@ -638,31 +636,31 @@ bool SDASession::handleKeyUp(KeyEvent &event) {
 			switch (event.getCode()) {
 			case KeyEvent::KEY_g:
 				// glitch
-				mSDAWebsocket->changeBoolValue(45, false);
+				mSDAWebsocket->changeBoolValue(mSDASettings->IGLITCH, false);
 				break;
 			case KeyEvent::KEY_t:
 				// trixels
-				mSDAWebsocket->changeFloatValue(16, 0.0f);
+				mSDAWebsocket->changeFloatValue(mSDASettings->ITRIXELS, 0.0f);
 				break;
 			case KeyEvent::KEY_i:
 				// invert
-				mSDAWebsocket->changeBoolValue(48, false);
+				mSDAWebsocket->changeBoolValue(mSDASettings->IINVERT, false);
 				break;
 			case KeyEvent::KEY_c:
 				// chromatic
-				mSDAWebsocket->changeFloatValue(10, 0.0f);
+				mSDAWebsocket->changeFloatValue(mSDASettings->ICHROMATIC, 0.0f);
 				break;
 			case KeyEvent::KEY_p:
 				// pixelate
-				mSDAWebsocket->changeFloatValue(15, 1.0f);
+				mSDAWebsocket->changeFloatValue(mSDASettings->IPIXELATE, 1.0f);
 				break;
 			case KeyEvent::KEY_o:
 				// toggle
-				mSDAWebsocket->changeBoolValue(46, false);
+				mSDAWebsocket->changeBoolValue(mSDASettings->ITOGGLE, false);
 				break;
 			case KeyEvent::KEY_z:
 				// zoom
-				mSDAWebsocket->changeFloatValue(12, 1.0f);
+				mSDAWebsocket->changeFloatValue(mSDASettings->IZOOM, 1.0f);
 				break;
 			default:
 				handled = false;

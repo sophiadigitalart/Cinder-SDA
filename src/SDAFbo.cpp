@@ -236,11 +236,16 @@ namespace SophiaDigitalArt {
 		getShader();
 		gl::ScopedFramebuffer fbScp(mFbo);
 		gl::clear(Color::black());
+
+
+
 		if (mInputTextureIndex > mTextureList.size() - 1) mInputTextureIndex = 0;
 		mTextureList[mInputTextureIndex]->getTexture()->bind(0);
 
 		gl::ScopedGlslProg glslScope(mFboTextureShader);
-		gl::drawSolidRect(Rectf(0, 0, mSDASettings->mFboWidth, mSDASettings->mFboHeight));
+		// TODO: test gl::ScopedViewport sVp(0, 0, mFbo->getWidth(), mFbo->getHeight());
+
+		gl::drawSolidRect(Rectf(0, 0, mSDASettings->mPreviewWidth, mSDASettings->mPreviewHeight));
 
 		mRenderedTexture = mFbo->getColorTexture();
 		return mRenderedTexture;
@@ -256,16 +261,71 @@ namespace SophiaDigitalArt {
 				CI_LOG_V(fr.string() + " does not exist, creating");
 				// TODO move this:
 				getShader();
+
+				gl::ScopedFramebuffer fbo(mThumbFbo);
+				gl::ScopedViewport viewport(0, 0, mThumbFbo->getWidth(), mThumbFbo->getHeight());
+				gl::ScopedMatrices matrices;
+				gl::setMatricesWindow(mThumbFbo->getSize(), false);
+
+
 				ci::gl::Texture2dRef mThumbTexture;
-				gl::ScopedFramebuffer fbScp(mThumbFbo);
+				//gl::ScopedFramebuffer fbScp(mThumbFbo);
 				gl::clear(Color::black());
-				gl::ScopedViewport scpVp(ivec2(0), mThumbFbo->getSize());
+				//gl::ScopedViewport scpVp(ivec2(0), mThumbFbo->getSize());
 				if (mInputTextureIndex > mTextureList.size() - 1) mInputTextureIndex = 0;
 				mTextureList[mInputTextureIndex]->getTexture()->bind(0);
-				mFboTextureShader->uniform("iResolution", vec3(mSDASettings->mPreviewWidth, mSDASettings->mPreviewHeight, 1.0));
+				
+				mFboTextureShader->uniform("iBlendmode", mSDASettings->iBlendmode);
+				mFboTextureShader->uniform("iTime", mSDAAnimation->getFloatUniformValueByIndex(0));
+				// was vec3(mSDASettings->mFboWidth, mSDASettings->mFboHeight, 1.0)):
+				mFboTextureShader->uniform("iResolution", vec3(mThumbFbo->getWidth(), mThumbFbo->getHeight(), 1.0));
+				//mFboTextureShader->uniform("iChannelResolution", mSDASettings->iChannelResolution, 4);
+				// 20180318 mFboTextureShader->uniform("iMouse", mSDAAnimation->getVec4UniformValueByName("iMouse"));
+				mFboTextureShader->uniform("iMouse", vec3(mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IMOUSEX), mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IMOUSEY), mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IMOUSEZ)));
+				mFboTextureShader->uniform("iDate", mSDAAnimation->getVec4UniformValueByName("iDate"));
+				mFboTextureShader->uniform("iWeight0", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT0));	// weight of channel 0
+				mFboTextureShader->uniform("iWeight1", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT1));	// weight of channel 1
+				mFboTextureShader->uniform("iWeight2", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT2));	// weight of channel 2
+				mFboTextureShader->uniform("iWeight3", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT3)); // texture
+				mFboTextureShader->uniform("iWeight4", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT4)); // texture
+				mFboTextureShader->uniform("iChannel0", 0); // fbo shader 
+				mFboTextureShader->uniform("iChannel1", 1); // fbo shader
+				mFboTextureShader->uniform("iChannel2", 2); // texture 1
+				mFboTextureShader->uniform("iChannel3", 3); // texture 2
+				mFboTextureShader->uniform("iChannel4", 4); // texture 3
+
+				mFboTextureShader->uniform("iRatio", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IRATIO));//check if needed: +1;
+				mFboTextureShader->uniform("iRenderXY", mSDASettings->mRenderXY);
+				mFboTextureShader->uniform("iZoom", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IZOOM));
+				mFboTextureShader->uniform("iAlpha", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFA) * mSDASettings->iAlpha);
+				mFboTextureShader->uniform("iChromatic", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ICHROMATIC));
+				mFboTextureShader->uniform("iRotationSpeed", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IROTATIONSPEED));
+				mFboTextureShader->uniform("iCrossfade", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE));
+				mFboTextureShader->uniform("iPixelate", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IPIXELATE));
+				mFboTextureShader->uniform("iExposure", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IEXPOSURE));
+				mFboTextureShader->uniform("iToggle", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->ITOGGLE));
+				mFboTextureShader->uniform("iGreyScale", (int)mSDASettings->iGreyScale);
+				mFboTextureShader->uniform("iBackgroundColor", mSDAAnimation->getVec3UniformValueByName("iBackgroundColor"));
+				mFboTextureShader->uniform("iVignette", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IVIGN));
+				mFboTextureShader->uniform("iInvert", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IINVERT));
+				mFboTextureShader->uniform("iTempoTime", mSDAAnimation->getFloatUniformValueByName("iTempoTime"));
+				mFboTextureShader->uniform("iGlitch", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IGLITCH));
+				mFboTextureShader->uniform("iTrixels", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ITRIXELS));
+				mFboTextureShader->uniform("iRedMultiplier", mSDAAnimation->getFloatUniformValueByName("iRedMultiplier"));
+				mFboTextureShader->uniform("iGreenMultiplier", mSDAAnimation->getFloatUniformValueByName("iGreenMultiplier"));
+				mFboTextureShader->uniform("iBlueMultiplier", mSDAAnimation->getFloatUniformValueByName("iBlueMultiplier"));
+				mFboTextureShader->uniform("iFlipH", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPH));
+				mFboTextureShader->uniform("iFlipV", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPV));
+				mFboTextureShader->uniform("iParam1", mSDASettings->iParam1);
+				mFboTextureShader->uniform("iParam2", mSDASettings->iParam2);
+				mFboTextureShader->uniform("iXorY", mSDASettings->iXorY);
+				mFboTextureShader->uniform("iBadTv", mSDAAnimation->getFloatUniformValueByName("iBadTv"));
+				mFboTextureShader->uniform("iFps", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFPS));
+				mFboTextureShader->uniform("iContour", mSDAAnimation->getFloatUniformValueByName("iContour"));
+				mFboTextureShader->uniform("iSobel", mSDAAnimation->getFloatUniformValueByName("iSobel"));
 
 				gl::ScopedGlslProg glslScope(mFboTextureShader);
-				gl::drawSolidRect(Rectf(0, 0, mSDASettings->mPreviewWidth, mSDASettings->mPreviewHeight));
+				gl::drawSolidRect(Rectf(0, 0, mThumbFbo->getWidth(), mThumbFbo->getHeight()));
 				
 				mThumbTexture = mThumbFbo->getColorTexture();
 				Surface s8(mThumbTexture->createSource());
