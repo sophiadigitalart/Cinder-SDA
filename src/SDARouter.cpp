@@ -176,9 +176,11 @@ SDARouter::SDARouter(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation,
 			}
 			if (found) {
 				CI_LOG_I("OSC: " << ctrl << " addr: " << addr);
+				mSDASettings->mOSCMsg = addr;
 			}
 			else {
 				CI_LOG_E("not handled: " << msg.getNumArgs() << " addr: " << addr);
+				mSDASettings->mOSCMsg = "not handled: " + addr;
 			}
 		});
 
