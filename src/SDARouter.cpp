@@ -7,7 +7,202 @@ SDARouter::SDARouter(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation,
 	mSDAAnimation = aSDAAnimation;
 	mSDAWebsocket = aSDAWebsocket;
 	CI_LOG_V("SDARouter constructor");
+	// Osc
+	if (mSDASettings->mOSCEnabled) {
+		mOscReceiver = std::make_shared<osc::ReceiverUdp>(mSDASettings->mOSCReceiverPort);
+		mOscReceiver->setListener("/*",
+			[&](const osc::Message &msg) {
+			// touchosc
+			bool found = false;
+			string ctrl = "";
+			int index = -1;
+			int i = 0;
+			float f = 1.0f;
+			vec2 vv = vec2(0.0f);
+			string addr = msg.getAddress();
+			// handle all msg without page integer first
+			// accxyz
+			ctrl = "accxyz";
+			index = addr.find(ctrl);
+			if (index != std::string::npos)
+			{
+				found = true;
+			}
+			if (!found)
+			{
+				int page = 0;
+				try {
+					page = std::stoi(addr.substr(1, 1)); // 1 to 4
 
+
+					int lastSlashIndex = addr.find_last_of("/"); // 0 2
+					// if not a page selection
+					if (addr.length() > 2) {
+						ctrl = "multifader1";
+						index = addr.find(ctrl);
+						if (index != std::string::npos)
+						{
+							found = true;
+							f = msg[0].flt();
+							i = std::stoi(addr.substr(lastSlashIndex + 1)) + 8;
+							mSDAAnimation->setFloatUniformValueByIndex(i, f);
+						}
+
+						if (!found)
+						{
+							ctrl = "multifader2";
+							index = addr.find(ctrl);
+							if (index != std::string::npos)
+							{
+								found = true;
+								f = msg[0].flt();
+								i = std::stoi(addr.substr(lastSlashIndex + 1)) + 32; // 24 + 8
+								mSDAAnimation->setFloatUniformValueByIndex(i, f);
+							}
+						}
+						if (!found)
+						{
+							ctrl = "multifader";
+							index = addr.find(ctrl);
+							if (index != std::string::npos)
+							{
+								found = true;
+								f = msg[0].flt();
+								i = std::stoi(addr.substr(lastSlashIndex + 1)) + 56; // 48 + 8
+								mSDAAnimation->setFloatUniformValueByIndex(i, f);
+							}
+						}
+						if (!found)
+						{
+							ctrl = "fader";
+							index = addr.find(ctrl);
+							if (index != std::string::npos)
+							{
+								found = true;
+								f = msg[0].flt();
+								i = std::stoi(addr.substr(index + ctrl.length()));
+								mSDAAnimation->setFloatUniformValueByIndex(i, f);// starts at 1: mSDASettings->IFR G B
+							}
+						}
+						if (!found)
+						{
+							ctrl = "rotary";
+							index = addr.find(ctrl);
+							if (index != std::string::npos)
+							{
+								found = true;
+								f = msg[0].flt();
+								i = std::stoi(addr.substr(index + ctrl.length())) + 10;
+								mSDAAnimation->setFloatUniformValueByIndex(i, f);
+							}
+						}
+						if (!found)
+						{
+							// toggle
+							ctrl = "multitoggle";
+							index = addr.find(ctrl);
+							if (!found && index != std::string::npos)
+							{
+								found = true;
+								// /2/multitoggle/5/3
+
+							}
+						}
+						if (!found)
+						{
+							// toggle
+							ctrl = "toggle";
+							index = addr.find(ctrl);
+							if (!found && index != std::string::npos)
+							{
+								found = true;
+								f = msg[0].flt();
+								i = std::stoi(addr.substr(index + ctrl.length())) + 80;
+								mSDAAnimation->toggleValue(i);
+							}
+						}
+						if (!found)
+						{
+							// push
+							ctrl = "push";
+							index = addr.find(ctrl);
+							if (!found && index != std::string::npos)
+							{
+								found = true;
+								f = msg[0].flt();
+								i = std::stoi(addr.substr(index + ctrl.length())) + 80;
+								mSDAAnimation->toggleValue(i);
+							}
+						}
+						if (!found)
+						{
+							// xy
+							ctrl = "xy1";
+							index = addr.find(ctrl);
+							if (!found && index != std::string::npos)
+							{
+								found = true;
+								vv = vec2(msg[0].flt(), msg[1].flt());
+
+							}
+						}
+						if (!found)
+						{
+							// xy
+							ctrl = "xy2";
+							index = addr.find(ctrl);
+							if (!found && index != std::string::npos)
+							{
+								found = true;
+								vv = vec2(msg[0].flt(), msg[1].flt());
+							}
+						}
+						if (!found)
+						{
+							// xy
+							ctrl = "xy";
+							index = addr.find(ctrl);
+							if (!found && index != std::string::npos)
+							{
+								found = true;
+								vv = vec2(msg[0].flt(), msg[1].flt());
+							}
+						}
+					}
+				}
+				catch (const std::exception& e) {
+					CI_LOG_E("not integer: " << addr);
+				}
+			}
+			if (found) {
+				CI_LOG_I("OSC: " << ctrl << " addr: " << addr);
+			}
+			else {
+				CI_LOG_E("not handled: " << msg.getNumArgs() << " addr: " << addr);
+			}
+		});
+
+		try {
+			// Bind the receiver to the endpoint. This function may throw.
+			mOscReceiver->bind();
+		}
+		catch (const osc::Exception &ex) {
+			CI_LOG_E("Error binding: " << ex.what() << " val: " << ex.value());
+		}
+
+		// UDP opens the socket and "listens" accepting any message from any endpoint. The listen
+		// function takes an error handler for the underlying socket. Any errors that would
+		// call this function are because of problems with the socket or with the remote message.
+		mOscReceiver->listen(
+			[](asio::error_code error, protocol::endpoint endpoint) -> bool {
+			if (error) {
+				CI_LOG_E("Error Listening: " << error.message() << " val: " << error.value() << " endpoint: " << endpoint);
+				return false;
+			}
+			else
+				return true;
+		});
+	}
 	// midi
 	if (mSDASettings->mMIDIOpenAllInputPorts) midiSetup();
 	mSelectedWarp = 0;

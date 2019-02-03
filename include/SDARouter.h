@@ -11,6 +11,8 @@
 #include "SDAWebsocket.h"
 // Midi
 #include "MidiIn.h"
+// OSC
+#include "cinder/osc/Osc.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -18,6 +20,9 @@ using namespace std;
 using namespace asio;
 using namespace asio::ip; 
 using namespace SophiaDigitalArt;
+
+using Receiver = osc::ReceiverUdp;
+using protocol = asio::ip::udp;
 
 namespace SophiaDigitalArt
 {
@@ -108,7 +113,9 @@ namespace SophiaDigitalArt
 		int							mSelectedFboB;
 
 		static const int			MAX = 16;
-
+		// osc
+		shared_ptr<osc::ReceiverUdp>			mOscReceiver;
+		std::map<uint64_t, protocol::endpoint>	mConnections;
 	};
 }
 
