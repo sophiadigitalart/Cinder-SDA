@@ -20,6 +20,7 @@
 		<libraryPath>lib</libraryPath>
 		<requires>fr.batchass.spout</requires>
 		<requires>mb.cinder.midi2</requires>
+		<requires>org.libcinder.OSC</requires>
 	</platform>
 </block>
 <template>templates/SDA/template.xml</template>

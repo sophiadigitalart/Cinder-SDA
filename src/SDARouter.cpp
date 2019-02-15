@@ -30,6 +30,18 @@ SDARouter::SDARouter(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation,
 			}
 			if (!found)
 			{
+				// ableton link tempo from ofx abletonLinkToWebsocket
+				ctrl = "/live/tempo";
+				index = addr.find(ctrl);
+				if (index != std::string::npos)
+				{
+					found = true;
+					mSDAAnimation->setAutoBeatAnimation(false);
+					mSDAAnimation->setBpm(msg[0].flt());
+				}
+			}
+			if (!found)
+			{
 				int page = 0;
 				try {
 					page = std::stoi(addr.substr(1, 1)); // 1 to 4

@@ -134,6 +134,10 @@ namespace SophiaDigitalArt {
 		vec2						mRenderPosXY;
 		vec2						mPreviewFragXY;
 		vec2						mCamPosXY;
+		int							mxLeft;
+		int							mxRight;
+		int							myLeft;
+		int							myRight;
 		//vec2						mRenderResoXY;
 		bool						mAutoLayout;
 		bool						mStandalone;

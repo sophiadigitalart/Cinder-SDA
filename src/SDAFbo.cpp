@@ -237,16 +237,14 @@ namespace SophiaDigitalArt {
 		gl::ScopedFramebuffer fbScp(mFbo);
 		gl::clear(Color::black());
 
-
-
 		if (mInputTextureIndex > mTextureList.size() - 1) mInputTextureIndex = 0;
 		mTextureList[mInputTextureIndex]->getTexture()->bind(0);
 
 		gl::ScopedGlslProg glslScope(mFboTextureShader);
 		// TODO: test gl::ScopedViewport sVp(0, 0, mFbo->getWidth(), mFbo->getHeight());
 
-		gl::drawSolidRect(Rectf(0, 0, mSDASettings->mPreviewWidth, mSDASettings->mPreviewHeight));
-
+		//gl::drawSolidRect(Rectf(0, 0, mSDASettings->mPreviewWidth, mSDASettings->mPreviewHeight));
+		gl::drawSolidRect(Rectf(0, 0, mSDASettings->mFboWidth, mSDASettings->mFboHeight));
 		mRenderedTexture = mFbo->getColorTexture();
 		return mRenderedTexture;
 	}

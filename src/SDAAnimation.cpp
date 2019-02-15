@@ -115,9 +115,9 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		// iFreq3  
 		createFloatUniform("iFreq3", mSDASettings->IFREQ3, 0.0f, 0.01f, 256.0f); // 28
 		// iResolutionX (should be fbowidth) 
-		createFloatUniform("iResolutionX", mSDASettings->IRESX, mSDASettings->mFboWidth, 0.01f, 1280.0f); // 29
+		createFloatUniform("iResolutionX", mSDASettings->IRESX, mSDASettings->mFboWidth, 0.01f, 2280.0f); // 29
 		// iResolutionY (should be fboheight)  
-		createFloatUniform("iResolutionY", mSDASettings->IRESY, mSDASettings->mFboHeight, 0.01f, 800.0f); // 30
+		createFloatUniform("iResolutionY", mSDASettings->IRESY, mSDASettings->mFboHeight, 0.01f, 2800.0f); // 30
 
 		// TODO: double 
 		// weight mix fbo texture 0

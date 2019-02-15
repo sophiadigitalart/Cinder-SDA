@@ -460,6 +460,10 @@ void SDASettings::reset()
 	iTrack = 0;
 	mMainWindowX = mRenderX = 0;
 	mMainWindowY = mRenderY = 0;
+	mxLeft = 0;
+	mxRight = 1280;
+	myLeft = 0;
+	myRight = 720;
 	mMainWindowWidth = 1280;
 	mMainWindowHeight = 720;
 	mRenderWidth = 1280;
@@ -470,8 +474,8 @@ void SDASettings::reset()
 	//mRenderResoXY = vec2(mRenderWidth, mRenderHeight);
 	//mRenderResolution = ivec2(mRenderWidth, mRenderHeight);
 	mPreviewFragXY = vec2(0.0, 0.0);
-	mAspectRatio = 0.75; // ratio 4:3 (0.75) 16:9 (0.5625)
-	mFboWidth = 640;
+	mAspectRatio = 0.5625; // ratio 4:3 (0.75) 16:9 (0.5625)
+	mFboWidth = 1280;
 	mFboHeight = mFboWidth * mAspectRatio;
 	mPreviewFboWidth = 70;
 	mPreviewFboHeight = mPreviewFboWidth* mAspectRatio;

@@ -841,8 +841,8 @@ unsigned int SDASession::createShaderFboFromString(string aFragmentShaderString,
 		XmlTree			fboXml;
 		fboXml.setTag(aShaderFilename);
 		fboXml.setAttribute("id", rtn);
-		fboXml.setAttribute("width", "640");
-		fboXml.setAttribute("height", "480");
+		fboXml.setAttribute("width", "1280");
+		fboXml.setAttribute("height", "720");
 		fboXml.setAttribute("shadername", mShaderList[rtn]->getName());
 		fboXml.setAttribute("inputtextureindex", math<int>::min(rtn, mTextureList.size() - 1));
 		f->fromXml(fboXml);
@@ -1034,8 +1034,8 @@ bool SDASession::initTextureList() {
 						XmlTree		xml;
 						xml.setTag("details");
 						xml.setAttribute("path", "0.jpg");
-						xml.setAttribute("width", 640);
-						xml.setAttribute("height", 480);
+						xml.setAttribute("width", 1280);
+						xml.setAttribute("height", 720);
 						t->fromXml(xml);
 						mTextureList.push_back(t);
 					}
