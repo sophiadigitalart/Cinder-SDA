@@ -393,7 +393,11 @@ namespace SophiaDigitalArt {
 				bool firstIndexFound = false;
 				// loading 2000 files takes a while, I load only the first one
 				for (fs::directory_iterator it(fullPath); it != fs::directory_iterator(); ++it)
-				{
+				{ 
+					// if file(1).jpg filename, mNumberOfDigits is 2
+					if (mNumberOfDigits == 2) {
+						break;
+					}
 					if (fs::is_regular_file(*it))
 					{
 						fileName = it->path().filename().string();
@@ -404,9 +408,7 @@ namespace SophiaDigitalArt {
 							if (mExt == "png" || mExt == "jpg") {
 								anyImagefileName = fileName;
 							}
-							// get the prefix for the image sequence
-							// the files are named from p0000.jpg to p2253.jpg for instance
-							// sometimes only 3 digits : l000 this time
+							// get the prefix for the image sequence, the files are named from p0000.jpg to p2253.jpg for instance, sometimes only 3 digits : l000 this time
 							// find the first digit
 							int firstDigit = fileName.find_first_of("0123456789");
 							// if valid image sequence (contains a digit)
@@ -497,14 +499,21 @@ namespace SophiaDigitalArt {
 			if (!mLoadingFilesComplete) {
 				// thank you Omar!
 				char restOfFileName[32];
-				if (mNumberOfDigits == 4) {
-
-					sprintf(restOfFileName, "%04d", mNextIndexFrameToTry);
-				}
-				else {
-
+				switch (mNumberOfDigits)
+				{
+				case 2:
+					sprintf(restOfFileName, "%d)", mNextIndexFrameToTry);
+					break;
+				case 3:
 					sprintf(restOfFileName, "%03d", mNextIndexFrameToTry);
+					break;
+				case 4:
+					sprintf(restOfFileName, "%04d", mNextIndexFrameToTry);
+					break;
+				default:
+					break;
 				}
+				
 				string fileNameToLoad = mPrefix + restOfFileName + "." + mExt;
 				fs::path fileToLoad = getAssetPath("") / mPath / fileNameToLoad;
 				if (fs::exists(fileToLoad)) {
@@ -529,7 +538,7 @@ namespace SophiaDigitalArt {
 						mLoadingFilesComplete = true;
 					}
 				}
-
+				CI_LOG_V(mStatus);
 				// increment counter for next filename
 				mNextIndexFrameToTry++;
 				if (mNextIndexFrameToTry > 9999 && mNumberOfDigits == 4) mLoadingFilesComplete = true;
