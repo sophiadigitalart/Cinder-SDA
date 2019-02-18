@@ -80,7 +80,7 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 	try
 	{
 		mGlslMix = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixFragmentShaderString());
-		mGlslBlend = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixFragmentShaderString());		
+		mGlslBlend = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixFragmentShaderString());
 	}
 	catch (gl::GlslProgCompileExc &exc)
 	{
@@ -93,7 +93,7 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 		CI_LOG_V("setFragmentString, error on live fragment shader:" + mError);
 	}
 	mSDASettings->mMsg = mError;
-	
+
 	mAFboIndex = 0;
 	mBFboIndex = 1;
 }
@@ -184,7 +184,7 @@ void SDASession::updateMixUniforms() {
 	mGlslMix->uniform("iAlpha", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFA) * mSDASettings->iAlpha);
 	mGlslMix->uniform("iChromatic", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ICHROMATIC));
 	mGlslMix->uniform("iRotationSpeed", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IROTATIONSPEED));
-	mGlslMix->uniform("iCrossfade", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE)); 
+	mGlslMix->uniform("iCrossfade", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE));
 	mGlslMix->uniform("iPixelate", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IPIXELATE));
 	mGlslMix->uniform("iExposure", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IEXPOSURE));
 	mGlslMix->uniform("iToggle", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->ITOGGLE));
@@ -279,7 +279,7 @@ void SDASession::updateBlendUniforms() {
 
 }
 void SDASession::update(unsigned int aClassIndex) {
-	
+
 	if (aClassIndex == 0) {
 		if (mSDAWebsocket->hasReceivedStream() && (getElapsedFrames() % 100 == 0)) {
 			updateStream(mSDAWebsocket->getBase64Image());
@@ -301,7 +301,7 @@ void SDASession::update(unsigned int aClassIndex) {
 		}*/
 
 		// fps calculated in main app
-		mSDASettings->sFps = toString(floor(getFloatUniformValueByIndex(mSDASettings->IFPS)));		
+		mSDASettings->sFps = toString(floor(getFloatUniformValueByIndex(mSDASettings->IFPS)));
 		mSDAAnimation->update();
 	}
 	else {
@@ -376,20 +376,20 @@ void SDASession::restore()
 		JsonTree doc(loadFile(sessionPath));
 		if (doc.hasChild("settings")) {
 			JsonTree settings(doc.getChild("settings"));
-			if (settings.hasChild("bpm")) { 
-				mOriginalBpm = settings.getValueForKey<float>("bpm", 166.0f); 
+			if (settings.hasChild("bpm")) {
+				mOriginalBpm = settings.getValueForKey<float>("bpm", 166.0f);
 				CI_LOG_W("getBpm" + toString(mSDAAnimation->getBpm()) + " mOriginalBpm " + toString(mOriginalBpm));
-				mSDAAnimation->setBpm(mOriginalBpm); 
-				CI_LOG_W("getBpm" + toString(mSDAAnimation->getBpm()) );
+				mSDAAnimation->setBpm(mOriginalBpm);
+				CI_LOG_W("getBpm" + toString(mSDAAnimation->getBpm()));
 			};
 			if (settings.hasChild("beatsperbar")) mSDAAnimation->setIntUniformValueByName("iBeatsPerBar", settings.getValueForKey<int>("beatsperbar"));
 			if (mSDAAnimation->getIntUniformValueByName("iBeatsPerBar") < 1) mSDAAnimation->setIntUniformValueByName("iBeatsPerBar", 4);
 			if (settings.hasChild("fadeindelay")) mFadeInDelay = settings.getValueForKey<int>("fadeindelay");
 			if (settings.hasChild("fadeoutdelay")) mFadeOutDelay = settings.getValueForKey<int>("fadeoutdelay");
 			if (settings.hasChild("endframe")) mSDAAnimation->mEndFrame = settings.getValueForKey<int>("endframe");
-			CI_LOG_W("getBpm" + toString( mSDAAnimation->getBpm()) + " mTargetFps " + toString( mTargetFps));
+			CI_LOG_W("getBpm" + toString(mSDAAnimation->getBpm()) + " mTargetFps " + toString(mTargetFps));
 			mTargetFps = mSDAAnimation->getBpm() / 60.0f * mFpb;
-			CI_LOG_W("getBpm" + toString( mSDAAnimation->getBpm()) + " mTargetFps " + toString( mTargetFps));
+			CI_LOG_W("getBpm" + toString(mSDAAnimation->getBpm()) + " mTargetFps " + toString(mTargetFps));
 		}
 
 		if (doc.hasChild("assets")) {
@@ -489,10 +489,10 @@ void SDASession::fileDrop(FileDropEvent event) {
 }
 #pragma region events
 bool SDASession::handleMouseMove(MouseEvent &event)
-{	
+{
 	// 20180318 handled in SDAUIMouse mSDAAnimation->setVec4UniformValueByIndex(70, vec4(event.getX(), event.getY(), event.isLeftDown(), event.isRightDown()));
 	// pass this mouse event to the warp editor first	
-	bool handled = false;	
+	bool handled = false;
 	event.setHandled(handled);
 	return event.isHandled();
 }
@@ -526,102 +526,103 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 	bool handled = true;
 	float newValue;
 
+	// pass this event to Mix handler
+	if (!mSDAAnimation->handleKeyDown(event)) {
+		switch (event.getCode()) {
 
-		// pass this event to Mix handler
-		if (!mSDAAnimation->handleKeyDown(event)) {
-			switch (event.getCode()) {
-			
-			case KeyEvent::KEY_SPACE:
-				//mSDATextures->playMovie();
-				//mSDAAnimation->currentScene++;
-				//if (mMovie) { if (mMovie->isPlaying()) mMovie->stop(); else mMovie->play(); }
+		case KeyEvent::KEY_SPACE:
+			//mSDATextures->playMovie();
+			//mSDAAnimation->currentScene++;
+			//if (mMovie) { if (mMovie->isPlaying()) mMovie->stop(); else mMovie->play(); }
+			break;
+		case KeyEvent::KEY_0:
+			break;
+		case KeyEvent::KEY_l:
+			mSDAAnimation->load();
+			//mLoopVideo = !mLoopVideo;
+			//if (mMovie) mMovie->setLoop(mLoopVideo);
+			break;
+		case KeyEvent::KEY_x:
+			// trixels
+			mSDAWebsocket->changeFloatValue(mSDASettings->ITRIXELS, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ITRIXELS) + 0.05f);
+			break;
+		case KeyEvent::KEY_r:
+			newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFR) + 0.1f;
+			if (newValue > 1.0f) newValue = 0.0f;
+			mSDAWebsocket->changeFloatValue(mSDASettings->IFR, newValue);
+			break;
+		case KeyEvent::KEY_g:
+			newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFG) + 0.1f;
+			if (newValue > 1.0f) newValue = 0.0f;
+			mSDAWebsocket->changeFloatValue(mSDASettings->IFG, newValue);
+			break;
+		case KeyEvent::KEY_b:
+			newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFB) + 0.1f;
+			if (newValue > 1.0f) newValue = 0.0f;
+			mSDAWebsocket->changeFloatValue(mSDASettings->IFB, newValue);
+			break;
+		case KeyEvent::KEY_e:
+			newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFR) - 0.1f;
+			if (newValue < 0.0f) newValue = 1.0f;
+			mSDAWebsocket->changeFloatValue(mSDASettings->IFR, newValue);
+			break;
+		case KeyEvent::KEY_f:
+			newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFG) - 0.1f;
+			if (newValue < 0.0f) newValue = 1.0f;
+			mSDAWebsocket->changeFloatValue(mSDASettings->IFG, newValue);
+			break;
+		case KeyEvent::KEY_v:
+			newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFB) - 0.1f;
+			if (newValue < 0.0f) newValue = 1.0f;
+			mSDAWebsocket->changeFloatValue(mSDASettings->IFB, newValue);
+			break;
+		case KeyEvent::KEY_c:
+			// chromatic
+			// TODO find why can't put value >0.9 or 0.85!
+			newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ICHROMATIC) + 0.05f;
+			if (newValue > 1.0f) newValue = 0.0f;
+			mSDAWebsocket->changeFloatValue(mSDASettings->ICHROMATIC, newValue);
+			break;
+		case KeyEvent::KEY_p:
+			// pixelate
+			mSDAWebsocket->changeFloatValue(mSDASettings->IPIXELATE, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IPIXELATE) + 0.05f);
+			break;
+		case KeyEvent::KEY_t:
+			// glitch
+			mSDAWebsocket->changeBoolValue(mSDASettings->IGLITCH, true);
+			break;
+		case KeyEvent::KEY_i:
+			// invert
+			mSDAWebsocket->changeBoolValue(mSDASettings->IINVERT, true);
+			break;
+		case KeyEvent::KEY_o:
+			// toggle
+			mSDAWebsocket->toggleValue(mSDASettings->ITOGGLE);
+			break;
+		case KeyEvent::KEY_z:
+			// zoom
+			mSDAWebsocket->changeFloatValue(mSDASettings->IZOOM, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IZOOM) - 0.05f);
+			break;
+			/* removed temp for Sky Project case KeyEvent::KEY_LEFT:
+				//mSDATextures->rewindMovie();
+				if (mSDAAnimation->getFloatUniformValueByIndex(21) > 0.1f) mSDAWebsocket->changeFloatValue(21, mSDAAnimation->getFloatUniformValueByIndex(21) - 0.1f);
 				break;
-			case KeyEvent::KEY_0:
-				break;
-			case KeyEvent::KEY_l:
-				mSDAAnimation->load();
-				//mLoopVideo = !mLoopVideo;
-				//if (mMovie) mMovie->setLoop(mLoopVideo);
-				break;
-			case KeyEvent::KEY_x:
-				// trixels
-				mSDAWebsocket->changeFloatValue(mSDASettings->ITRIXELS, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ITRIXELS) + 0.05f);
-				break;
-			case KeyEvent::KEY_r:
-				newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFR) + 0.1f;
-				if (newValue > 1.0f) newValue = 0.0f;
-				mSDAWebsocket->changeFloatValue(mSDASettings->IFR, newValue);
-				break;
-			case KeyEvent::KEY_g:
-				newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFG) + 0.1f;
-				if (newValue > 1.0f) newValue = 0.0f;
-				mSDAWebsocket->changeFloatValue(mSDASettings->IFG, newValue);
-				break;
-			case KeyEvent::KEY_b:
-				newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFB) + 0.1f;
-				if (newValue > 1.0f) newValue = 0.0f;
-				mSDAWebsocket->changeFloatValue(mSDASettings->IFB, newValue);
-				break;
-			case KeyEvent::KEY_e:
-				newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFR) - 0.1f;
-				if (newValue < 0.0f) newValue = 1.0;
-				mSDAWebsocket->changeFloatValue(mSDASettings->IFR, newValue);
-				break;
-			case KeyEvent::KEY_f:
-				newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFG) - 0.1f;
-				if (newValue < 0.0f) newValue = 1.0;
-				mSDAWebsocket->changeFloatValue(mSDASettings->IFG, newValue);
-				break;
-			case KeyEvent::KEY_v:
-				newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFB) - 0.1f;
-				if (newValue < 0.0f) newValue = 1.0;
-				mSDAWebsocket->changeFloatValue(mSDASettings->IFB, newValue);
-				break;
-			case KeyEvent::KEY_c:
-				// chromatic
-				mSDAWebsocket->changeFloatValue(mSDASettings->ICHROMATIC, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ICHROMATIC) + 0.05f);
-				break;
-			case KeyEvent::KEY_p:
-				// pixelate
-				mSDAWebsocket->changeFloatValue(mSDASettings->IPIXELATE, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IPIXELATE) + 0.05f);
-				break;
-			case KeyEvent::KEY_t:
-				// glitch
-				mSDAWebsocket->changeBoolValue(mSDASettings->IGLITCH, true);
-				break;
-			case KeyEvent::KEY_i:
-				// invert
-				mSDAWebsocket->changeBoolValue(mSDASettings->IINVERT, true);
-				break;
-			case KeyEvent::KEY_o:
-				// toggle
-				mSDAWebsocket->toggleValue(mSDASettings->ITOGGLE);
-				break;
-			case KeyEvent::KEY_z:
-				// zoom
-				mSDAWebsocket->changeFloatValue(mSDASettings->IZOOM, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IZOOM) - 0.05f);
-				break;
-				/* removed temp for Sky Project case KeyEvent::KEY_LEFT:
-					//mSDATextures->rewindMovie();
-					if (mSDAAnimation->getFloatUniformValueByIndex(21) > 0.1f) mSDAWebsocket->changeFloatValue(21, mSDAAnimation->getFloatUniformValueByIndex(21) - 0.1f);
-					break;
-				case KeyEvent::KEY_RIGHT:
-					//mSDATextures->fastforwardMovie();
-					if (mSDAAnimation->getFloatUniformValueByIndex(21) < 1.0f) mSDAWebsocket->changeFloatValue(21, mSDAAnimation->getFloatUniformValueByIndex(21) + 0.1f);
-					break;*/
-			case KeyEvent::KEY_PAGEDOWN:
-				// crossfade right
-				if (mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) < 1.0f) mSDAWebsocket->changeFloatValue(mSDASettings->IXFADE, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) + 0.1f);
-				break;
-			case KeyEvent::KEY_PAGEUP:
-				// crossfade left
-				if (mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) > 0.0f) mSDAWebsocket->changeFloatValue(mSDASettings->IXFADE, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) - 0.1f);
-				break;
-
-			default:
-				handled = false;
-				break;
-			}
+			case KeyEvent::KEY_RIGHT:
+				//mSDATextures->fastforwardMovie();
+				if (mSDAAnimation->getFloatUniformValueByIndex(21) < 1.0f) mSDAWebsocket->changeFloatValue(21, mSDAAnimation->getFloatUniformValueByIndex(21) + 0.1f);
+				break;*/
+		case KeyEvent::KEY_PAGEDOWN:
+			// crossfade right
+			if (mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) < 1.0f) mSDAWebsocket->changeFloatValue(mSDASettings->IXFADE, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) + 0.1f);
+			break;
+		case KeyEvent::KEY_PAGEUP:
+			// crossfade left
+			if (mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) > 0.0f) mSDAWebsocket->changeFloatValue(mSDASettings->IXFADE, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) - 0.1f);
+			break;
+		default:
+			handled = false;
+			break;
+		}
 
 	}
 	event.setHandled(handled);
@@ -631,42 +632,42 @@ bool SDASession::handleKeyUp(KeyEvent &event) {
 	bool handled = true;
 
 
-		if (!mSDAAnimation->handleKeyUp(event)) {
-			// Animation did not handle the key, so handle it here
-			switch (event.getCode()) {
-			case KeyEvent::KEY_g:
-				// glitch
-				mSDAWebsocket->changeBoolValue(mSDASettings->IGLITCH, false);
-				break;
-			case KeyEvent::KEY_t:
-				// trixels
-				mSDAWebsocket->changeFloatValue(mSDASettings->ITRIXELS, 0.0f);
-				break;
-			case KeyEvent::KEY_i:
-				// invert
-				mSDAWebsocket->changeBoolValue(mSDASettings->IINVERT, false);
-				break;
-			case KeyEvent::KEY_c:
-				// chromatic
-				mSDAWebsocket->changeFloatValue(mSDASettings->ICHROMATIC, 0.0f);
-				break;
-			case KeyEvent::KEY_p:
-				// pixelate
-				mSDAWebsocket->changeFloatValue(mSDASettings->IPIXELATE, 1.0f);
-				break;
-			case KeyEvent::KEY_o:
-				// toggle
-				mSDAWebsocket->changeBoolValue(mSDASettings->ITOGGLE, false);
-				break;
-			case KeyEvent::KEY_z:
-				// zoom
-				mSDAWebsocket->changeFloatValue(mSDASettings->IZOOM, 1.0f);
-				break;
-			default:
-				handled = false;
-				break;
-			}
-		
+	if (!mSDAAnimation->handleKeyUp(event)) {
+		// Animation did not handle the key, so handle it here
+		switch (event.getCode()) {
+		case KeyEvent::KEY_g:
+			// glitch
+			mSDAWebsocket->changeBoolValue(mSDASettings->IGLITCH, false);
+			break;
+		case KeyEvent::KEY_t:
+			// trixels
+			mSDAWebsocket->changeFloatValue(mSDASettings->ITRIXELS, 0.0f);
+			break;
+		case KeyEvent::KEY_i:
+			// invert
+			mSDAWebsocket->changeBoolValue(mSDASettings->IINVERT, false);
+			break;
+		case KeyEvent::KEY_c:
+			// chromatic
+			mSDAWebsocket->changeFloatValue(mSDASettings->ICHROMATIC, 0.0f);
+			break;
+		case KeyEvent::KEY_p:
+			// pixelate
+			mSDAWebsocket->changeFloatValue(mSDASettings->IPIXELATE, 1.0f);
+			break;
+		case KeyEvent::KEY_o:
+			// toggle
+			mSDAWebsocket->changeBoolValue(mSDASettings->ITOGGLE, false);
+			break;
+		case KeyEvent::KEY_z:
+			// zoom
+			mSDAWebsocket->changeFloatValue(mSDASettings->IZOOM, 1.0f);
+			break;
+		default:
+			handled = false;
+			break;
+		}
+
 	}
 	event.setHandled(handled);
 	return event.isHandled();
@@ -933,21 +934,21 @@ void SDASession::initShaderList() {
 
 	if (mShaderList.size() == 0) {
 		CI_LOG_V("SDASession::init mShaderList");
-		createShaderFboFromString("void main(void){vec2 uv = gl_FragCoord.xy / iResolution.xy;uv = abs(2.0*(uv - 0.5));vec4 t1 = texture2D(iChannel0, vec2(uv[0], 0.1));vec4 t2 = texture2D(iChannel0, vec2(uv[1], 0.1));float fft = t1[0] * t2[0];gl_FragColor = vec4(sin(fft*3.141*2.5), sin(fft*3.141*2.0), sin(fft*3.141*1.0), 1.0);}",  "fftMatrixProduct.glsl");
-		createShaderFboFromString("void main(void){vec2 uv = fragCoord.xy / iResolution.xy;vec4 tex = texture(iChannel0, uv);fragColor = vec4(vec3( tex.r, tex.g, tex.b ),1.0);}",  "0.glsl");
-		createShaderFboFromString("void main(void){vec2 uv = fragCoord.xy / iResolution.xy;vec4 tex = texture(iChannel0, uv);fragColor = vec4(vec3( tex.r, tex.g, tex.b ),1.0);}",  "1.glsl");
-		createShaderFboFromString("void main(void) {vec2 uv = 2 * (gl_FragCoord.xy / iResolution.xy - vec2(0.5));float radius = length(uv);float angle = atan(uv.y, uv.x);float col = .0;col += 1.5*sin(iTime + 13.0 * angle + uv.y * 20);col += cos(.9 * uv.x * angle * 60.0 + radius * 5.0 - iTime * 2.);fragColor = (1.2 - radius) * vec4(vec3(col), 1.0);}",  "hexler330.glsl");
+		createShaderFboFromString("void main(void){vec2 uv = gl_FragCoord.xy / iResolution.xy;uv = abs(2.0*(uv - 0.5));vec4 t1 = texture2D(iChannel0, vec2(uv[0], 0.1));vec4 t2 = texture2D(iChannel0, vec2(uv[1], 0.1));float fft = t1[0] * t2[0];gl_FragColor = vec4(sin(fft*3.141*2.5), sin(fft*3.141*2.0), sin(fft*3.141*1.0), 1.0);}", "fftMatrixProduct.glsl");
+		createShaderFboFromString("void main(void){vec2 uv = fragCoord.xy / iResolution.xy;vec4 tex = texture(iChannel0, uv);fragColor = vec4(vec3( tex.r, tex.g, tex.b ),1.0);}", "0.glsl");
+		createShaderFboFromString("void main(void){vec2 uv = fragCoord.xy / iResolution.xy;vec4 tex = texture(iChannel0, uv);fragColor = vec4(vec3( tex.r, tex.g, tex.b ),1.0);}", "1.glsl");
+		createShaderFboFromString("void main(void) {vec2 uv = 2 * (gl_FragCoord.xy / iResolution.xy - vec2(0.5));float radius = length(uv);float angle = atan(uv.y, uv.x);float col = .0;col += 1.5*sin(iTime + 13.0 * angle + uv.y * 20);col += cos(.9 * uv.x * angle * 60.0 + radius * 5.0 - iTime * 2.);fragColor = (1.2 - radius) * vec4(vec3(col), 1.0);}", "hexler330.glsl");
 
 		createShaderFboFromString("void main(void){vec2 uv = 2 * (fragCoord.xy / iResolution.xy - vec2(0.5));float specx = texture2D( iChannel0, vec2(0.25,5.0/100.0) ).x;float specy = texture2D( iChannel0, vec2(0.5,5.0/100.0) ).x;float specz = 1.0*texture2D( iChannel0, vec2(0.7,5.0/100.0) ).x;float r = length(uv); float p = atan(uv.y/uv.x); uv = abs(uv);float col = 0.0;float amp = (specx+specy+specz)/3.0;uv.y += sin(uv.y*3.0*specx-iTime/5.0*specy+r*10.);uv.x += cos((iTime/5.0)+specx*30.0*uv.x);col += abs(1.0/uv.y/30.0) * (specx+specz)*15.0;col += abs(1.0/uv.x/60.0) * specx*8. ; fragColor=vec4(vec3( col ),1.0);}", "Hexler2.glsl");
-		createShaderFboFromString("void main(void){vec2 uv = 2 * (gl_FragCoord.xy / iResolution.xy - vec2(0.5));vec2 spec = 1.0*texture2D(iChannel0, vec2(0.25, 5.0 / 100.0)).xx;float col = 0.0;uv.x += sin(iTime * 6.0 + uv.y*1.5)*spec.y;col += abs(0.8 / uv.x) * spec.y;gl_FragColor = vec4(col, col, col, 1.0);}",  "SoundVizVert.glsl");
-		createShaderFboFromString("void main(void){vec2 uv = 2 * (gl_FragCoord.xy / iResolution.xy - vec2(0.5));vec2 spec = 1.0*texture2D(iChannel0, vec2(0.25, 5.0 / 100.0)).yy;float col = 0.0;uv.y += sin(iTime * 6.0 + uv.x*1.5)*spec.x;col += abs(0.8/uv.y) * spec.x;gl_FragColor = vec4(col, col, col, 1.0);}",  "SoundVizHoriz.glsl");
+		createShaderFboFromString("void main(void){vec2 uv = 2 * (gl_FragCoord.xy / iResolution.xy - vec2(0.5));vec2 spec = 1.0*texture2D(iChannel0, vec2(0.25, 5.0 / 100.0)).xx;float col = 0.0;uv.x += sin(iTime * 6.0 + uv.y*1.5)*spec.y;col += abs(0.8 / uv.x) * spec.y;gl_FragColor = vec4(col, col, col, 1.0);}", "SoundVizVert.glsl");
+		createShaderFboFromString("void main(void){vec2 uv = 2 * (gl_FragCoord.xy / iResolution.xy - vec2(0.5));vec2 spec = 1.0*texture2D(iChannel0, vec2(0.25, 5.0 / 100.0)).yy;float col = 0.0;uv.y += sin(iTime * 6.0 + uv.x*1.5)*spec.x;col += abs(0.8/uv.y) * spec.x;gl_FragColor = vec4(col, col, col, 1.0);}", "SoundVizHoriz.glsl");
 		//createShaderFboFromString("#define f(a,b)sin(50.3*length(fragCoord.xy/iResolution.xy*4.-vec2(cos(a),sin(b))-3.)) \n void main(){float t=iTime;fragColor=vec4(f(t,t)*f(1.4*t,.7*t));}", "Hyper-lightweight2XOR", "Hyper-lightweight2XOR.glsl");
-		createShaderFboFromString("void main(void) {float d = pow(dot(fragCoord.xy, iResolution.xy ), 0.52); d =  d * 0.5;float x = sin(6.0+0.1*d + iTime*-6.0) * 10.0;fragColor = vec4( x, x, x, 1 );}",  "WallSide.glsl");
+		createShaderFboFromString("void main(void) {float d = pow(dot(fragCoord.xy, iResolution.xy ), 0.52); d =  d * 0.5;float x = sin(6.0+0.1*d + iTime*-6.0) * 10.0;fragColor = vec4( x, x, x, 1 );}", "WallSide.glsl");
 
-		createShaderFboFromString("void main(void){float d = distance(fragCoord.xy, iResolution.xy * vec2(0.5,0.5).xy);float x = sin(5.0+0.1*d + iTime*-4.0) * 5.0;x = clamp( x, 0.0, 1.0 );fragColor = vec4(x, x, x, 1.0);}",  "Circular.glsl");
-		createShaderFboFromString("void main(void){vec4 p = vec4(fragCoord.xy,0.,1.)/iResolution.y - vec4(.9,.5,0,0), c=p-p;float t=iTime,r=length(p.xy+=sin(t+sin(t*.8))*.4),a=atan(p.y,p.x);for (float i = 0.;i<60.;i++) c = c*.98 + (sin(i+vec4(5,3,2,1))*.5+.5)*smoothstep(.99, 1., sin(log(r+i*.05)-t-i+sin(a +=t*.01)));fragColor = c*r;}",  "2TweetsChallenge.glsl");
-		createShaderFboFromString("void main(void){vec2 p = -1.0+2.0*fragCoord.xy/iResolution.xy;float w = sin(iTime+6.5*sqrt(dot(p,p))*cos(p.x));float x = cos(int(iRatio*10.0)*atan(p.y,p.x) + 1.8*w);vec3 col = iColor*15.0;fragColor = vec4(col*x,1.0);}",  "gunstonSmoke.glsl");
-		createShaderFboFromString("void main(void) {vec2  px = 4.0*(-iResolution.xy + 2.0*fragCoord.xy)/iResolution.y;float id = 0.5 + 0.5*cos(iTime + sin(dot(floor(px+0.5),vec2(113.1,17.81)))*43758.545);vec3 co = 0.5 + 0.5*cos(iTime + 3.5*id + vec3(0.0,1.57,3.14) );vec2 pa = smoothstep( 0.0, 0.2, id*(0.5 + 0.5*cos(6.2831*px)) );fragColor = vec4( co*pa.x*pa.y, 1.0 );}",  "ColorGrid.glsl");
+		createShaderFboFromString("void main(void){float d = distance(fragCoord.xy, iResolution.xy * vec2(0.5,0.5).xy);float x = sin(5.0+0.1*d + iTime*-4.0) * 5.0;x = clamp( x, 0.0, 1.0 );fragColor = vec4(x, x, x, 1.0);}", "Circular.glsl");
+		createShaderFboFromString("void main(void){vec4 p = vec4(fragCoord.xy,0.,1.)/iResolution.y - vec4(.9,.5,0,0), c=p-p;float t=iTime,r=length(p.xy+=sin(t+sin(t*.8))*.4),a=atan(p.y,p.x);for (float i = 0.;i<60.;i++) c = c*.98 + (sin(i+vec4(5,3,2,1))*.5+.5)*smoothstep(.99, 1., sin(log(r+i*.05)-t-i+sin(a +=t*.01)));fragColor = c*r;}", "2TweetsChallenge.glsl");
+		createShaderFboFromString("void main(void){vec2 p = -1.0+2.0*fragCoord.xy/iResolution.xy;float w = sin(iTime+6.5*sqrt(dot(p,p))*cos(p.x));float x = cos(int(iRatio*10.0)*atan(p.y,p.x) + 1.8*w);vec3 col = iColor*15.0;fragColor = vec4(col*x,1.0);}", "gunstonSmoke.glsl");
+		createShaderFboFromString("void main(void) {vec2  px = 4.0*(-iResolution.xy + 2.0*fragCoord.xy)/iResolution.y;float id = 0.5 + 0.5*cos(iTime + sin(dot(floor(px+0.5),vec2(113.1,17.81)))*43758.545);vec3 co = 0.5 + 0.5*cos(iTime + 3.5*id + vec3(0.0,1.57,3.14) );vec2 pa = smoothstep( 0.0, 0.2, id*(0.5 + 0.5*cos(6.2831*px)) );fragColor = vec4( co*pa.x*pa.y, 1.0 );}", "ColorGrid.glsl");
 		createShaderFboFromString("void main(void){vec2 uv = gl_FragCoord.xy / iResolution.xy;fragColor = texture(iChannel0, uv);}", "tex0");
 		createShaderFboFromString("void main(void){vec2 uv = gl_FragCoord.xy / iResolution.xy;fragColor = texture(iChannel0, uv);}", "tex1");
 	}
@@ -1226,7 +1227,7 @@ ci::gl::Texture2dRef SDASession::getRenderTexture()
 	// setup the viewport to match the dimensions of the FBO
 	gl::ScopedViewport scpVp(ivec2(0), mRenderFbo->getSize());
 
-	
+
 	mRenderedTexture = mRenderFbo->getColorTexture();
 	return mRenderedTexture;
 }
@@ -1241,7 +1242,7 @@ ci::gl::TextureRef SDASession::getMixTexture(unsigned int aMixFboIndex) {
 		// should never happen
 		mMixFbos[aMixFboIndex].fbo = gl::Fbo::create(mSDASettings->mFboWidth, mSDASettings->mFboHeight, fboFmt);
 	}
-	
+
 	return mMixFbos[aMixFboIndex].texture;
 }
 
