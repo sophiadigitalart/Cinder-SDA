@@ -374,7 +374,7 @@ namespace SophiaDigitalArt {
 		mCurrentLoadedFrame = 0;
 		mNextIndexFrameToTry = 0;
 		mPlaying = false;
-		mSpeed = 0.032f;
+		mSpeed = 0.1f;
 		mExt = "png";
 		mPrefix = "none";
 		mNextIndexFrameToTry = 0;
