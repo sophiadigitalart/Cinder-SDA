@@ -115,10 +115,11 @@ namespace SophiaDigitalArt
 		virtual void					reverse();
 		virtual float					getSpeed();
 		virtual void					setSpeed(float speed);
-		//virtual int						getPlayheadPosition();
+		//virtual int					getPlayheadPosition();
 		int								getPosition() { return mPosition; };
 		virtual void					setPlayheadPosition(int position);
 		virtual int						getMaxFrame();
+		//virtual ci::gl::Texture2dRef	getNextTexture();
 
 	protected:
 		std::string						mName;
@@ -198,19 +199,20 @@ namespace SophiaDigitalArt
 
 		//! returns a shared pointer 
 		TextureImageSequenceRef	getPtr() { return std::static_pointer_cast<TextureImageSequence>(shared_from_this()); }
-		void						stopSequence();
-		void						toggleLoadingFromDisk() override;
-		bool						isLoadingFromDisk() override;
-		//void						stopLoading();
+		void							stopSequence();
+		void							toggleLoadingFromDisk() override;
+		bool							isLoadingFromDisk() override;
+		//void							stopLoading();
 		//int							getPlayheadPosition() override;
-		void						setPlayheadPosition(int position) override;
+		void							setPlayheadPosition(int position) override;
 
-		float						getSpeed() override;
-		void						setSpeed(float speed) override;
-		void						reverse() override;
+		float							getSpeed() override;
+		void							setSpeed(float speed) override;
+		void							reverse() override;
 
-		bool						isValid(){ return mFramesLoaded > 0; };
-		int							getMaxFrame() override;
+		bool							isValid(){ return mFramesLoaded > 0; };
+		int								getMaxFrame() override;
+		//ci::gl::Texture2dRef			getNextTexture() override;
 	protected:
 		//! 
 		virtual ci::gl::Texture2dRef	getTexture() override;

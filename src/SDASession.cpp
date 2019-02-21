@@ -281,7 +281,7 @@ void SDASession::updateBlendUniforms() {
 void SDASession::update(unsigned int aClassIndex) {
 
 	if (aClassIndex == 0) {
-		if (mSDAWebsocket->hasReceivedStream() && (getElapsedFrames() % 100 == 0)) {
+		if (mSDAWebsocket->hasReceivedStream()) { //&& (getElapsedFrames() % 100 == 0)) {
 			updateStream(mSDAWebsocket->getBase64Image());
 		}
 		if (mSDAWebsocket->hasReceivedShader()) {
@@ -1062,6 +1062,16 @@ ci::gl::TextureRef SDASession::getInputTexture(unsigned int aTextureIndex) {
 	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
 	return mTextureList[aTextureIndex]->getTexture();
 }
+/*ci::gl::TextureRef SDASession::getNextInputTexture(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	if (mTextureList[aTextureIndex]->getType() == mTextureList[aTextureIndex]->SEQUENCE) {
+		return mTextureList[aTextureIndex]->getNextTexture();
+	}
+	else {
+		return mTextureList[aTextureIndex]->getTexture();
+	}
+	
+}*/
 string SDASession::getInputTextureName(unsigned int aTextureIndex) {
 	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
 	return mTextureList[aTextureIndex]->getName();

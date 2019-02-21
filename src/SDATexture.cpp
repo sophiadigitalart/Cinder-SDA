@@ -589,7 +589,18 @@ namespace SophiaDigitalArt {
 		}
 		return mTexture;
 	}
+	/*ci::gl::Texture2dRef TextureImageSequence::getNextTexture() {
 
+		if (mSequenceTextures.size() > 1) {
+
+			if (mPosition+1 > mFramesLoaded) {
+				//error
+				mPosition = 0;
+			}
+			mTexture = mSequenceTextures[mPosition+1];
+		}
+		return mTexture;
+	}*/
 	// Stops playback and resets the playhead to zero
 	void TextureImageSequence::stopSequence() {
 

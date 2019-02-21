@@ -225,6 +225,7 @@ namespace SophiaDigitalArt {
 
 		// textures
 		ci::gl::TextureRef				getInputTexture(unsigned int aTextureIndex);
+		//ci::gl::TextureRef				getNextInputTexture(unsigned int aTextureIndex);
 		string							getInputTextureName(unsigned int aTextureIndex);
 		unsigned int					getInputTexturesCount();
 		void							loadImageFile(string aFile, unsigned int aTextureIndex);
