@@ -124,11 +124,37 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 	CI_LOG_V("setFragmentString, loading" + aName);
 	try
 	{
+		// from Hydra
+		std::regex pattern{ "time" };
+		std::string replacement{ "iTime" };
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
+		pattern = { "uniform vec2 resolution;" };
+		replacement = { "uniform vec3 iResolution ;" }; //keep the space
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
+		pattern = { "resolution" };
+		replacement = { "iResolution" };
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
+		pattern = { "varying vec2 uv;" };
+		replacement = { "// from Hydra" };
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
+		/*uniform float time;
+		uniform vec2 resolution;
+		varying vec2 uv; */
+
+		// to change in Hydra
+		pattern = { "iResolution;" };
+		replacement = { "iResolution.xy;" };
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
+		pattern = { "1.0/iResolution" };
+		replacement = { "1.0/iResolution.xy" };
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
+
+
 		//CI_LOG_V("before regex " + mOriginalFragmentString);
 				// shadertoy: 
 		// change void mainImage( out vec4 fragColor, in vec2 fragCoord ) to void main(void)
-		std::regex pattern{ "mainImage" };
-		std::string replacement{ "main" };
+		pattern = { "mainImage" };
+		replacement = { "main" };
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
 		pattern = { "out vec4 fragColor," };
 		replacement = { "void" };
@@ -443,12 +469,12 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 	catch (gl::GlslProgCompileExc &exc)
 	{
 		mError = aName + string(exc.what());
-		CI_LOG_V("setFragmentString, unable to compile live fragment shader:" + mError);
+		CI_LOG_V("setFragmentString, unable to compile live fragment shader:" + mError + " frag:" + aFragmentShaderString);
 	}
 	catch (const std::exception &e)
 	{
 		mError = aName + string(e.what());
-		CI_LOG_V("setFragmentString, error on live fragment shader:" + mError);
+		CI_LOG_V("setFragmentString, error on live fragment shader:" + mError + " frag:" + aFragmentShaderString);
 	}
 	mSDASettings->mMsg = mError;
 	return mValid;
