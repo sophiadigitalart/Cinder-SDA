@@ -139,7 +139,7 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
 		/*uniform float time;
 		uniform vec2 resolution;
-		varying vec2 uv; */
+		varying vec2 uv;
 
 		// to change in Hydra
 		pattern = { "iResolution;" };
@@ -147,7 +147,7 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
 		pattern = { "1.0/iResolution" };
 		replacement = { "1.0/iResolution.xy" };
-		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement); */
 
 
 		//CI_LOG_V("before regex " + mOriginalFragmentString);
