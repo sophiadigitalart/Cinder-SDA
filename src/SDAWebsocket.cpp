@@ -374,7 +374,13 @@ void SDAWebsocket::wsClientConnect()
 {
 
 	stringstream s;
-	s << mSDASettings->mWebSocketsProtocol << mSDASettings->mWebSocketsHost << ":" << mSDASettings->mWebSocketsPort;
+	if (mSDASettings->mWebSocketsPort == 80) {
+		s << mSDASettings->mWebSocketsProtocol << mSDASettings->mWebSocketsHost;
+	}
+	else {
+		s << mSDASettings->mWebSocketsProtocol << mSDASettings->mWebSocketsHost << ":" << mSDASettings->mWebSocketsPort;
+	}
+	// BL TEMP s << "https://" << mSDASettings->mWebSocketsHost << ":" << mSDASettings->mWebSocketsPort;
 	mClient.connect(s.str());
 
 }
@@ -491,11 +497,13 @@ void SDAWebsocket::colorWrite()
 {
 
 	// lights4events
-	char col[8];
+	char col[97];
 	int r = (int)(mSDAAnimation->getFloatUniformValueByIndex(1) * 255);
 	int g = (int)(mSDAAnimation->getFloatUniformValueByIndex(2) * 255);
 	int b = (int)(mSDAAnimation->getFloatUniformValueByIndex(3) * 255);
-	sprintf(col, "#%02X%02X%02X", r, g, b);
+	int a = (int)(mSDAAnimation->getFloatUniformValueByIndex(4) * 255);
+	//sprintf(col, "#%02X%02X%02X", r, g, b);
+	sprintf(col, "{\"type\":\"action\", \"parameters\":{\"name\":\"FC\",\"parameters\":{\"color\":\"#%02X%02X%02X%02X\",\"fading\":\"NONE\"}}}", a, r, g, b);
 	wsWrite(col);
 
 }
