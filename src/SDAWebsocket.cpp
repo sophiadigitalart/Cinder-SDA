@@ -500,10 +500,32 @@ void SDAWebsocket::changeBoolValue(unsigned int aControl, bool aValue) {
 	sendJSON(strParams);
 }
 
-void SDAWebsocket::changeFloatValue(unsigned int aControl, float aValue, bool forceSend) {
+void SDAWebsocket::changeFloatValue(unsigned int aControl, float aValue, bool forceSend, bool toggle, bool increase, bool decrease) {
 	/*if (aControl == 31) {
 		CI_LOG_V("old value " + toString(mSDAAnimation->getFloatUniformValueByIndex(aControl)) + " newvalue " + toString(aValue));
 	}*/
+	float newValue;
+	if (increase) {
+		// increase
+		newValue = mSDAAnimation->getFloatUniformValueByIndex(aControl) + 0.1f;
+		if (newValue > 1.0f) newValue = 1.0f;
+		aValue = newValue;
+	}
+	else {
+		// decrease
+		if (decrease) {
+			newValue = mSDAAnimation->getFloatUniformValueByIndex(aControl) - 0.1f;
+			if (newValue < 0.0f) newValue = 0.0f;
+			aValue = newValue;
+		}
+		else {
+			// toggle
+			newValue = mSDAAnimation->getFloatUniformValueByIndex(aControl);
+			if (newValue > 0.0f) { newValue = 0.0f; }
+			else { newValue = 1.0f; } // Check for max instead?
+			aValue = newValue;
+		}
+	}
 	// check if changed
 	if ( (mSDAAnimation->setFloatUniformValueByIndex(aControl, aValue) && aControl != mSDASettings->IFPS) || forceSend) {
 		stringstream sParams;

@@ -526,6 +526,14 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 {
 	bool handled = true;
 	float newValue;
+#if defined( CINDER_COCOA )
+	bool isModDown = event.isMetaDown();
+#else // windows
+	bool isModDown = event.isControlDown();
+#endif
+	bool isShiftDown = event.isShiftDown();
+
+	CI_LOG_V("session keydown: " + toString(event.getCode()) + " ctrl: " + toString(isModDown) + " shift: " + toString(isShiftDown));
 
 	// pass this event to Mix handler
 	if (!mSDAAnimation->handleKeyDown(event)) {
@@ -539,7 +547,7 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 		case KeyEvent::KEY_0:
 			break;
 		case KeyEvent::KEY_l:
-			mSDAAnimation->load();
+			// live params TODO mSDAAnimation->load();
 			//mLoopVideo = !mLoopVideo;
 			//if (mMovie) mMovie->setLoop(mLoopVideo);
 			break;
@@ -548,35 +556,13 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 			mSDAWebsocket->changeFloatValue(mSDASettings->ITRIXELS, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ITRIXELS) + 0.05f);
 			break;
 		case KeyEvent::KEY_r:
-			newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFR) + 0.1f;
-			if (newValue > 1.0f) newValue = 0.0f;
-			mSDAWebsocket->changeFloatValue(mSDASettings->IFR, newValue);
+			mSDAWebsocket->changeFloatValue(mSDASettings->IFR, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFR), false, true, isShiftDown, isModDown);
 			break;
 		case KeyEvent::KEY_g:
-			newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFG) + 0.1f;
-			if (newValue > 1.0f) newValue = 0.0f;
-			mSDAWebsocket->changeFloatValue(mSDASettings->IFG, newValue);
+			mSDAWebsocket->changeFloatValue(mSDASettings->IFG, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFG), false, true, isShiftDown, isModDown);
 			break;
 		case KeyEvent::KEY_b:
-			newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFB) + 0.1f;
-			if (newValue > 1.0f) newValue = 0.0f;
-			mSDAWebsocket->changeFloatValue(mSDASettings->IFB, newValue);
-			break;
-		case KeyEvent::KEY_e:
-			newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFR) - 0.1f;
-			if (newValue < 0.0f) newValue = 1.0f;
-			mSDAWebsocket->changeFloatValue(mSDASettings->IFR, newValue);
-			break;
-		case KeyEvent::KEY_f:
-			newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFG) - 0.1f;
-			if (newValue < 0.0f) newValue = 1.0f;
-			mSDAWebsocket->changeFloatValue(mSDASettings->IFG, newValue);
-			break;
-		case KeyEvent::KEY_v:
-			newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFB) - 0.1f;
-			if (newValue < 0.0f) newValue = 1.0f;
-			mSDAWebsocket->changeFloatValue(mSDASettings->IFB, newValue);
-			break;
+			mSDAWebsocket->changeFloatValue(mSDASettings->IFB, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFB), false, true, isShiftDown, isModDown);
 		case KeyEvent::KEY_c:
 			// chromatic
 			// TODO find why can't put value >0.9 or 0.85!
