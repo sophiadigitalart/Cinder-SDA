@@ -17,7 +17,8 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 	// Animation
 	mSDAAnimation = SDAAnimation::create(mSDASettings);
 	// TODO: needed? mSDAAnimation->tapTempo();
-
+		// allow log to file
+	mSDALog = SDALog::create();
 	// init fbo format
 	//fmt.setWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
 	//fmt.setBorderColor(Color::black());		
@@ -587,7 +588,7 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 			// pixelate
 			mSDAWebsocket->changeFloatValue(mSDASettings->IPIXELATE, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IPIXELATE) + 0.05f);
 			break;
-		case KeyEvent::KEY_t:
+		case KeyEvent::KEY_y:
 			// glitch
 			mSDAWebsocket->changeBoolValue(mSDASettings->IGLITCH, true);
 			break;
@@ -597,7 +598,7 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 			break;
 		case KeyEvent::KEY_o:
 			// toggle
-			mSDAWebsocket->toggleValue(mSDASettings->ITOGGLE);
+			mSDAWebsocket->changeBoolValue(mSDASettings->ITOGGLE, true);
 			break;
 		case KeyEvent::KEY_z:
 			// zoom
@@ -619,12 +620,13 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 			// crossfade left
 			if (mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) > 0.0f) mSDAWebsocket->changeFloatValue(mSDASettings->IXFADE, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) - 0.1f);
 			break;
-		default:
+		default:	
+			CI_LOG_V("session keydown: " + toString(event.getCode()));			
 			handled = false;
 			break;
 		}
-
 	}
+	CI_LOG_V((handled ? "session keydown handled " : "session keydown not handled "));
 	event.setHandled(handled);
 	return event.isHandled();
 }
@@ -635,7 +637,7 @@ bool SDASession::handleKeyUp(KeyEvent &event) {
 	if (!mSDAAnimation->handleKeyUp(event)) {
 		// Animation did not handle the key, so handle it here
 		switch (event.getCode()) {
-		case KeyEvent::KEY_g:
+		case KeyEvent::KEY_y:
 			// glitch
 			mSDAWebsocket->changeBoolValue(mSDASettings->IGLITCH, false);
 			break;
@@ -664,11 +666,12 @@ bool SDASession::handleKeyUp(KeyEvent &event) {
 			mSDAWebsocket->changeFloatValue(mSDASettings->IZOOM, 1.0f);
 			break;
 		default:
+			CI_LOG_V("session keyup: " + toString(event.getCode()));
 			handled = false;
 			break;
 		}
-
 	}
+	CI_LOG_V((handled ? "session keyup handled " : "session keyup not handled "));
 	event.setHandled(handled);
 	return event.isHandled();
 }

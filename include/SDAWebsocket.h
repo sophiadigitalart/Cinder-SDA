@@ -69,6 +69,7 @@ namespace SophiaDigitalArt
 		// Web socket client
 		bool						clientConnected;
 		void						wsClientConnect();
+		//void						wsL4EClientConnect();
 		void						wsClientDisconnect();
 		int							receivedType;
 		int							receivedWarpIndex;
@@ -77,16 +78,17 @@ namespace SophiaDigitalArt
 		int							receivedSlot;
 
 		WebSocketClient				mClient;
-		void						onWsConnect();
+		//WebSocketClient				mL4EClient;
+		/*void						onWsConnect();
 		void						onWsDisconnect();
 		void						onWsError(std::string err);
 		void						onWsInterrupt();
 		void						onWsPing(std::string msg);
-		void						onWsRead(std::string msg);
+		void						onWsRead(std::string msg);*/
 		// Web socket  server
 		WebSocketServer				mServer;
-		void						serverConnect();
-		void						serverDisconnect();
+		/*void						serverConnect();
+		void						serverDisconnect();*/
 		double						mPingTime;
 
 		// received shaders

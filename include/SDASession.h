@@ -130,6 +130,8 @@ namespace SophiaDigitalArt {
 		float							getBpm() { return mSDAAnimation->getBpm(); };
 		void							setBpm(float aBpm) { mSDAAnimation->setBpm(aBpm); };
 		void							tapTempo() { mSDAAnimation->tapTempo(); };
+		void							toggleUseTimeWithTempo() { mSDAAnimation->toggleUseTimeWithTempo(); };
+		void							useTimeWithTempo() { mSDAAnimation->useTimeWithTempo(); };
 		// audio
 		float							getMaxVolume() { return mSDAAnimation->maxVolume; };
 		float *							getFreqs() { return mSDAAnimation->iFreqs; };

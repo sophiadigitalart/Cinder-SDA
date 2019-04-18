@@ -155,7 +155,20 @@ void SDAWebsocket::parseMessage(string msg) {
 						{
 						case 2:
 							// change tempo
+							mSDAAnimation->useTimeWithTempo();
 							mSDAAnimation->setBpm(jsonElement->getChild("tempo").getValue<float>());
+							CI_LOG_E("tempo:" + toString(mSDAAnimation->getBpm()));
+							break;
+						case 3:
+							// change beat
+							mSDAAnimation->setFloatUniformValueByIndex(mSDASettings->ITIME, jsonElement->getChild("beat").getValue<float>());
+							CI_LOG_E("beat:" + toString(mSDASettings->ITIME) + " " + toString(mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ITIME)));
+							break;
+						case 4:
+							// change phase
+							mSDAAnimation->setFloatUniformValueByIndex(mSDASettings->ITEMPOTIME, jsonElement->getChild("phase").getValue<float>());
+							CI_LOG_E("phase:" + toString(mSDASettings->ITEMPOTIME) + " " + toString(mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ITEMPOTIME)));
+							mSDAAnimation->setIntUniformValueByName("iBeat", (int)jsonElement->getChild("phase").getValue<float>());
 							break;
 						default:
 							break;
@@ -368,7 +381,45 @@ void SDAWebsocket::wsConnect() {
 	}
 	mSDASettings->mAreWebSocketsEnabledAtStartup = true;
 	clientConnected = true;
-
+	// light4vents
+	/*mL4EClient.connectOpenEventHandler([&]() {
+		mSDASettings->mOSCMsg = "Connected";
+		mSDASettings->mOSCNewMsg = true;
+	});
+	mL4EClient.connectCloseEventHandler([&]() {
+		clientConnected = false;
+		mSDASettings->mOSCMsg = "Disconnected";
+		mSDASettings->mOSCNewMsg = true;
+	});
+	mL4EClient.connectFailEventHandler([&](string err) {
+		mSDASettings->mOSCMsg = "WS Error";
+		mSDASettings->mOSCNewMsg = true;
+		if (!err.empty()) {
+			mSDASettings->mOSCMsg += ": " + err;
+		}
+	});
+	mL4EClient.connectInterruptEventHandler([&]() {
+		mSDASettings->mOSCMsg = "WS Interrupted";
+		mSDASettings->mOSCNewMsg = true;
+	});
+	mL4EClient.connectPingEventHandler([&](string msg) {
+		mSDASettings->mOSCMsg = "WS Ponged";
+		mSDASettings->mOSCNewMsg = true;
+		if (!msg.empty())
+		{
+			mSDASettings->mOSCMsg += ": " + msg;
+		}
+	});
+	mL4EClient.connectMessageEventHandler([&](string msg) {
+		// parseMessage(msg);
+	});
+	wsL4EClientConnect();
+}
+void SDAWebsocket::wsL4EClientConnect()
+{
+	stringstream s;
+	s << mSDASettings->mWebSocketsProtocol << "light4eventsws.herokuapp.com/bruce";
+	mL4EClient.connect(s.str());*/
 }
 void SDAWebsocket::wsClientConnect()
 {
@@ -395,7 +446,6 @@ void SDAWebsocket::wsClientDisconnect()
 }
 void SDAWebsocket::wsWrite(string msg)
 {
-
 	if (mSDASettings->mAreWebSocketsEnabledAtStartup)
 	{
 		CI_LOG_V("wsWrite send: " + msg);
@@ -408,7 +458,6 @@ void SDAWebsocket::wsWrite(string msg)
 			if (clientConnected) mClient.write(msg);
 		}
 	}
-
 }
 
 void SDAWebsocket::sendJSON(string params) {
@@ -495,7 +544,14 @@ void SDAWebsocket::changeFragmentShader(string aFragmentShaderText) {
 }
 void SDAWebsocket::colorWrite()
 {
-
+	/* remove apache untick proxy mode in nginx
+	location /ws {
+	proxy_pass http://domain;
+	proxy_http_version 1.1;
+	proxy_set_header Upgrade $http_upgrade;
+	proxy_set_header Connection "Upgrade";
+	}
+	*/
 	// lights4events
 	char col[97];
 	int r = (int)(mSDAAnimation->getFloatUniformValueByIndex(1) * 255);
@@ -505,7 +561,7 @@ void SDAWebsocket::colorWrite()
 	//sprintf(col, "#%02X%02X%02X", r, g, b);
 	sprintf(col, "{\"type\":\"action\", \"parameters\":{\"name\":\"FC\",\"parameters\":{\"color\":\"#%02X%02X%02X%02X\",\"fading\":\"NONE\"}}}", a, r, g, b);
 	wsWrite(col);
-
+	//mL4EClient.write(col);
 }
 
 void SDAWebsocket::update() {

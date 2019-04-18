@@ -545,6 +545,10 @@ bool SDAAnimation::setFloatUniformValueByIndex(unsigned int aIndex, float aValue
 			rtn = true;
 		}*/
 	}
+	else {
+		// no max 
+		if (aIndex == 0) shaderUniforms[getUniformNameForIndex(aIndex)].floatValue = aValue;
+	}
 	return rtn;
 }
 
@@ -575,7 +579,7 @@ void SDAAnimation::save() {
 }
 void SDAAnimation::saveAnimation() {
 	// save 
-	fs::path mJsonFilePath = app::getAssetPath("") / mSDASettings->mAssetsPath / "animation.json";
+	/*fs::path mJsonFilePath = app::getAssetPath("") / mSDASettings->mAssetsPath / "animation.json";
 	JsonTree doc;
 	JsonTree badtv = JsonTree::makeArray("badtv");
 
@@ -584,7 +588,7 @@ void SDAAnimation::saveAnimation() {
 	}
 
 	doc.pushBack(badtv);
-	doc.write(writeFile(mJsonFilePath), JsonTree::WriteOptions());
+	doc.write(writeFile(mJsonFilePath), JsonTree::WriteOptions()); */
 	// backup save
 	/*string fileName = "animation" + toString(getElapsedFrames()) + ".json";
 	mJsonFilePath = app::getAssetPath("") / mSDASettings->mAssetsPath / fileName;
@@ -592,7 +596,7 @@ void SDAAnimation::saveAnimation() {
 }
 void SDAAnimation::loadAnimation() {
 
-	fs::path mJsonFilePath = app::getAssetPath("") / mSDASettings->mAssetsPath / "animation.json";
+	/*fs::path mJsonFilePath = app::getAssetPath("") / mSDASettings->mAssetsPath / "animation.json";
 	// Create json file if it doesn't already exist.
 	if (!fs::exists(mJsonFilePath)) {
 		std::ofstream oStream(mJsonFilePath.string());
@@ -613,7 +617,7 @@ void SDAAnimation::loadAnimation() {
 	}
 	catch (const JsonTree::ExcJsonParserError&) {
 		CI_LOG_W("Failed to parse json file.");
-	}
+	} */
 }
 
 void SDAAnimation::setExposure(float aExposure) {
@@ -692,7 +696,12 @@ void SDAAnimation::update() {
 	// iTime
 	if (mUseTimeWithTempo)
 	{
-		shaderUniforms["iTime"].floatValue = shaderUniforms["iTempoTime"].floatValue*iTimeFactor;
+		float f = getFloatUniformValueByName("iTime");
+		float g = shaderUniforms["iTime"].floatValue;
+		// shaderUniforms["iTime"].floatValue = shaderUniforms["iTempoTime"].floatValue*iTimeFactor;
+		CI_LOG_W(" shaderUniforms[iTime].floatValue:" + toString(g));
+		CI_LOG_W(" getFloatUniformValueByName(iTime):" + toString(f));
+		//shaderUniforms["iTime"].floatValue = getFloatUniformValueByName("iTime");
 	}
 	else
 	{
