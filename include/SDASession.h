@@ -373,7 +373,6 @@ namespace SophiaDigitalArt {
 
 		//! Fbos
 		map<int, SDAMixFbo>				mMixFbos;
-		//map<int, SDAMixFbo>				mTriangleFbos;
 		// maintain a list of fbos specific to this mix
 		SDAFboList						mFboList;
 		fs::path						mMixesFilepath;

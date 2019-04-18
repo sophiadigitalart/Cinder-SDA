@@ -292,6 +292,7 @@ void SDASession::update(unsigned int aClassIndex) {
 			else {
 				setFragmentShaderString(1, mSDAWebsocket->getReceivedShader());
 			}
+			// TODO timeline().apply(&mWarps[aWarpIndex]->ABCrossfade, 0.0f, 2.0f); };
 		}
 		/* TODO: CHECK index if (mSDASettings->iGreyScale)
 		{
@@ -532,8 +533,8 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 	bool isModDown = event.isControlDown();
 #endif
 	bool isShiftDown = event.isShiftDown();
-
-	CI_LOG_V("session keydown: " + toString(event.getCode()) + " ctrl: " + toString(isModDown) + " shift: " + toString(isShiftDown));
+	bool isAltDown = event.isAltDown();
+	CI_LOG_V("session keydown: " + toString(event.getCode()) + " ctrl: " + toString(isModDown) + " shift: " + toString(isShiftDown) + " alt: " + toString(isAltDown));
 
 	// pass this event to Mix handler
 	if (!mSDAAnimation->handleKeyDown(event)) {
@@ -556,13 +557,32 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 			mSDAWebsocket->changeFloatValue(mSDASettings->ITRIXELS, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ITRIXELS) + 0.05f);
 			break;
 		case KeyEvent::KEY_r:
-			mSDAWebsocket->changeFloatValue(mSDASettings->IFR, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFR), false, true, isShiftDown, isModDown);
+			if (isAltDown) {
+				mSDAWebsocket->changeFloatValue(mSDASettings->IBR, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IBR), false, true, isShiftDown, isModDown);
+			}
+			else {
+				mSDAWebsocket->changeFloatValue(mSDASettings->IFR, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFR), false, true, isShiftDown, isModDown);
+			}
 			break;
 		case KeyEvent::KEY_g:
-			mSDAWebsocket->changeFloatValue(mSDASettings->IFG, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFG), false, true, isShiftDown, isModDown);
+			if (isAltDown) {
+				mSDAWebsocket->changeFloatValue(mSDASettings->IBG, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IBG), false, true, isShiftDown, isModDown);
+			}
+			else {
+				mSDAWebsocket->changeFloatValue(mSDASettings->IFG, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFG), false, true, isShiftDown, isModDown);
+			}
 			break;
 		case KeyEvent::KEY_b:
-			mSDAWebsocket->changeFloatValue(mSDASettings->IFB, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFB), false, true, isShiftDown, isModDown);
+			if (isAltDown) {
+				mSDAWebsocket->changeFloatValue(mSDASettings->IBB, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IBB), false, true, isShiftDown, isModDown);
+			}
+			else {
+				mSDAWebsocket->changeFloatValue(mSDASettings->IFB, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFB), false, true, isShiftDown, isModDown);
+			}
+			break;
+		case KeyEvent::KEY_a:
+			mSDAWebsocket->changeFloatValue(mSDASettings->IFA, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFA), false, true, isShiftDown, isModDown);
+			break;
 		case KeyEvent::KEY_c:
 			// chromatic
 			// TODO find why can't put value >0.9 or 0.85!

@@ -635,7 +635,7 @@ bool SDAAnimation::handleKeyDown(KeyEvent &event)
 		// save animation
 		save();
 		break;
-	case KeyEvent::KEY_a:
+	case KeyEvent::KEY_u:
 		// save badtv keyframe
 		mBadTV[getElapsedFrames() - 10] = 1.0f;
 		//iBadTvRunning = true;
@@ -664,9 +664,9 @@ bool SDAAnimation::handleKeyUp(KeyEvent &event)
 {
 	bool handled = true;
 	switch (event.getCode()) {
-	case KeyEvent::KEY_a:
+	case KeyEvent::KEY_u:
 		// save badtv keyframe
-		mBadTV[getElapsedFrames()] = 0.001f;
+		// not used for now mBadTV[getElapsedFrames()] = 0.001f;
 		shaderUniforms["iBadTv"].floatValue = 0.0f;
 		break;
 

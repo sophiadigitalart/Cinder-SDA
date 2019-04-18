@@ -172,53 +172,6 @@ namespace SophiaDigitalArt {
 				}
 			}
 		}
-		// feedback
-		/*auto &fbuniforms = mFeedbackShader->getActiveUniforms();
-		for (const auto &uniform : fbuniforms) {
-			//CI_LOG_V(mFboTextureShader->getLabel() + ", getShader uniform name:" + uniform.getName());
-			if (mSDAAnimation->isExistingUniform(uniform.getName())) {
-				int uniformType = mSDAAnimation->getUniformType(uniform.getName());
-				switch (uniformType)
-				{
-				case 0:
-					// float
-					mFeedbackShader->uniform(uniform.getName(), mSDAAnimation->getFloatUniformValueByName(uniform.getName()));
-					break;
-				case 1:
-					// sampler2D
-					mFeedbackShader->uniform(uniform.getName(), mCurrentFeedbackIndex);
-					break;
-				case 2:
-					// vec2
-					mFeedbackShader->uniform(uniform.getName(), mSDAAnimation->getVec2UniformValueByName(uniform.getName()));
-					break;
-				case 3:
-					// vec3
-					mFeedbackShader->uniform(uniform.getName(), mSDAAnimation->getVec3UniformValueByName(uniform.getName()));
-					break;
-				case 4:
-					// vec4
-					mFeedbackShader->uniform(uniform.getName(), mSDAAnimation->getVec4UniformValueByName(uniform.getName()));
-					break;
-				case 5:
-					// int
-					mFeedbackShader->uniform(uniform.getName(), mSDAAnimation->getIntUniformValueByName(uniform.getName()));
-					break;
-				case 6:
-					// bool
-					mFeedbackShader->uniform(uniform.getName(), mSDAAnimation->getBoolUniformValueByName(uniform.getName()));
-					break;
-				default:
-					break;
-				}
-			}
-			else {
-				if (uniform.getName() != "ciModelViewProjection") {
-					mSDASettings->mMsg =  "feedback shader, uniform not found:" + uniform.getName();
-					CI_LOG_V(mSDASettings->mMsg);
-				}
-			}
-		}*/
 		return mFboTextureShader;
 	}
 	ci::gl::Texture2dRef SDAFbo::getRenderedTexture() {

@@ -518,12 +518,14 @@ void SDAWebsocket::changeFloatValue(unsigned int aControl, float aValue, bool fo
 			if (newValue < 0.0f) newValue = 0.0f;
 			aValue = newValue;
 		}
-		else {
+		else { 
 			// toggle
-			newValue = mSDAAnimation->getFloatUniformValueByIndex(aControl);
-			if (newValue > 0.0f) { newValue = 0.0f; }
-			else { newValue = 1.0f; } // Check for max instead?
-			aValue = newValue;
+			if (toggle) {
+				newValue = mSDAAnimation->getFloatUniformValueByIndex(aControl);
+				if (newValue > 0.0f) { newValue = 0.0f; }
+				else { newValue = 1.0f; } // Check for max instead?
+				aValue = newValue;
+			}
 		}
 	}
 	// check if changed
