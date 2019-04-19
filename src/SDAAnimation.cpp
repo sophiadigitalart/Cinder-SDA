@@ -163,6 +163,10 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		createIntUniform("iPhase", mSDASettings->IPHASE, 0); // 52
 		// beats per bar 
 		createIntUniform("iBeatsPerBar", 53, 4);
+		// fbo A
+		createIntUniform("iFboA", mSDASettings->IFBOA, 0); // 54
+		// fbo B
+		createIntUniform("iFboB", mSDASettings->IFBOB, 1); // 55
 
 		// vec3
 		createVec3Uniform("iResolution", 60, vec3(getFloatUniformValueByName("iResolutionX"), getFloatUniformValueByName("iResolutionY"), 1.0));

@@ -153,6 +153,34 @@ void SDAWebsocket::parseMessage(string msg) {
 						receivedType = jsonElement->getChild("type").getValue<int>();
 						switch (receivedType)
 						{
+						case 0:
+							// change fbo
+
+							CI_LOG_E("shader:" + toString(mSDAAnimation->getBpm()));
+							
+							// from changeWarpFboIndex
+							receivedWarpIndex = jsonElement->getChild("warp").getValue<float>(); // TODO int, useless for now
+							receivedFboIndex = jsonElement->getChild("fbo").getValue<float>(); // TODO int
+							receivedSlot = jsonElement->getChild("slot").getValue<float>(); // TODO int
+							if (receivedSlot == 0) {
+								mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, receivedFboIndex);
+							}
+							else {
+								mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, receivedFboIndex);
+							}
+							break;
+						case 1:
+							// from changeWarpShaderIndex
+							//receivedWarpIndex = jsonElement->getChild("warp").getValue<float>(); // TODO int
+							//receivedShaderIndex = jsonElement->getChild("shader").getValue<float>(); // TODO int
+							//receivedSlot = jsonElement->getChild("slot").getValue<float>(); // TODO int
+							//if (receivedSlot == 0) {
+							//	mVDMix->setWarpAShaderIndex(receivedWarpIndex, receivedShaderIndex);
+							//}
+							//else {
+							//	mVDMix->setWarpBShaderIndex(receivedWarpIndex, receivedShaderIndex);
+							//}
+							//break;
 						case 2:
 							// change tempo
 							mSDAAnimation->useTimeWithTempo();

@@ -94,9 +94,10 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 		CI_LOG_V("setFragmentString, error on live fragment shader:" + mError);
 	}
 	mSDASettings->mMsg = mError;
-
-	mAFboIndex = 0;
-	mBFboIndex = 1;
+	mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, 0);
+	mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, 1);
+	//mAFboIndex = 0;
+	//mBFboIndex = 1;
 }
 
 SDASessionRef SDASession::create(SDASettingsRef aSDASettings)
@@ -701,10 +702,10 @@ void SDASession::sendFragmentShader(unsigned int aShaderIndex) {
 
 void SDASession::setFboAIndex(unsigned int aIndex, unsigned int aFboIndex) {
 	if (aFboIndex < mFboList.size()) {
-		mAFboIndex = aFboIndex;
+		mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, aFboIndex);
 	}
 	else {
-		mAFboIndex = mFboList.size() - 1;
+		mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, mFboList.size() - 1);
 	}
 	/*mSDAMix->setWarpAFboIndex(aIndex, aFboIndex);
 	mSDARouter->setWarpAFboIndex(aIndex, aFboIndex);
@@ -712,10 +713,10 @@ void SDASession::setFboAIndex(unsigned int aIndex, unsigned int aFboIndex) {
 }
 void SDASession::setFboBIndex(unsigned int aIndex, unsigned int aFboIndex) {
 	if (aFboIndex < mFboList.size()) {
-		mBFboIndex = aFboIndex;
+		mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, aFboIndex); 
 	}
 	else {
-		mBFboIndex = mFboList.size() - 1;
+		mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, mFboList.size() - 1);
 	}
 	/*mSDAMix->setWarpBFboIndex(aIndex, aFboIndex);
 	mSDARouter->setWarpBFboIndex(aIndex, aFboIndex);
@@ -1292,11 +1293,11 @@ void SDASession::renderMix() {
 		gl::ScopedFramebuffer scopedFbo(mMixFbos[0].fbo);
 		gl::clear(Color::black());
 		// render A and B fbos 
-		mFboList[mAFboIndex]->getFboTexture();
-		mFboList[mBFboIndex]->getFboTexture();
+		mFboList[mSDAAnimation->getIntUniformValueByName("iFboA")]->getFboTexture();
+		mFboList[mSDAAnimation->getIntUniformValueByName("iFboB")]->getFboTexture();
 		// texture binding must be before ScopedGlslProg
-		mFboList[mAFboIndex]->getRenderedTexture()->bind(0);
-		mFboList[mBFboIndex]->getRenderedTexture()->bind(1);
+		mFboList[mSDAAnimation->getIntUniformValueByName("iFboA")]->getRenderedTexture()->bind(0);
+		mFboList[mSDAAnimation->getIntUniformValueByName("iFboB")]->getRenderedTexture()->bind(1);
 		gl::ScopedGlslProg glslScope(mGlslMix);
 		mGlslMix->uniform("iCrossfade", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE));
 

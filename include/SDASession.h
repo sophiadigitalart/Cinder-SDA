@@ -158,8 +158,8 @@ namespace SophiaDigitalArt {
 		};
 		void							setFboAIndex(unsigned int aIndex, unsigned int aFboIndex);
 		void							setFboBIndex(unsigned int aIndex, unsigned int aFboIndex);
-		unsigned int					getFboAIndex(unsigned int aIndex) { return mAFboIndex; };
-		unsigned int					getFboBIndex(unsigned int aIndex) { return mBFboIndex; };
+		unsigned int					getFboAIndex(unsigned int aIndex) { return mSDAAnimation->getIntUniformValueByName("iFboA"); };
+		unsigned int					getFboBIndex(unsigned int aIndex) { return mSDAAnimation->getIntUniformValueByName("iFboB"); };
 
 		void							setFboFragmentShaderIndex(unsigned int aFboIndex, unsigned int aFboShaderIndex);
 		unsigned int					getFboFragmentShaderIndex(unsigned int aFboIndex);
@@ -376,8 +376,8 @@ namespace SophiaDigitalArt {
 		// maintain a list of fbos specific to this mix
 		SDAFboList						mFboList;
 		fs::path						mMixesFilepath;
-		unsigned int					mAFboIndex;
-		unsigned int					mBFboIndex;
+		//unsigned int					mAFboIndex;
+		//unsigned int					mBFboIndex;
 
 		//! Shaders
 		SDAShaderList					mShaderList;

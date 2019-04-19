@@ -74,6 +74,8 @@ namespace SophiaDigitalArt {
 		static const int			IVFALLOFF = 46;
 		// int
 		static const int			IPHASE = 52;
+		static const int			IFBOA = 54;
+		static const int			IFBOB = 55;
 		// booleans 80 to 110
 		static const int			IGLITCH = 81;
 		static const int			IVIGN = 82;

@@ -540,11 +540,13 @@ void SDARouter::updateParams(int iarg0, float farg1) {
 	if (iarg0 > 20 && iarg0 < 29) {
 		// top row
 		mSDAAnimation->setFloatUniformValueByIndex(iarg0, farg1);
+		mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, iarg0 - 21);
 	}
 	if (iarg0 > 30 && iarg0 < 39)
 	{
 		// middle row
 		mSDAAnimation->setFloatUniformValueByIndex(iarg0, farg1);
+		mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, iarg0 - 31);
 	}
 	if (iarg0 > 40 && iarg0 < 49) {
 		// low row 
