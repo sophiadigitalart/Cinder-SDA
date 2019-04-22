@@ -172,6 +172,9 @@ namespace SophiaDigitalArt {
 		void							setFragmentShaderString(unsigned int aShaderIndex, string aFragmentShaderString, string aName = "");
 		//string							getVertexShaderString(unsigned int aShaderIndex) { return mSDAMix->getVertexShaderString(aShaderIndex); };
 		string							getFragmentShaderString(unsigned int aShaderIndex);
+		//string							getVertexShaderString(unsigned int aShaderIndex) { return mSDAMix->getVertexShaderString(aShaderIndex); };
+		void							setHydraFragmentShaderString(string aFragmentShaderString, string aName = "");
+		string							getHydraFragmentShaderString();
 		void							updateShaderThumbFile(unsigned int aShaderIndex);
 		void							removeShader(unsigned int aShaderIndex);
 		// utils
@@ -300,6 +303,10 @@ namespace SophiaDigitalArt {
 		void							updateAudio() {mTextureList[0]->getTexture();}
 		void							updateMixUniforms();
 		void							updateBlendUniforms();
+		// hydra
+		string							getHydraUniformsString() { return mHydraUniformsValuesString; };
+		ci::gl::TextureRef				getHydraTexture() { return mHydraFbo->getColorTexture(); };
+
 	private:
 		// Settings
 		SDASettingsRef					mSDASettings;
@@ -351,6 +358,12 @@ namespace SophiaDigitalArt {
 		//! Shaders
 		string							mShaderLeft;
 		string							mShaderRight;
+		//! hydra
+		string							mHydraUniformsValuesString;
+		void							updateHydraUniforms();
+		void							renderHydra();
+		ci::gl::FboRef					mHydraFbo;
+		gl::GlslProgRef					mHydraShader;
 		//! textures
 		int								mWidth;
 		int								mHeight;
@@ -373,6 +386,7 @@ namespace SophiaDigitalArt {
 
 		//! Fbos
 		map<int, SDAMixFbo>				mMixFbos;
+		
 		// maintain a list of fbos specific to this mix
 		SDAFboList						mFboList;
 		fs::path						mMixesFilepath;

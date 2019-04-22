@@ -431,9 +431,11 @@ void SDARouter::midiListener(midi::Message msg) {
 			}
 			if (midiControl > 30 && midiControl < 39) {
 				mSelectedFboA = midiControl - 31;
+				mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, mSelectedFboA);
 			}
 			if (midiControl > 40 && midiControl < 49) {
 				mSelectedFboB = midiControl - 41;
+				mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, mSelectedFboB);
 			}
 		}
 		else {
@@ -540,17 +542,17 @@ void SDARouter::updateParams(int iarg0, float farg1) {
 	if (iarg0 > 20 && iarg0 < 29) {
 		// top row
 		mSDAAnimation->setFloatUniformValueByIndex(iarg0, farg1);
-		mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, iarg0 - 21);
 	}
 	if (iarg0 > 30 && iarg0 < 39)
 	{
 		// middle row
 		mSDAAnimation->setFloatUniformValueByIndex(iarg0, farg1);
-		mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, iarg0 - 31);
+		mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, iarg0 - 31);
 	}
 	if (iarg0 > 40 && iarg0 < 49) {
 		// low row 
 		mSDAAnimation->setFloatUniformValueByIndex(iarg0, farg1);
+		mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, iarg0 - 41);
 	}
 	if (iarg0 > 0 && iarg0 < 49) {
 		// float values 

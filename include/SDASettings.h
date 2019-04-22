@@ -72,6 +72,7 @@ namespace SophiaDigitalArt {
 		static const int			IMOUSEZ = 44;
 		static const int			IVAMOUNT = 45;
 		static const int			IVFALLOFF = 46;
+		static const int			TIME = 47;
 		// int
 		static const int			IPHASE = 52;
 		static const int			IFBOA = 54;
@@ -90,6 +91,8 @@ namespace SophiaDigitalArt {
 		static const int			ILHANDX = 113;
 		static const int			ILHANDY = 114;
 		static const int			ILHANDZ = 115;*/
+		// vec2
+		static const int			RESOLUTION = 120;
 		// texture modes
 		static const int			TEXTUREMODEMIX = 0;				// mix two shaders
 		static const int			TEXTUREMODEAUDIO = 1;			// audio spectrum
@@ -306,12 +309,14 @@ namespace SophiaDigitalArt {
 		std::string					getDefaultVextexShaderString() { return mDefaultVextexShaderString; };
 		std::string					getDefaultFragmentShaderString() { return mDefaultFragmentShaderString; };
 		std::string					getMixFragmentShaderString() { return mMixFragmentShaderString; };
+		std::string					getHydraFragmentShaderString() { return mHydraFragmentShaderString; };
 	private:
 		std::string					settingsFileName = "SDA";
 		//! default vertex shader
 		std::string					mDefaultVextexShaderString;
 		std::string					mDefaultFragmentShaderString;
 		std::string					mMixFragmentShaderString;
+		std::string					mHydraFragmentShaderString;
 
 	};
 

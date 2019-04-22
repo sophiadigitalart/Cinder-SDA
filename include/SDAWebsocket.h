@@ -53,6 +53,8 @@ namespace SophiaDigitalArt
 		// received shaders
 		bool						hasReceivedShader() { return shaderReceived; };
 		string						getReceivedShader();
+		bool						hasReceivedUniforms() { return shaderUniforms; };
+		string						getReceivedUniforms();
 		// received stream
 		string *					getBase64Image();
 		bool						hasReceivedStream() { return streamReceived; };
@@ -94,6 +96,9 @@ namespace SophiaDigitalArt
 		// received shaders
 		bool						shaderReceived; // TODO remove
 		string						receivedFragString; // TODO remove
+		bool						shaderUniforms;
+		string						receivedUniformsString;
+		
 		string						mBase64String;
 		// received stream
 		bool						streamReceived;

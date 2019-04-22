@@ -82,6 +82,7 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 	{
 		mGlslMix = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixFragmentShaderString());
 		mGlslBlend = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixFragmentShaderString());
+		mHydraShader = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getHydraFragmentShaderString());
 	}
 	catch (gl::GlslProgCompileExc &exc)
 	{
@@ -98,6 +99,11 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 	mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, 1);
 	//mAFboIndex = 0;
 	//mBFboIndex = 1;
+	mShaderLeft = "";
+	mShaderRight = "";
+	// hydra
+	mHydraUniformsValuesString = "";
+	mHydraFbo = gl::Fbo::create(mSDASettings->mFboWidth, mSDASettings->mFboHeight, fboFmt);
 }
 
 SDASessionRef SDASession::create(SDASettingsRef aSDASettings)
@@ -158,6 +164,7 @@ float SDASession::getMinUniformValueByIndex(unsigned int aIndex) {
 float SDASession::getMaxUniformValueByIndex(unsigned int aIndex) {
 	return mSDAAnimation->getMaxUniformValueByIndex(aIndex);
 }
+
 void SDASession::updateMixUniforms() {
 	//vec4 mouse = mSDAAnimation->getVec4UniformValueByName("iMouse");
 
@@ -287,13 +294,21 @@ void SDASession::update(unsigned int aClassIndex) {
 			updateStream(mSDAWebsocket->getBase64Image());
 		}
 		if (mSDAWebsocket->hasReceivedShader()) {
+			string receivedShader = mSDAWebsocket->getReceivedShader();
 			if (mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) < 0.5) {
-				setFragmentShaderString(2, mSDAWebsocket->getReceivedShader());
+				setFragmentShaderString(2, receivedShader);
+				mShaderLeft = receivedShader;
 			}
 			else {
-				setFragmentShaderString(1, mSDAWebsocket->getReceivedShader());
+				setFragmentShaderString(1, receivedShader);
+				mShaderRight = receivedShader;
 			}
+			setFragmentShaderString(0, receivedShader);
+			setHydraFragmentShaderString(receivedShader);
 			// TODO timeline().apply(&mWarps[aWarpIndex]->ABCrossfade, 0.0f, 2.0f); };
+		}
+		if (mSDAWebsocket->hasReceivedUniforms()) {
+			mHydraUniformsValuesString = mSDAWebsocket->getReceivedUniforms();
 		}
 		/* TODO: CHECK index if (mSDASettings->iGreyScale)
 		{
@@ -325,6 +340,8 @@ void SDASession::update(unsigned int aClassIndex) {
 	}*/
 	updateMixUniforms();
 	renderMix();
+	updateHydraUniforms();
+	renderHydra();
 	// blendmodes preview
 	if (mSDAAnimation->renderBlend()) {
 		updateBlendUniforms();
@@ -620,15 +637,17 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 				if (mSDAAnimation->getFloatUniformValueByIndex(21) < 1.0f) mSDAWebsocket->changeFloatValue(21, mSDAAnimation->getFloatUniformValueByIndex(21) + 0.1f);
 				break;*/
 		case KeyEvent::KEY_PAGEDOWN:
+		case KeyEvent::KEY_RIGHT:
 			// crossfade right
 			if (mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) < 1.0f) mSDAWebsocket->changeFloatValue(mSDASettings->IXFADE, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) + 0.1f);
 			break;
 		case KeyEvent::KEY_PAGEUP:
+		case KeyEvent::KEY_LEFT:
 			// crossfade left
 			if (mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) > 0.0f) mSDAWebsocket->changeFloatValue(mSDASettings->IXFADE, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE) - 0.1f);
 			break;
-		default:	
-			CI_LOG_V("session keydown: " + toString(event.getCode()));			
+		default:
+			CI_LOG_V("session keydown: " + toString(event.getCode()));
 			handled = false;
 			break;
 		}
@@ -713,7 +732,7 @@ void SDASession::setFboAIndex(unsigned int aIndex, unsigned int aFboIndex) {
 }
 void SDASession::setFboBIndex(unsigned int aIndex, unsigned int aFboIndex) {
 	if (aFboIndex < mFboList.size()) {
-		mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, aFboIndex); 
+		mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, aFboIndex);
 	}
 	else {
 		mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, mFboList.size() - 1);
@@ -839,6 +858,105 @@ void SDASession::setFragmentShaderString(unsigned int aShaderIndex, string aFrag
 		if (mFboList[i]->getShaderIndex() == aShaderIndex) setFboFragmentShaderIndex(i, aShaderIndex);
 	}
 }
+void SDASession::setHydraFragmentShaderString(string aFragmentShaderString, string aName) {
+
+	//mShaderList[0]->setFragmentString(aFragmentShaderString, aName);
+	//setFboFragmentShaderIndex(0, 0);
+	// try to compile a first time to get active uniforms
+	mHydraShader = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), aFragmentShaderString);
+
+}
+void SDASession::updateHydraUniforms() {
+	int index = 300;
+	int texIndex = 0;
+	int firstDigit = -1;
+	auto &uniforms = mHydraShader->getActiveUniforms();
+	string name;
+	string textName;
+	for (const auto &uniform : uniforms) {
+		name = uniform.getName();
+
+		// if uniform is handled
+		if (mSDAAnimation->isExistingUniform(name)) {
+			int uniformType = mSDAAnimation->getUniformType(name);
+			switch (uniformType)
+			{
+			case 0:
+				// float
+				firstDigit = name.find_first_of("0123456789");
+				// if contains a digit
+				if (firstDigit > -1) {
+					index = std::stoi(name.substr(firstDigit));
+					textName = name.substr(0, firstDigit);
+					if (mSDAAnimation->isExistingUniform(textName)) {
+						mHydraShader->uniform(name, mSDAAnimation->getFloatUniformValueByName(textName));
+					}
+					else {
+						mSDAAnimation->createFloatUniform(name, 400 + index, 0.31f, 0.0f, 1000.0f);
+					}
+				}
+				else {
+					mHydraShader->uniform(name, mSDAAnimation->getFloatUniformValueByName(name));
+				}
+				break;
+			case 1:
+				// sampler2D
+				mHydraShader->uniform(name, 0);
+				break;
+			case 2:
+				// vec2
+				mHydraShader->uniform(name, mSDAAnimation->getVec2UniformValueByName(name));
+				break;
+			case 3:
+				// vec3
+				mHydraShader->uniform(name, mSDAAnimation->getVec3UniformValueByName(name));
+				break;
+			case 4:
+				// vec4
+				mHydraShader->uniform(name, mSDAAnimation->getVec4UniformValueByName(name));
+				break;
+			case 5:
+				// int
+				mHydraShader->uniform(name, mSDAAnimation->getIntUniformValueByName(name));
+				break;
+			case 6:
+				// bool
+				mHydraShader->uniform(name, mSDAAnimation->getBoolUniformValueByName(name));
+				break;
+			default:
+				break;
+			}
+		}
+		else {
+			if (name != "ciModelViewProjection") {
+				mSDASettings->mMsg = "mHydraShader, uniform not found:" + name + " type:" + toString(uniform.getType());
+				CI_LOG_V(mSDASettings->mMsg);
+				firstDigit = name.find_first_of("0123456789");
+				// if contains a digit
+				if (firstDigit > -1) {
+					index = std::stoi(name.substr(firstDigit));
+					textName = name.substr(0, firstDigit);
+
+					// create uniform
+					/* done in SDAFbo
+					switch (uniform.getType())
+					{
+					case 5126:
+
+					} */
+				}
+			}
+		}
+	}
+	mHydraShader->uniform("time", mSDAAnimation->getFloatUniformValueByIndex(0));
+	mHydraShader->uniform("resolution", vec2(mSDAAnimation->getFloatUniformValueByName("iResolutionX"), mSDAAnimation->getFloatUniformValueByName("iResolutionY")));
+
+
+}
+string SDASession::getHydraFragmentShaderString() {
+	return mShaderList[0]->getFragmentString();
+}
+
 unsigned int SDASession::createShaderFboFromString(string aFragmentShaderString, string aShaderFilename) {
 	unsigned int rtn = 0;
 	// create new shader
@@ -1080,7 +1198,7 @@ ci::gl::TextureRef SDASession::getInputTexture(unsigned int aTextureIndex) {
 	else {
 		return mTextureList[aTextureIndex]->getTexture();
 	}
-	
+
 }*/
 string SDASession::getInputTextureName(unsigned int aTextureIndex) {
 	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
@@ -1232,6 +1350,7 @@ int SDASession::getMaxFrame(unsigned int aTextureIndex) {
 #pragma endregion textures
 void SDASession::load()
 {
+
 	CI_LOG_V("SDAMix load: ");
 	CI_LOG_V("mMixFbos.size() < mWarps.size(), we create a new mixFbo");
 	mMixFbos[0].fbo = gl::Fbo::create(mSDASettings->mFboWidth, mSDASettings->mFboHeight, fboFmt);
@@ -1285,6 +1404,16 @@ void SDASession::renderBlend()
 	mFboList[1]->getRenderedTexture()->bind(1);
 	gl::ScopedGlslProg glslScope(mGlslBlend);
 	gl::drawSolidRect(Rectf(0, 0, mBlendFbos[mCurrentBlend]->getWidth(), mBlendFbos[mCurrentBlend]->getHeight()));
+}
+
+void SDASession::renderHydra() {
+	gl::ScopedFramebuffer scopedFbo(mHydraFbo);
+	gl::clear(Color::black());
+
+	gl::ScopedGlslProg glslScope(mHydraShader);
+	mHydraShader->uniform("iCrossfade", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE));
+
+	gl::drawSolidRect(Rectf(0, 0, mHydraFbo->getWidth(), mHydraFbo->getHeight()));
 }
 
 void SDASession::renderMix() {

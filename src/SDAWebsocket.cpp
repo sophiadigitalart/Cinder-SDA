@@ -9,6 +9,8 @@ SDAWebsocket::SDAWebsocket(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnim
 	CI_LOG_V("SDAWebsocket constructor");
 	shaderReceived = false;
 	receivedFragString = "";
+	shaderUniforms = false;
+	receivedUniformsString = "";
 	streamReceived = false;
 	// WebSockets
 	clientConnected = false;
@@ -78,7 +80,7 @@ string * SDAWebsocket::getBase64Image() {
 	streamReceived = false; 
 	return &mBase64String; 
 }
-
+//dreads(1, 0, 0.8).out(o0)
 void SDAWebsocket::parseMessage(string msg) {
 	mSDASettings->mWebSocketsMsg = "WS onRead";
 	mSDASettings->mWebSocketsNewMsg = true;
@@ -134,15 +136,29 @@ void SDAWebsocket::parseMessage(string msg) {
 							for (JsonTree::ConstIter jsonElement = jsonParams.begin(); jsonElement != jsonParams.end(); ++jsonElement) {
 								int name = jsonElement->getChild("name").getValue<int>();
 								float value = jsonElement->getChild("value").getValue<float>();
-								CI_LOG_V("SDAWebsocket jsonParams.mValue:" + toString(name) );
+								CI_LOG_V("SDAWebsocket jsonParams.mValue:" + toString(name));
 								// basic name value 
 								mSDAAnimation->setFloatUniformValueByIndex(name, value);
 							}
 						}
-						else {
+						else if (val == "hydra") {
+							receivedUniformsString = json.getChild("message").getValue<string>();
+							shaderUniforms = true;
+							// force to display
+							mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, 0);
+							mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, 1);
+						}
+						else if (val == "frag") {
 							// we received a fragment shader string
 							receivedFragString = json.getChild("message").getValue<string>();
 							shaderReceived = true;
+							// force to display
+							mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, 0);
+							mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, 1);
+						}
+						else {
+							// we received a fragment shader string
+							CI_LOG_V("SDAWebsocket unknown event: " + val);
 						}
 						//string evt = json.getChild("event").getValue<string>();
 					}
@@ -155,9 +171,7 @@ void SDAWebsocket::parseMessage(string msg) {
 						{
 						case 0:
 							// change fbo
-
-							CI_LOG_E("shader:" + toString(mSDAAnimation->getBpm()));
-							
+							// react-nexusui
 							// from changeWarpFboIndex
 							receivedWarpIndex = jsonElement->getChild("warp").getValue<float>(); // TODO int, useless for now
 							receivedFboIndex = jsonElement->getChild("fbo").getValue<float>(); // TODO int
@@ -333,6 +347,11 @@ string SDAWebsocket::getReceivedShader() {
 	shaderReceived = false;
 	return receivedFragString;
 }
+string SDAWebsocket::getReceivedUniforms() {
+	shaderUniforms = false;
+	return receivedUniformsString;
+}
+
 void SDAWebsocket::wsConnect() {
 
 	// either a client or a server

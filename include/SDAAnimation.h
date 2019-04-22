@@ -226,7 +226,9 @@ namespace SophiaDigitalArt
 		int								getFreqIndex(unsigned int aFreqIndex) { return freqIndexes[aFreqIndex]; };
 		void							setFreqIndex(unsigned int aFreqIndex, unsigned int aFreq) { freqIndexes[aFreqIndex] = aFreq; };
 		//float							getFreq(unsigned int aFreqIndex) { return iFreqs[freqIndexes[aFreqIndex]]; };
-
+		// public for hydra
+		void							createFloatUniform(string aName, int aCtrlIndex, float aValue = 0.01f, float aMin = 0.0f, float aMax = 1.0f);
+		void							createSampler2DUniform(string aName, int aCtrlIndex, int aTextureIndex = 0);
 	private:
 		// Settings
 		SDASettingsRef					mSDASettings;
@@ -252,8 +254,8 @@ namespace SophiaDigitalArt
 		void							boolFromJson(const ci::JsonTree &json);
 		fs::path						mUniformsJson;
 
-		void							createFloatUniform(string aName, int aCtrlIndex, float aValue = 0.01f, float aMin = 0.0f, float aMax = 1.0f);
-		void							createSampler2DUniform(string aName, int aCtrlIndex, int aTextureIndex = 0);
+		
+
 		void							createVec2Uniform(string aName, int aCtrlIndex, vec2 aValue = vec2(0.0));
 		void							createVec3Uniform(string aName, int aCtrlIndex, vec3 aValue = vec3(0.0));
 		void							createVec4Uniform(string aName, int aCtrlIndex, vec4 aValue = vec4(0.0));

@@ -646,6 +646,14 @@ void SDASettings::reset()
 		"vec3 t9 = 0.1*texture(iChannel9, uv).rgb;\n"
 		"fragColor = vec4(t0 + t1 + t2 + t3 + t4 + t5 + t6 + t7 + t8 + t9, 1.0);\n"
 		"}\n";
+	mHydraFragmentShaderString = "precision mediump float;\n"
+		"uniform float time;\n"
+		"uniform vec2 resolution;\n"
+		"varying vec2 uv;\n"
+		"void main () {\n"
+		"vec2 st = gl_FragCoord.xy/resolution.xy;\n"
+		"gl_FragColor = vec4(st.x,st.y,sin(time), 1.0);\n"
+		"}\n";
 	mMixFragmentShaderString = "#version 150\n"
 		"uniform vec3 iResolution;\n"
 		"uniform sampler2D iChannel0;\n"

@@ -153,7 +153,8 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		createFloatUniform("iVAmount", mSDASettings->IVAMOUNT, 0.91f, 0.0f, 1.0f); // 45
 		// vignette falloff
 		createFloatUniform("iVFallOff", mSDASettings->IVFALLOFF, 0.31f, 0.0f, 1.0f); // 46
-
+		// hydra time
+		createFloatUniform("time", mSDASettings->TIME, 0.0f); // 47
 		// int
 		// blend mode 
 		createIntUniform("iBlendmode", 50, 0);
@@ -176,7 +177,7 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 
 		// vec4
 		createVec4Uniform("iMouse", 70, vec4(320.0f, 240.0f, 0.0f, 0.0f));
-		createVec4Uniform("iDate", 71, vec4(2018.0f, 12.0f, 1.0f, 5.0f));
+		createVec4Uniform("iDate", 71, vec4(2019.0f, 12.0f, 1.0f, 5.0f));
 
 		// boolean
 		// invert
@@ -191,6 +192,9 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		createBoolUniform("iXorY", mSDASettings->IXORY); // was 87
 		createBoolUniform("iFlipH", mSDASettings->IFLIPH); // 100 toggle was 90
 		createBoolUniform("iFlipV", mSDASettings->IFLIPV); // 103 toggle was 92
+
+		// vec2
+		createVec2Uniform("resolution", mSDASettings->RESOLUTION, vec2(1280.0f, 720.0f)); // 120
 
 		// vec4 kinect2
 		createVec4Uniform("iSpineBase", 200, vec4(320.0f, 240.0f, 0.0f, 0.0f));
@@ -423,13 +427,13 @@ JsonTree SDAAnimation::uniformToJson(int i)
 void SDAAnimation::saveUniforms()
 {
 	string jName;
-	int jCtrlIndex;
+	int ctrlSize = math<int>::min(310,controlIndexes.size());
 	float jMin, jMax;
 	JsonTree		json;
 	// create uniforms json
 	JsonTree uniformsJson = JsonTree::makeArray("uniforms");
 
-	for (unsigned i = 0; i < controlIndexes.size(); ++i) {
+	for (unsigned i = 0; i < ctrlSize; ++i) {
 		JsonTree		u(uniformToJson(i));
 		// create <uniform>
 		uniformsJson.pushBack(u);

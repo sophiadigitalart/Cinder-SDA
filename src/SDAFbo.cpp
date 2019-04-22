@@ -125,50 +125,106 @@ namespace SophiaDigitalArt {
 		if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
 		mInputTextureIndex = aTextureIndex;
 	}
+	/*
+	precision mediump float;
+	uniform float frequency194;
+	uniform float sync195;
+	uniform float offset196;
+	uniform float r197;
+	uniform float g198;
+	uniform float b199;
+	uniform float frequency200;
+	uniform float sync201;
+	uniform float offset202;
+	uniform float amount204;
+	uniform sampler2D tex206;
+	uniform float multiple207;
+	uniform float offset208;
+	uniform float angle209;
+	uniform float speed210;
+	uniform float time;
+	uniform vec2 resolution;
+	varying vec2 uv;
+	//\tSimplex 3D Noise\n    //\tby Ian McEwan, Ashima Arts\n    
+	vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
+	vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
+	float _noise(vec3 v){
+	const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
+	const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
+	// First corner
+	vec3 i  = floor(v + dot(v, C.yyy) );
+	
+	*/
 	gl::GlslProgRef SDAFbo::getShader() {
+		int index = 300;
+		int texIndex = 0;
+		string name;
 		auto &uniforms = mFboTextureShader->getActiveUniforms();
 		for (const auto &uniform : uniforms) {
+			name = uniform.getName();
 			//CI_LOG_V(mFboTextureShader->getLabel() + ", getShader uniform name:" + uniform.getName());
-			if (mSDAAnimation->isExistingUniform(uniform.getName())) {
-				int uniformType = mSDAAnimation->getUniformType(uniform.getName());
+			if (mSDAAnimation->isExistingUniform(name)) {
+				int uniformType = mSDAAnimation->getUniformType(name);
 				switch (uniformType)
 				{
 				case 0:
 					// float
-					mFboTextureShader->uniform(uniform.getName(), mSDAAnimation->getFloatUniformValueByName(uniform.getName()));
+					mFboTextureShader->uniform(name, mSDAAnimation->getFloatUniformValueByName(name));
 					break;
 				case 1:
 					// sampler2D
-					mFboTextureShader->uniform(uniform.getName(), mInputTextureIndex);
+					mFboTextureShader->uniform(name, mInputTextureIndex);
 					break;
 				case 2:
 					// vec2
-					mFboTextureShader->uniform(uniform.getName(), mSDAAnimation->getVec2UniformValueByName(uniform.getName()));
+					mFboTextureShader->uniform(name, mSDAAnimation->getVec2UniformValueByName(name));
 					break;
 				case 3:
 					// vec3
-					mFboTextureShader->uniform(uniform.getName(), mSDAAnimation->getVec3UniformValueByName(uniform.getName()));
+					mFboTextureShader->uniform(name, mSDAAnimation->getVec3UniformValueByName(name));
 					break;
 				case 4:
 					// vec4
-					mFboTextureShader->uniform(uniform.getName(), mSDAAnimation->getVec4UniformValueByName(uniform.getName()));
+					mFboTextureShader->uniform(name, mSDAAnimation->getVec4UniformValueByName(name));
 					break;
 				case 5:
 					// int
-					mFboTextureShader->uniform(uniform.getName(), mSDAAnimation->getIntUniformValueByName(uniform.getName()));
+					mFboTextureShader->uniform(name, mSDAAnimation->getIntUniformValueByName(name));
 					break;
 				case 6:
 					// bool
-					mFboTextureShader->uniform(uniform.getName(), mSDAAnimation->getBoolUniformValueByName(uniform.getName()));
+					mFboTextureShader->uniform(name, mSDAAnimation->getBoolUniformValueByName(name));
 					break;
 				default:
 					break;
 				}
 			}
 			else {
-				if (uniform.getName() != "ciModelViewProjection") {
-					mSDASettings->mMsg = mFboName + ", uniform not found:" + uniform.getName();
-					CI_LOG_V(mSDASettings->mMsg);
+				if (name != "ciModelViewProjection") {
+					mSDASettings->mMsg = mFboName + ", uniform not found:" + name + " type:" + toString( uniform.getType());
+					CI_LOG_V(mSDASettings->mMsg); 
+					int firstDigit = name.find_first_of("0123456789");
+					// if valid image sequence (contains a digit)
+					if (firstDigit > -1) {
+						index = std::stoi(name.substr(firstDigit));
+					}
+					switch (uniform.getType())
+					{
+					case 5126:
+						mSDAAnimation->createFloatUniform(name, 400 + index, 0.31f, 0.0f, 1000.0f);
+						mFboTextureShader->uniform(name, mSDAAnimation->getFloatUniformValueByName(name));
+						break;
+					case 35664:
+						//mSDAAnimation->createvec2(uniform.getName(), 310 + , 0);
+						//++;	
+						break;
+					case 35678:
+						mSDAAnimation->createSampler2DUniform(uniform.getName(), 310 + texIndex, 0);
+						texIndex++;
+						break;
+					default:
+						break;
+					}
 				}
 			}
 		}
