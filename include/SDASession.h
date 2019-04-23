@@ -210,6 +210,7 @@ namespace SophiaDigitalArt {
 		};*/
 		string							getMixFboName(unsigned int aMixFboIndex);
 		ci::gl::TextureRef				getMixTexture(unsigned int aMixFboIndex = 0);
+		ci::gl::TextureRef				getMixetteTexture();
 		unsigned int					getMixFbosCount() { return mMixFbos.size(); };
 		// RTE in release mode ci::gl::Texture2dRef			getRenderedTexture(bool reDraw = true) { return mSDAMix->getRenderedTexture(reDraw); };
 		ci::gl::TextureRef				getRenderTexture();
@@ -306,8 +307,12 @@ namespace SophiaDigitalArt {
 		// hydra
 		string							getHydraUniformsString() { return mHydraUniformsValuesString; };
 		ci::gl::TextureRef				getHydraTexture() { return mHydraFbo->getColorTexture(); };
-
+		// modeint
+		
+		int								getMode() { return mMode; };
+		void							setMode(int aMode) { mMode = aMode; };;
 	private:
+		int								mMode;
 		// Settings
 		SDASettingsRef					mSDASettings;
 		// Utils
@@ -347,8 +352,6 @@ namespace SophiaDigitalArt {
 		//SDAFboList						mFboList;
 		fs::path						mFbosFilepath;
 		// fbo 
-		//bool							mFlipV;
-		//bool							mFlipH;
 		gl::Texture::Format				fmt;
 		gl::Fbo::Format					fboFmt;
 		bool							mEnabledAlphaBlending;
@@ -403,7 +406,7 @@ namespace SophiaDigitalArt {
 		// blendmodes fbos
 		map<int, ci::gl::FboRef>		mBlendFbos;
 		int								mCurrentBlend;
-		gl::GlslProgRef					mGlslMix, mGlslBlend, mGlslFeedback;
+		gl::GlslProgRef					mGlslMix, mGlslBlend, mGlslFeedback, mGlslMixette;
 		// render
 		void							renderMix();
 		void							renderBlend();
@@ -411,6 +414,8 @@ namespace SophiaDigitalArt {
 		gl::FboRef						mRenderFbo;
 		// warp rendered texture
 		ci::gl::Texture2dRef			mRenderedTexture;
+		// mixette
+		gl::FboRef						mMixetteFbo;
 	};
 
 }

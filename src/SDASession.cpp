@@ -69,8 +69,9 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 		// load textures from file if one exists
 		// TODO readSettings(mSDASettings, mSDAAnimation, loadFile(mMixesFilepath));
 		}*/
-		// render fbo
+	// render fbo
 	mRenderFbo = gl::Fbo::create(mSDASettings->mRenderWidth, mSDASettings->mRenderHeight, fboFmt);
+	mMixetteFbo = gl::Fbo::create(mSDASettings->mRenderWidth, mSDASettings->mRenderHeight, fboFmt);
 
 	mCurrentBlend = 0;
 	for (size_t i = 0; i < mSDAAnimation->getBlendModesCount(); i++)
@@ -83,6 +84,12 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 		mGlslMix = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixFragmentShaderString());
 		mGlslBlend = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixFragmentShaderString());
 		mHydraShader = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getHydraFragmentShaderString());
+		fs::path mMixetteFilePath = getAssetPath("") / "mixette.glsl";
+		if (!fs::exists(mMixetteFilePath)) {
+			mError = mMixetteFilePath.string() + " does not exist";
+			CI_LOG_V(mError);
+		}
+		mGlslMixette = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), loadString(loadFile(mMixetteFilePath)));
 	}
 	catch (gl::GlslProgCompileExc &exc)
 	{
@@ -99,6 +106,7 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 	mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, 1);
 	//mAFboIndex = 0;
 	//mBFboIndex = 1;
+	mMode = mSDASettings->MODE_MIX;
 	mShaderLeft = "";
 	mShaderRight = "";
 	// hydra
@@ -209,8 +217,8 @@ void SDASession::updateMixUniforms() {
 	mGlslMix->uniform("iBlueMultiplier", mSDAAnimation->getFloatUniformValueByName("iBlueMultiplier"));
 	mGlslMix->uniform("iFlipH", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPH));
 	mGlslMix->uniform("iFlipV", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPV));
-	mGlslMix->uniform("iParam1", mSDASettings->iParam1);
-	mGlslMix->uniform("iParam2", mSDASettings->iParam2);
+	mGlslMix->uniform("pixelX", mSDAAnimation->getFloatUniformValueByName("pixelX"));
+	mGlslMix->uniform("pixelY", mSDAAnimation->getFloatUniformValueByName("pixelY"));
 	mGlslMix->uniform("iXorY", mSDASettings->iXorY);
 	mGlslMix->uniform("iBadTv", mSDAAnimation->getFloatUniformValueByName("iBadTv"));
 	mGlslMix->uniform("iFps", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFPS));
@@ -279,8 +287,8 @@ void SDASession::updateBlendUniforms() {
 	mGlslBlend->uniform("iBlueMultiplier", mSDAAnimation->getFloatUniformValueByName("iBlueMultiplier"));
 	mGlslBlend->uniform("iFlipH", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPH));
 	mGlslBlend->uniform("iFlipV", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPV));
-	mGlslBlend->uniform("iParam1", mSDASettings->iParam1);
-	mGlslBlend->uniform("iParam2", mSDASettings->iParam2);
+	mGlslBlend->uniform("pixelX", mSDAAnimation->getFloatUniformValueByName("IPIXELX"));
+	mGlslBlend->uniform("pixelY", mSDAAnimation->getFloatUniformValueByName("IPIXELY"));
 	mGlslBlend->uniform("iXorY", mSDASettings->iXorY);
 	mGlslBlend->uniform("iBadTv", mSDAAnimation->getFloatUniformValueByName("iBadTv"));
 	mGlslBlend->uniform("iContour", mSDAAnimation->getFloatUniformValueByName("iContour"));
@@ -309,6 +317,11 @@ void SDASession::update(unsigned int aClassIndex) {
 		}
 		if (mSDAWebsocket->hasReceivedUniforms()) {
 			mHydraUniformsValuesString = mSDAWebsocket->getReceivedUniforms();
+
+
+
+
+
 		}
 		/* TODO: CHECK index if (mSDASettings->iGreyScale)
 		{
@@ -557,19 +570,46 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 	// pass this event to Mix handler
 	if (!mSDAAnimation->handleKeyDown(event)) {
 		switch (event.getCode()) {
-
-		case KeyEvent::KEY_SPACE:
+		case KeyEvent::KEY_w:
+			CI_LOG_V("wsConnect");
+			if (isModDown) {
+				wsConnect();
+			}
+			else {
+				// handled in main app
+				handled = false;
+			}
+			break;
+		case KeyEvent::KEY_v:
+			mSDASettings->mFlipV = !mSDASettings->mFlipV;
+			break;
+		case KeyEvent::KEY_h:
+			mSDASettings->mFlipH = !mSDASettings->mFlipH;
+			break;
+		case KeyEvent::KEY_F1:
+			mMode = mSDASettings->MODE_SHADER;
+			break;
+		case KeyEvent::KEY_F2:
+			mMode = mSDASettings->MODE_SHARED;
+			break;
+		case KeyEvent::KEY_F3:
+			mMode = mSDASettings->MODE_IMAGE;
+			break;
+		case KeyEvent::KEY_F4:
+			mMode = mSDASettings->MODE_MIX;
+			break;
+		//case KeyEvent::KEY_SPACE:
 			//mSDATextures->playMovie();
 			//mSDAAnimation->currentScene++;
 			//if (mMovie) { if (mMovie->isPlaying()) mMovie->stop(); else mMovie->play(); }
-			break;
-		case KeyEvent::KEY_0:
-			break;
-		case KeyEvent::KEY_l:
+			//break;
+		//case KeyEvent::KEY_0:
+			//break;
+		//case KeyEvent::KEY_l:
 			// live params TODO mSDAAnimation->load();
 			//mLoopVideo = !mLoopVideo;
 			//if (mMovie) mMovie->setLoop(mLoopVideo);
-			break;
+			//break;
 		case KeyEvent::KEY_x:
 			// trixels
 			mSDAWebsocket->changeFloatValue(mSDASettings->ITRIXELS, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ITRIXELS) + 0.05f);
@@ -601,7 +641,7 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 		case KeyEvent::KEY_a:
 			mSDAWebsocket->changeFloatValue(mSDASettings->IFA, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFA), false, true, isShiftDown, isModDown);
 			break;
-		case KeyEvent::KEY_c:
+		case KeyEvent::KEY_u:
 			// chromatic
 			// TODO find why can't put value >0.9 or 0.85!
 			newValue = mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ICHROMATIC) + 0.05f;
@@ -675,7 +715,7 @@ bool SDASession::handleKeyUp(KeyEvent &event) {
 			// invert
 			mSDAWebsocket->changeBoolValue(mSDASettings->IINVERT, false);
 			break;
-		case KeyEvent::KEY_c:
+		case KeyEvent::KEY_u:
 			// chromatic
 			mSDAWebsocket->changeFloatValue(mSDASettings->ICHROMATIC, 0.0f);
 			break;
@@ -1370,7 +1410,40 @@ ci::gl::Texture2dRef SDASession::getRenderTexture()
 	mRenderedTexture = mRenderFbo->getColorTexture();
 	return mRenderedTexture;
 }
+ci::gl::TextureRef SDASession::getMixetteTexture() {
+	gl::ScopedFramebuffer fbScp(mMixetteFbo);
+	// clear out the FBO with black
+	gl::clear(Color::black());
+	mTextureList[1]->getTexture()->bind(0);
+	mFboList[0]->getRenderedTexture()->bind(1);
+	mFboList[1]->getRenderedTexture()->bind(2);
+	mMixFbos[0].fbo->getColorTexture()->bind(3);
+	mHydraFbo->getColorTexture()->bind(4);
+	//mImage->bind(0);
+	gl::ScopedGlslProg prog(mGlslMixette);
 
+	mGlslMixette->uniform("iGlobalTime", (float)getElapsedSeconds());
+	mGlslMixette->uniform("iResolution", vec3(mSDASettings->mRenderWidth, mSDASettings->mRenderHeight, 1.0));
+	mGlslMixette->uniform("iChannel0", 0); // texture 0
+	mGlslMixette->uniform("iChannel1", 1);
+	mGlslMixette->uniform("iChannel2", 2);
+	mGlslMixette->uniform("iChannel3", 3);
+	mGlslMixette->uniform("iChannel4", 4);
+	mGlslMixette->uniform("iWeight0", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT0));	// weight of channel 0
+	mGlslMixette->uniform("iWeight1", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT1));	// weight of channel 1
+	mGlslMixette->uniform("iWeight2", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT2));	// weight of channel 2
+	mGlslMixette->uniform("iWeight3", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT3)); 
+	mGlslMixette->uniform("iWeight4", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT4)); 
+
+
+
+	//gl::drawSolidRect(getWindowBounds());
+	gl::drawSolidRect(Rectf(0, 0, mSDASettings->mRenderWidth, mSDASettings->mRenderHeight));
+	// setup the viewport to match the dimensions of the FBO
+	gl::ScopedViewport scpVp(ivec2(0), mMixetteFbo->getSize());
+
+	return mMixetteFbo->getColorTexture();
+}
 ci::gl::TextureRef SDASession::getMixTexture(unsigned int aMixFboIndex) {
 	if (aMixFboIndex > mMixFbos.size() - 1) aMixFboIndex = 0;
 	if (!mMixFbos[aMixFboIndex].texture) {

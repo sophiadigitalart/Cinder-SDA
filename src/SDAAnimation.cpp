@@ -57,11 +57,11 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		createFloatUniform("iTime", mSDASettings->ITIME, 0.0f); // 0
 		// sliders
 		// red
-		createFloatUniform("iFR", mSDASettings->IFR, 1.0f); // 1
+		createFloatUniform("r", mSDASettings->IFR, 1.0f); // 1
 		// green
-		createFloatUniform("iFG", mSDASettings->IFG, 0.3f); // 2
+		createFloatUniform("g", mSDASettings->IFG, 0.3f); // 2
 		// blue
-		createFloatUniform("iFB", mSDASettings->IFB, 0.0f); // 3
+		createFloatUniform("b", mSDASettings->IFB, 0.0f); // 3
 		// Alpha 
 		createFloatUniform("iAlpha", mSDASettings->IFA, 1.0f); // 4
 		// red multiplier 
@@ -101,11 +101,11 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		// iBpm 
 		createFloatUniform("iBpm", mSDASettings->IBPM, 165.0f, 0.000000001f, 400.0f); // 21
 		// Speed 
-		createFloatUniform("iSpeed", mSDASettings->ISPEED, 12.0f, 0.01f, 12.0f); // 22
+		createFloatUniform("speed", mSDASettings->ISPEED, 12.0f, 0.01f, 12.0f); // 22
 		// slitscan (or other) Param1 
-		createFloatUniform("iParam1", mSDASettings->IPARAM1, 1.0f, 0.01f, 100.0f); // 23
+		createFloatUniform("pixelX", mSDASettings->IPIXELX, 1.0f, 0.01f, 100.0f); // 23
 		// slitscan (or other) Param2 
-		createFloatUniform("iParam2", mSDASettings->IPARAM2, 1.0f, 0.01f, 100.0f); // 24
+		createFloatUniform("pixelY", mSDASettings->IPIXELY, 1.0f, 0.01f, 100.0f); // 24
 		// iFreq0  
 		createFloatUniform("iFreq0", mSDASettings->IFREQ0, 0.0f, 0.01f, 256.0f); // 25 
 		// iFreq1  
@@ -115,9 +115,9 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		// iFreq3  
 		createFloatUniform("iFreq3", mSDASettings->IFREQ3, 0.0f, 0.01f, 256.0f); // 28
 		// iResolutionX (should be fbowidth) 
-		createFloatUniform("iResolutionX", mSDASettings->IRESX, mSDASettings->mFboWidth, 0.01f, 2280.0f); // 29
+		createFloatUniform("iResolutionX", mSDASettings->IRESX, mSDASettings->mRenderWidth, 320.01f, 4280.0f); // 29
 		// iResolutionY (should be fboheight)  
-		createFloatUniform("iResolutionY", mSDASettings->IRESY, mSDASettings->mFboHeight, 0.01f, 2800.0f); // 30
+		createFloatUniform("iResolutionY", mSDASettings->IRESY, mSDASettings->mRenderHeight, 240.01f, 2160.0f); // 30
 
 		// TODO: double 
 		// weight mix fbo texture 0
@@ -637,20 +637,20 @@ void SDAAnimation::setAutoBeatAnimation(bool aAutoBeatAnimation) {
 bool SDAAnimation::handleKeyDown(KeyEvent &event)
 {
 	//float newValue;
-	bool handled = true;
+	/*bool handled = true;
 	switch (event.getCode()) {
 	case KeyEvent::KEY_s:
 		// save animation
 		save();
 		break;
-	case KeyEvent::KEY_u:
-		// save badtv keyframe
-		mBadTV[getElapsedFrames() - 10] = 1.0f;
-		//iBadTvRunning = true;
-		// duration = 0.2
-		shaderUniforms["iBadTv"].floatValue = 5.0f;
-		//timeline().apply(&mSDASettings->iBadTv, 60.0f, 0.0f, 0.2f, EaseInCubic());
-		break;
+	//case KeyEvent::KEY_u:
+	//	// save badtv keyframe
+	//	mBadTV[getElapsedFrames() - 10] = 1.0f;
+	//	//iBadTvRunning = true;
+	//	// duration = 0.2
+	//	shaderUniforms["iBadTv"].floatValue = 5.0f;
+	//	//timeline().apply(&mSDASettings->iBadTv, 60.0f, 0.0f, 0.2f, EaseInCubic());
+	//	break;
 	case KeyEvent::KEY_d:
 		// save end keyframe
 		setEndFrame(getElapsedFrames() - 10);
@@ -663,8 +663,9 @@ bool SDAAnimation::handleKeyDown(KeyEvent &event)
 
 	default:
 		handled = false;
-	}
-	event.setHandled(handled);
+	} */
+
+	event.setHandled(false);
 
 	return event.isHandled();
 }

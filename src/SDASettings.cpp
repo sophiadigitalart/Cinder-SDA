@@ -408,7 +408,6 @@ void SDASettings::resetSomeParams() {
 	// unicorns
 	//iBadTv = 0.0f;
 	iAlpha = 1.0f;
-	iParam1 = iParam2 = 1.0f;
 	iSpeedMultiplier = 1.0f;
 
 	iGreyScale = false;
@@ -691,8 +690,8 @@ void SDASettings::reset()
 		"uniform float     iRedMultiplier;\n"
 		"uniform float     iGreenMultiplier;\n"
 		"uniform float     iBlueMultiplier;\n"
-		"uniform float     iParam1; // slitscan (or other) Param1\n"
-		"uniform float     iParam2;\n"
+		"uniform float     pixelX; // slitscan (or other) \n"
+		"uniform float     pixelY;\n"
 		"uniform float     iBadTv; // badtv if > 0.01\n"
 		"uniform float     iContour; // contour size if > 0.01\n"
 		"uniform bool	   iFlipH;\n"
@@ -1153,12 +1152,12 @@ void SDASettings::reset()
 		"	float y2 = y;\n"
 		"	if (iXorY)\n"
 		"	{\n"
-		"		float z1 = floor((x / iParam1) + 0.5);     //((x/20.0) + 0.5)\n"
+		"		float z1 = floor((x / pixelX) + 0.5);     //((x/20.0) + 0.5)\n"
 		"		x2 = x + (sin(z1 + (iTime * 2.0)) * iRatio);\n"
 		"	}\n"
 		"	else\n"
 		"	{\n"
-		"		float z2 = floor((y / iParam2) + 0.5);     //((x/20.0) + 0.5)\n"
+		"		float z2 = floor((y / pixelY) + 0.5);     //((x/20.0) + 0.5)\n"
 		"		y2 = y + (sin(z2 + (iTime * 2.0)) * iRatio);\n"
 		"	}\n"
 		"\n"
@@ -1208,16 +1207,16 @@ void SDASettings::reset()
 		"	float c = 1.;\n"
 		"	if (iXorY)\n"
 		"	{\n"
-		"		c += iBadTv * sin(iTime * 2. + uv.y * 100. * iParam1);\n"
+		"		c += iBadTv * sin(iTime * 2. + uv.y * 100. * pixelX);\n"
 		"		c += iBadTv * sin(iTime * 1. + uv.y * 80.);\n"
-		"		c += iBadTv * sin(iTime * 5. + uv.y * 900. * iParam2);\n"
+		"		c += iBadTv * sin(iTime * 5. + uv.y * 900. * pixelY);\n"
 		"		c += 1. * cos(iTime + uv.x);\n"
 		"	}\n"
 		"	else\n"
 		"	{\n"
-		"		c += iBadTv * sin(iTime * 2. + uv.x * 100. * iParam1);\n"
+		"		c += iBadTv * sin(iTime * 2. + uv.x * 100. * pixelX);\n"
 		"		c += iBadTv * sin(iTime * 1. + uv.x * 80.);\n"
-		"		c += iBadTv * sin(iTime * 5. + uv.x * 900. * iParam2);\n"
+		"		c += iBadTv * sin(iTime * 5. + uv.x * 900. * pixelY);\n"
 		"		c += 1. * cos(iTime + uv.y);\n"
 		"	}\n"
 

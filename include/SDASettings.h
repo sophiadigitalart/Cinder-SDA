@@ -48,8 +48,8 @@ namespace SophiaDigitalArt {
 		static const int			IFPS = 20;
 		static const int			IBPM = 21;
 		static const int			ISPEED = 22;
-		static const int			IPARAM1 = 23;
-		static const int			IPARAM2 = 24;
+		static const int			IPIXELX = 23;
+		static const int			IPIXELY = 24;
 		static const int			IFREQ0 = 25;
 		static const int			IFREQ1 = 26;
 		static const int			IFREQ2 = 27;
@@ -85,6 +85,9 @@ namespace SophiaDigitalArt {
 		static const int			IFLIPH = 100;
 		static const int			IXORY = 101;
 		static const int			IFLIPV = 103;
+		// global flip
+		bool						mFlipV;
+		bool						mFlipH;
 		/*static const int			IRHANDX = 110;
 		static const int			IRHANDY = 111;
 		static const int			IRHANDZ = 112;
@@ -163,8 +166,6 @@ namespace SophiaDigitalArt {
 		bool						iFade;
 		bool						iRepeat;
 		int							iBlendmode;
-		float						iParam1;
-		float						iParam2;
 		bool						iXorY;
 		//ci::Anim<float> 			iBadTv;
 		ci::Anim<float> 			iAlpha;
@@ -194,20 +195,27 @@ namespace SophiaDigitalArt {
 		int							currentSelectedIndex;
 
 		// modes, should be the same in App
-		/*static const int			MODE_MIX = 0;
-		static const int			MODE_WARP = 1;
+		static const int			MODE_MIX = 0;
+		static const int			MODE_IMAGE = 1;
+		static const int			MODE_SHARED = 2;
+		static const int			MODE_STREAM = 3;
+		static const int			MODE_SHADER = 4;
+		static const int			MODE_HYDRA = 5;
+
+		/* static const int			MODE_WARP = 1;
 		static const int			MODE_AUDIO = 2;
 		static const int			MODE_SPHERE = 3;
 		static const int			MODE_MESH = 4;
 		static const int			MODE_LIVE = 5;
 		static const int			MODE_ABP = 6;
-		static const int			MODE_KINECT = 8;
+		static const int			MODE_KINECT = 8; */
+
 		// windows to create, should be the same in App and UI
-		static const int			NONE = 0;
+		/*static const int			NONE = 0;
 		static const int			RENDER_1 = 1;
 		static const int			RENDER_DELETE = 5;
 		static const int			MIDI_IN = 6;*/
-
+		
 		int							mWindowToCreate;
 		ColorA						FPSColor;
 		ColorA						ColorGreen;
@@ -315,7 +323,7 @@ namespace SophiaDigitalArt {
 		//! default vertex shader
 		std::string					mDefaultVextexShaderString;
 		std::string					mDefaultFragmentShaderString;
-		std::string					mMixFragmentShaderString;
+		std::string					mMixFragmentShaderString; 
 		std::string					mHydraFragmentShaderString;
 
 	};

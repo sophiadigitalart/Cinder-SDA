@@ -425,8 +425,34 @@ void SDARouter::midiListener(midi::Message msg) {
 		midiControl = msg.control;
 		midiValue = msg.value;
 		midiNormalizedValue = lmap<float>(midiValue, 0.0, 127.0, 0.0, 1.0);
+		ss << "MIDI cc Chn: " << midiChannel << " CC: " << midiControl  << " Val: " << midiValue << " NVal: " << midiNormalizedValue << std::endl;
+		CI_LOG_V("Midi: " + ss.str());
+
 		if (midiControl > 20 && midiControl < 49) {
-			if (midiControl > 20 && midiControl < 29) {
+			/*if (midiControl > 20 && midiControl < 29) {
+				mSelectedWarp = midiControl - 21;
+			} 
+			if (midiControl > 40 && midiControl < 49) {
+				mSelectedFboB = midiControl - 41;
+				mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, mSelectedFboB);
+			}
+			*/
+			if (midiControl > 30 && midiControl < 39) {
+				mSDAWebsocket->changeFloatValue(midiControl, midiNormalizedValue);
+				//mSelectedFboA = midiControl - 31;
+				//mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, mSelectedFboA);
+			}
+			
+		}
+		else {
+			updateParams(midiControl, midiNormalizedValue);
+		}
+		//mWebSockets->write("{\"params\" :[{" + controlType);
+		break;
+	case MIDI_NOTE_ON:
+		/*
+		TODO nano notes instad of cc
+		if (midiControl > 20 && midiControl < 29) {
 				mSelectedWarp = midiControl - 21;
 			}
 			if (midiControl > 30 && midiControl < 39) {
@@ -437,13 +463,7 @@ void SDARouter::midiListener(midi::Message msg) {
 				mSelectedFboB = midiControl - 41;
 				mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, mSelectedFboB);
 			}
-		}
-		else {
-			updateParams(midiControl, midiNormalizedValue);
-		}
-		//mWebSockets->write("{\"params\" :[{" + controlType);
-		break;
-	case MIDI_NOTE_ON:
+		*/
 		//midiControlType = "/on";
 		//midiPitch = msg.pitch;
 		//midiVelocity = msg.velocity;
@@ -452,11 +472,11 @@ void SDARouter::midiListener(midi::Message msg) {
 		//mSDAAnimation->setFloatUniformValueByIndex(14, 1.0f + midiNormalizedValue);
 		midiPitch = msg.pitch;
 		// midimix solo mode
-		if (midiPitch == 27) midiSticky = true;
+		/*if (midiPitch == 27) midiSticky = true;
 		if (midiSticky) {
 			midiStickyPrevIndex = midiPitch;
 			midiStickyPrevValue = mSDAAnimation->getBoolUniformValueByIndex(midiPitch + 80);
-		}
+		}*/
 		mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80, true);
 		ss << "MIDI noteon Chn: " << midiChannel << " Pitch: " << midiPitch << std::endl;
 		CI_LOG_V("Midi: " + ss.str());
@@ -464,18 +484,18 @@ void SDARouter::midiListener(midi::Message msg) {
 	case MIDI_NOTE_OFF:
 		midiPitch = msg.pitch;
 		// midimix solo mode
-		if (midiPitch == 27) {
+		/*if (midiPitch == 27) {
 			midiStickyPrevIndex = 0;
 			midiSticky = false;
 		}
-		if (!midiSticky) {
+		if (!midiSticky) {*/
 			mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80, false);
-		}
+		/*}
 		else {
 			if (midiPitch == midiStickyPrevIndex) {
 				mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80, !midiStickyPrevValue);
 			}
-		}
+		}*/
 		ss << "MIDI noteoff Chn: " << midiChannel << " Pitch: " << midiPitch << std::endl;
 		CI_LOG_V("Midi: " + ss.str());
 		/*midiControlType = "/off";
@@ -486,8 +506,8 @@ void SDARouter::midiListener(midi::Message msg) {
 	default:
 		break;
 	}
-	ss << "MIDI Chn: " << midiChannel << " type: " << midiControlType << " CC: " << midiControl << " Pitch: " << midiPitch << " Vel: " << midiVelocity << " Val: " << midiValue << " NVal: " << midiNormalizedValue << std::endl;
-	CI_LOG_V("Midi: " + ss.str());
+	//ss << "MIDI Chn: " << midiChannel << " type: " << midiControlType << " CC: " << midiControl << " Pitch: " << midiPitch << " Vel: " << midiVelocity << " Val: " << midiValue << " NVal: " << midiNormalizedValue << std::endl;
+	//CI_LOG_V("Midi: " + ss.str());
 
 	mSDASettings->mMidiMsg = ss.str();
 }
@@ -522,18 +542,18 @@ void SDARouter::updateParams(int iarg0, float farg1) {
 	}
 	if (iarg0 > 0 && iarg0 < 9) {
 		// sliders 
-		mSDAAnimation->setFloatUniformValueByIndex(iarg0, farg1);
+		mSDAWebsocket->changeFloatValue(iarg0, farg1);
 	}
 	if (iarg0 > 10 && iarg0 < 19) {
 		// rotary 
-		mSDAAnimation->setFloatUniformValueByIndex(iarg0, farg1);
+		mSDAWebsocket->changeFloatValue(iarg0, farg1);
 		// audio multfactor
-		if (iarg0 == 13) mSDAAnimation->setFloatUniformValueByIndex(iarg0, (farg1 + 0.01) * 10);
+		if (iarg0 == 13) mSDAWebsocket->changeFloatValue(iarg0, (farg1 + 0.01) * 10);
 		// exposure
-		if (iarg0 == 14) mSDAAnimation->setFloatUniformValueByIndex(iarg0, (farg1 + 0.01) * mSDAAnimation->getMaxUniformValueByIndex(14));
+		if (iarg0 == 14) mSDAWebsocket->changeFloatValue(iarg0, (farg1 + 0.01) * mSDAAnimation->getMaxUniformValueByIndex(14));
 		// xfade
 		if (iarg0 == mSDASettings->IXFADE) {//18
-			mSDAAnimation->setFloatUniformValueByIndex(iarg0, farg1);
+			mSDAWebsocket->changeFloatValue(iarg0, farg1);
 			//mSDASettings->xFade = farg1;
 			//mSDASettings->xFadeChanged = true;
 		}
@@ -541,23 +561,23 @@ void SDARouter::updateParams(int iarg0, float farg1) {
 	// buttons
 	if (iarg0 > 20 && iarg0 < 29) {
 		// top row
-		mSDAAnimation->setFloatUniformValueByIndex(iarg0, farg1);
+		mSDAWebsocket->changeFloatValue(iarg0, farg1);
 	}
 	if (iarg0 > 30 && iarg0 < 39)
 	{
 		// middle row
-		mSDAAnimation->setFloatUniformValueByIndex(iarg0, farg1);
-		mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, iarg0 - 31);
+		mSDAWebsocket->changeFloatValue(iarg0, farg1);
+		//mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, iarg0 - 31);
 	}
 	if (iarg0 > 40 && iarg0 < 49) {
 		// low row 
-		mSDAAnimation->setFloatUniformValueByIndex(iarg0, farg1);
-		mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, iarg0 - 41);
+		mSDAWebsocket->changeFloatValue(iarg0, farg1);
+		//mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, iarg0 - 41);
 	}
-	if (iarg0 > 0 && iarg0 < 49) {
+	//if (iarg0 > 0 && iarg0 < 49) {
 		// float values 
-		mSDAWebsocket->wsWrite("{\"params\" :[{ \"name\":" + toString(iarg0) + ",\"value\":" + toString(mSDAAnimation->getFloatUniformValueByIndex(iarg0)) + "}]}");
-	}
+		//mSDAWebsocket->wsWrite("{\"params\" :[{ \"name\":" + toString(iarg0) + ",\"value\":" + toString(mSDAAnimation->getFloatUniformValueByIndex(iarg0)) + "}]}");
+	//}
 }
 
 

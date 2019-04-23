@@ -323,8 +323,8 @@ namespace SophiaDigitalArt {
 				mFboTextureShader->uniform("iBlueMultiplier", mSDAAnimation->getFloatUniformValueByName("iBlueMultiplier"));
 				mFboTextureShader->uniform("iFlipH", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPH));
 				mFboTextureShader->uniform("iFlipV", (int)mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPV));
-				mFboTextureShader->uniform("iParam1", mSDASettings->iParam1);
-				mFboTextureShader->uniform("iParam2", mSDASettings->iParam2);
+				mFboTextureShader->uniform("pixelX", mSDAAnimation->getFloatUniformValueByName("pixelX"));
+				mFboTextureShader->uniform("pixelY", mSDAAnimation->getFloatUniformValueByName("pixelY"));
 				mFboTextureShader->uniform("iXorY", mSDASettings->iXorY);
 				mFboTextureShader->uniform("iBadTv", mSDAAnimation->getFloatUniformValueByName("iBadTv"));
 				mFboTextureShader->uniform("iFps", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFPS));

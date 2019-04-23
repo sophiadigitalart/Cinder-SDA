@@ -9,6 +9,6 @@ SDALog::SDALog()
 #ifdef _DEBUG
 	log::makeLogger<log::LoggerFileRotating>("/tmp/sda", "sda.%Y.%m.%d.txt", false);
 #else
-	
+	log::makeLogger<log::LoggerFileRotating>("/tmp/sda", "sda.%Y.%m.%d.txt", false);
 #endif  // _DEBUG
 }

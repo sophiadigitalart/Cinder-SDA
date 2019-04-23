@@ -69,7 +69,6 @@ namespace SophiaDigitalArt
 		void							useTimeWithTempo() { mUseTimeWithTempo = true; };
 		float							iTempoTimeBeatPerBar;
 		float							getBpm() {
-			CI_LOG_W("getBpm " + toString(getFloatUniformValueByIndex(mSDASettings->IBPM)));
 			return getFloatUniformValueByIndex(mSDASettings->IBPM);
 		};
 		void							setBpm(float aBpm) {
