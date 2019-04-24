@@ -83,7 +83,16 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 	{
 		mGlslMix = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixFragmentShaderString());
 		mGlslBlend = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixFragmentShaderString());
-		mHydraShader = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getHydraFragmentShaderString());
+		mGlslHydra = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getHydraFragmentShaderString());
+
+		fs::path mPostFilePath = getAssetPath("") / "post.glsl";
+		if (!fs::exists(mPostFilePath)) {
+			mError = mPostFilePath.string() + " does not exist";
+			CI_LOG_V(mError);
+		}
+		mGlslRender = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), loadString(loadFile(mPostFilePath)));
+
+		
 		fs::path mMixetteFilePath = getAssetPath("") / "mixette.glsl";
 		if (!fs::exists(mMixetteFilePath)) {
 			mError = mMixetteFilePath.string() + " does not exist";
@@ -106,12 +115,13 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 	mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, 1);
 	//mAFboIndex = 0;
 	//mBFboIndex = 1;
-	mMode = mSDASettings->MODE_MIX;
+	mMode = mSDASettings->MODE_SHADER;
 	mShaderLeft = "";
 	mShaderRight = "";
 	// hydra
 	mHydraUniformsValuesString = "";
-	mHydraFbo = gl::Fbo::create(mSDASettings->mFboWidth, mSDASettings->mFboHeight, fboFmt);
+	mHydraFbo = gl::Fbo::create(mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IRESX), mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IRESY), fboFmt);
+	mRenderFbo = gl::Fbo::create(mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IRESX), mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IRESY), fboFmt);
 }
 
 SDASessionRef SDASession::create(SDASettingsRef aSDASettings)
@@ -903,14 +913,14 @@ void SDASession::setHydraFragmentShaderString(string aFragmentShaderString, stri
 	//mShaderList[0]->setFragmentString(aFragmentShaderString, aName);
 	//setFboFragmentShaderIndex(0, 0);
 	// try to compile a first time to get active uniforms
-	mHydraShader = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), aFragmentShaderString);
+	mGlslHydra = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), aFragmentShaderString);
 
 }
 void SDASession::updateHydraUniforms() {
 	int index = 300;
 	int texIndex = 0;
 	int firstDigit = -1;
-	auto &uniforms = mHydraShader->getActiveUniforms();
+	auto &uniforms = mGlslHydra->getActiveUniforms();
 	string name;
 	string textName;
 	for (const auto &uniform : uniforms) {
@@ -929,39 +939,39 @@ void SDASession::updateHydraUniforms() {
 					index = std::stoi(name.substr(firstDigit));
 					textName = name.substr(0, firstDigit);
 					if (mSDAAnimation->isExistingUniform(textName)) {
-						mHydraShader->uniform(name, mSDAAnimation->getFloatUniformValueByName(textName));
+						mGlslHydra->uniform(name, mSDAAnimation->getFloatUniformValueByName(textName));
 					}
 					else {
 						mSDAAnimation->createFloatUniform(name, 400 + index, 0.31f, 0.0f, 1000.0f);
 					}
 				}
 				else {
-					mHydraShader->uniform(name, mSDAAnimation->getFloatUniformValueByName(name));
+					mGlslHydra->uniform(name, mSDAAnimation->getFloatUniformValueByName(name));
 				}
 				break;
 			case 1:
 				// sampler2D
-				mHydraShader->uniform(name, 0);
+				mGlslHydra->uniform(name, 0);
 				break;
 			case 2:
 				// vec2
-				mHydraShader->uniform(name, mSDAAnimation->getVec2UniformValueByName(name));
+				mGlslHydra->uniform(name, mSDAAnimation->getVec2UniformValueByName(name));
 				break;
 			case 3:
 				// vec3
-				mHydraShader->uniform(name, mSDAAnimation->getVec3UniformValueByName(name));
+				mGlslHydra->uniform(name, mSDAAnimation->getVec3UniformValueByName(name));
 				break;
 			case 4:
 				// vec4
-				mHydraShader->uniform(name, mSDAAnimation->getVec4UniformValueByName(name));
+				mGlslHydra->uniform(name, mSDAAnimation->getVec4UniformValueByName(name));
 				break;
 			case 5:
 				// int
-				mHydraShader->uniform(name, mSDAAnimation->getIntUniformValueByName(name));
+				mGlslHydra->uniform(name, mSDAAnimation->getIntUniformValueByName(name));
 				break;
 			case 6:
 				// bool
-				mHydraShader->uniform(name, mSDAAnimation->getBoolUniformValueByName(name));
+				mGlslHydra->uniform(name, mSDAAnimation->getBoolUniformValueByName(name));
 				break;
 			default:
 				break;
@@ -988,8 +998,8 @@ void SDASession::updateHydraUniforms() {
 			}
 		}
 	}
-	mHydraShader->uniform("time", mSDAAnimation->getFloatUniformValueByIndex(0));
-	mHydraShader->uniform("resolution", vec2(mSDAAnimation->getFloatUniformValueByName("iResolutionX"), mSDAAnimation->getFloatUniformValueByName("iResolutionY")));
+	mGlslHydra->uniform("time", mSDAAnimation->getFloatUniformValueByIndex(0));
+	mGlslHydra->uniform("resolution", vec2(mSDAAnimation->getFloatUniformValueByName("iResolutionX"), mSDAAnimation->getFloatUniformValueByName("iResolutionY")));
 
 
 }
@@ -1403,12 +1413,19 @@ ci::gl::Texture2dRef SDASession::getRenderTexture()
 {
 	gl::ScopedFramebuffer fbScp(mRenderFbo);
 	gl::clear(Color::black());
+	getMixetteTexture()->bind(0);
+	gl::ScopedGlslProg prog(mGlslRender);
+	mGlslRender->uniform("iTime", (float)getElapsedSeconds());
+	mGlslRender->uniform("iResolution", vec3(mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IRESX), mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IRESY), 1.0));
+	mGlslRender->uniform("iChannel0", 0); // texture 0
+	mGlslRender->uniform("iExposure", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IEXPOSURE));
+	mGlslRender->uniform("iSobel", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ISOBEL));
+	mGlslRender->uniform("iChromatic", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ICHROMATIC));
+	gl::drawSolidRect(Rectf(0, 0, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IRESX), mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IRESY)));
 	// setup the viewport to match the dimensions of the FBO
 	gl::ScopedViewport scpVp(ivec2(0), mRenderFbo->getSize());
-
-
 	mRenderedTexture = mRenderFbo->getColorTexture();
-	return mRenderedTexture;
+	return  mRenderFbo->getColorTexture();
 }
 ci::gl::TextureRef SDASession::getMixetteTexture() {
 	gl::ScopedFramebuffer fbScp(mMixetteFbo);
@@ -1421,9 +1438,7 @@ ci::gl::TextureRef SDASession::getMixetteTexture() {
 	mHydraFbo->getColorTexture()->bind(4);
 	//mImage->bind(0);
 	gl::ScopedGlslProg prog(mGlslMixette);
-
-	mGlslMixette->uniform("iGlobalTime", (float)getElapsedSeconds());
-	mGlslMixette->uniform("iResolution", vec3(mSDASettings->mRenderWidth, mSDASettings->mRenderHeight, 1.0));
+	mGlslMixette->uniform("iResolution", vec3(mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IRESX), mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IRESY), 1.0));
 	mGlslMixette->uniform("iChannel0", 0); // texture 0
 	mGlslMixette->uniform("iChannel1", 1);
 	mGlslMixette->uniform("iChannel2", 2);
@@ -1434,14 +1449,11 @@ ci::gl::TextureRef SDASession::getMixetteTexture() {
 	mGlslMixette->uniform("iWeight2", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT2));	// weight of channel 2
 	mGlslMixette->uniform("iWeight3", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT3)); 
 	mGlslMixette->uniform("iWeight4", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT4)); 
-
-
-
 	//gl::drawSolidRect(getWindowBounds());
-	gl::drawSolidRect(Rectf(0, 0, mSDASettings->mRenderWidth, mSDASettings->mRenderHeight));
+	gl::drawSolidRect(Rectf(0, 0, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IRESX), mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IRESY)));
 	// setup the viewport to match the dimensions of the FBO
 	gl::ScopedViewport scpVp(ivec2(0), mMixetteFbo->getSize());
-
+	mMixetteTexture = mMixetteFbo->getColorTexture();
 	return mMixetteFbo->getColorTexture();
 }
 ci::gl::TextureRef SDASession::getMixTexture(unsigned int aMixFboIndex) {
@@ -1483,8 +1495,8 @@ void SDASession::renderHydra() {
 	gl::ScopedFramebuffer scopedFbo(mHydraFbo);
 	gl::clear(Color::black());
 
-	gl::ScopedGlslProg glslScope(mHydraShader);
-	mHydraShader->uniform("iCrossfade", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE));
+	gl::ScopedGlslProg glslScope(mGlslHydra);
+	// useless mGlslHydra->uniform("iCrossfade", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE));
 
 	gl::drawSolidRect(Rectf(0, 0, mHydraFbo->getWidth(), mHydraFbo->getHeight()));
 }

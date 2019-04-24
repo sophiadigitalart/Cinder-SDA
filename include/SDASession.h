@@ -366,7 +366,8 @@ namespace SophiaDigitalArt {
 		void							updateHydraUniforms();
 		void							renderHydra();
 		ci::gl::FboRef					mHydraFbo;
-		gl::GlslProgRef					mHydraShader;
+		gl::GlslProgRef					mGlslHydra;
+		gl::GlslProgRef					mGlslRender;
 		//! textures
 		int								mWidth;
 		int								mHeight;
@@ -413,7 +414,7 @@ namespace SophiaDigitalArt {
 		// warping
 		gl::FboRef						mRenderFbo;
 		// warp rendered texture
-		ci::gl::Texture2dRef			mRenderedTexture;
+		ci::gl::Texture2dRef			mRenderedTexture, mMixetteTexture;
 		// mixette
 		gl::FboRef						mMixetteFbo;
 	};
