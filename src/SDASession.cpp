@@ -84,21 +84,23 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 		mGlslMix = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixFragmentShaderString());
 		mGlslBlend = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixFragmentShaderString());
 		mGlslHydra = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getHydraFragmentShaderString());
+		mGlslMixette = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixetteFragmentShaderString());
+		mGlslRender = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getPostFragmentShaderString());
 
 		fs::path mPostFilePath = getAssetPath("") / "post.glsl";
 		if (!fs::exists(mPostFilePath)) {
 			mError = mPostFilePath.string() + " does not exist";
 			CI_LOG_V(mError);
 		}
-		mGlslRender = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), loadString(loadFile(mPostFilePath)));
-
+		mGlslRender = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), loadString(loadFile(mPostFilePath))); 
+		/*
 		
 		fs::path mMixetteFilePath = getAssetPath("") / "mixette.glsl";
 		if (!fs::exists(mMixetteFilePath)) {
 			mError = mMixetteFilePath.string() + " does not exist";
 			CI_LOG_V(mError);
 		}
-		mGlslMixette = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), loadString(loadFile(mMixetteFilePath)));
+		mGlslMixette = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), loadString(loadFile(mMixetteFilePath)));*/
 	}
 	catch (gl::GlslProgCompileExc &exc)
 	{
@@ -115,7 +117,7 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 	mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, 1);
 	//mAFboIndex = 0;
 	//mBFboIndex = 1;
-	mMode = mSDASettings->MODE_SHADER;
+	mMode = 0;
 	mShaderLeft = "";
 	mShaderRight = "";
 	// hydra
@@ -307,6 +309,12 @@ void SDASession::updateBlendUniforms() {
 }
 void SDASession::update(unsigned int aClassIndex) {
 
+	if (mSDARouter->hasFBOAChanged()) {
+		setFboFragmentShaderIndex(0, mSDARouter->selectedFboA());
+	}
+	if (mSDARouter->hasFBOBChanged()) {
+		setFboFragmentShaderIndex(1, mSDARouter->selectedFboB());
+	}
 	if (aClassIndex == 0) {
 		if (mSDAWebsocket->hasReceivedStream()) { //&& (getElapsedFrames() % 100 == 0)) {
 			updateStream(mSDAWebsocket->getBase64Image());
@@ -327,11 +335,6 @@ void SDASession::update(unsigned int aClassIndex) {
 		}
 		if (mSDAWebsocket->hasReceivedUniforms()) {
 			mHydraUniformsValuesString = mSDAWebsocket->getReceivedUniforms();
-
-
-
-
-
 		}
 		/* TODO: CHECK index if (mSDASettings->iGreyScale)
 		{
@@ -597,18 +600,33 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 			mSDASettings->mFlipH = !mSDASettings->mFlipH;
 			break;
 		case KeyEvent::KEY_F1:
-			mMode = mSDASettings->MODE_SHADER;
+			mMode = 0;
 			break;
 		case KeyEvent::KEY_F2:
-			mMode = mSDASettings->MODE_SHARED;
+			mMode = 1;
 			break;
 		case KeyEvent::KEY_F3:
-			mMode = mSDASettings->MODE_IMAGE;
+			mMode = 2;
 			break;
 		case KeyEvent::KEY_F4:
-			mMode = mSDASettings->MODE_MIX;
+			mMode = 3;
 			break;
-		//case KeyEvent::KEY_SPACE:
+		case KeyEvent::KEY_F5:
+			mMode = 4;
+			break;
+		case KeyEvent::KEY_F6:
+			mMode = 5;
+			break;
+		case KeyEvent::KEY_F7:
+			mMode = 6;
+			break;
+		case KeyEvent::KEY_F8:
+			mMode = 7;
+			break;
+		case KeyEvent::KEY_F9:
+			mMode = 8;
+			break;
+			//case KeyEvent::KEY_SPACE:
 			//mSDATextures->playMovie();
 			//mSDAAnimation->currentScene++;
 			//if (mMovie) { if (mMovie->isPlaying()) mMovie->stop(); else mMovie->play(); }
@@ -1432,10 +1450,14 @@ ci::gl::TextureRef SDASession::getMixetteTexture() {
 	// clear out the FBO with black
 	gl::clear(Color::black());
 	mTextureList[1]->getTexture()->bind(0);
-	mFboList[0]->getRenderedTexture()->bind(1);
-	mFboList[1]->getRenderedTexture()->bind(2);
-	mMixFbos[0].fbo->getColorTexture()->bind(3);
-	mHydraFbo->getColorTexture()->bind(4);
+	mHydraFbo->getColorTexture()->bind(1);
+	mMixFbos[0].fbo->getColorTexture()->bind(2);
+	mFboList[0]->getRenderedTexture()->bind(3);
+	mFboList[1]->getRenderedTexture()->bind(4);
+	mFboList[2]->getRenderedTexture()->bind(5);
+	mFboList[3]->getRenderedTexture()->bind(6);
+	mFboList[4]->getRenderedTexture()->bind(7);
+
 	//mImage->bind(0);
 	gl::ScopedGlslProg prog(mGlslMixette);
 	mGlslMixette->uniform("iResolution", vec3(mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IRESX), mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IRESY), 1.0));
@@ -1444,11 +1466,17 @@ ci::gl::TextureRef SDASession::getMixetteTexture() {
 	mGlslMixette->uniform("iChannel2", 2);
 	mGlslMixette->uniform("iChannel3", 3);
 	mGlslMixette->uniform("iChannel4", 4);
+	mGlslMixette->uniform("iChannel5", 5);
+	mGlslMixette->uniform("iChannel6", 6);
+	mGlslMixette->uniform("iChannel7", 7);
 	mGlslMixette->uniform("iWeight0", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT0));	// weight of channel 0
 	mGlslMixette->uniform("iWeight1", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT1));	// weight of channel 1
 	mGlslMixette->uniform("iWeight2", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT2));	// weight of channel 2
 	mGlslMixette->uniform("iWeight3", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT3)); 
-	mGlslMixette->uniform("iWeight4", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT4)); 
+	mGlslMixette->uniform("iWeight4", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT4));
+	mGlslMixette->uniform("iWeight5", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT5));
+	mGlslMixette->uniform("iWeight6", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT6));
+	mGlslMixette->uniform("iWeight7", mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IWEIGHT7));
 	//gl::drawSolidRect(getWindowBounds());
 	gl::drawSolidRect(Rectf(0, 0, mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IRESX), mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IRESY)));
 	// setup the viewport to match the dimensions of the FBO

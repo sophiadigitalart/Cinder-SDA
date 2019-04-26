@@ -46,14 +46,26 @@ namespace SophiaDigitalArt {
 		static const int			IXFADE = 18;
 		static const int			ITEMPOTIME = 19;
 		static const int			IFPS = 20;
+
 		static const int			IBPM = 21;
 		static const int			ISPEED = 22;
 		static const int			IPIXELX = 23;
 		static const int			IPIXELY = 24;
 		static const int			IFREQ0 = 25;
+		static const int			IBR = 26;
+		static const int			IBG = 27;
+		static const int			IBB = 28;
+
+		/*
 		static const int			IFREQ1 = 26;
 		static const int			IFREQ2 = 27;
 		static const int			IFREQ3 = 28;
+
+		static const int			IBR = 36;
+		static const int			IBG = 37;
+		static const int			IBB = 38; */
+		// useless? 
+
 		static const int			IRESX = 29;
 		static const int			IRESY = 30;
 		static const int			IWEIGHT0 = 31;
@@ -61,10 +73,11 @@ namespace SophiaDigitalArt {
 		static const int			IWEIGHT2 = 33;
 		static const int			IWEIGHT3 = 34;
 		static const int			IWEIGHT4 = 35;
-		static const int			IBR = 36;
-		static const int			IBG = 37;
-		static const int			IBB = 38;
-		static const int			IBA = 39;
+		static const int			IWEIGHT5 = 36;
+		static const int			IWEIGHT6 = 37;
+		static const int			IWEIGHT7 = 38;
+		//static const int			IBA = 39;
+		static const int			IFREQ1 = 39;
 		static const int			ICONTOUR = 40;
 		static const int			IROTATIONSPEED = 41;
 		static const int			IMOUSEX = 42;
@@ -73,6 +86,11 @@ namespace SophiaDigitalArt {
 		static const int			IVAMOUNT = 45;
 		static const int			IVFALLOFF = 46;
 		static const int			TIME = 47;
+		
+		static const int			IFREQ2 = 48;
+		static const int			IFREQ3 = 49;
+		static const int			IBLENDMODE = 50;
+
 		// int
 		static const int			IPHASE = 52;
 		static const int			IFBOA = 54;
@@ -96,6 +114,11 @@ namespace SophiaDigitalArt {
 		static const int			ILHANDZ = 115;*/
 		// vec2
 		static const int			RESOLUTION = 120;
+		// srcarea
+		static const int			SRCXLEFT = 130;
+		static const int			SRCXRIGHT = 131;
+		static const int			SRCYLEFT = 132;
+		static const int			SRCYRIGHT = 133;
 		// texture modes
 		static const int			TEXTUREMODEMIX = 0;				// mix two shaders
 		static const int			TEXTUREMODEAUDIO = 1;			// audio spectrum
@@ -318,6 +341,8 @@ namespace SophiaDigitalArt {
 		std::string					getDefaultFragmentShaderString() { return mDefaultFragmentShaderString; };
 		std::string					getMixFragmentShaderString() { return mMixFragmentShaderString; };
 		std::string					getHydraFragmentShaderString() { return mHydraFragmentShaderString; };
+		std::string					getMixetteFragmentShaderString() { return mMixetteFragmentShaderString; };
+		std::string					getPostFragmentShaderString() { return mPostFragmentShaderString; };
 	private:
 		std::string					settingsFileName = "SDA";
 		//! default vertex shader
@@ -325,6 +350,8 @@ namespace SophiaDigitalArt {
 		std::string					mDefaultFragmentShaderString;
 		std::string					mMixFragmentShaderString; 
 		std::string					mHydraFragmentShaderString;
+		std::string					mMixetteFragmentShaderString;
+		std::string					mPostFragmentShaderString;
 
 	};
 

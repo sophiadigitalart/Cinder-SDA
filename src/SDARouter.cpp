@@ -7,6 +7,8 @@ SDARouter::SDARouter(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation,
 	mSDAAnimation = aSDAAnimation;
 	mSDAWebsocket = aSDAWebsocket;
 	CI_LOG_V("SDARouter constructor");
+	mFBOAChanged = false;
+	mFBOBChanged = false;
 	// Osc
 	if (mSDASettings->mOSCEnabled) {
 		mOscReceiver = std::make_shared<osc::ReceiverUdp>(mSDASettings->mOSCReceiverPort);
@@ -477,19 +479,35 @@ void SDARouter::midiListener(midi::Message msg) {
 			midiStickyPrevIndex = midiPitch;
 			midiStickyPrevValue = mSDAAnimation->getBoolUniformValueByIndex(midiPitch + 80);
 		}*/
-		mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80, true);
+		//mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80, true);
+
+		// This does mSDASession->setFboFragmentShaderIndex(0, midiPitch);
+		if (midiPitch < 9) {
+			mSelectedFboA = midiPitch;
+			mFBOAChanged = true;
+		}
+		if (midiPitch > 8 && midiPitch < 17) {
+			mSelectedFboB = midiPitch - 8;
+			mFBOBChanged = true;
+		}
+		if (midiPitch > 17 && midiPitch < 24) {
+			mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80-17, true);
+		}
 		ss << "MIDI noteon Chn: " << midiChannel << " Pitch: " << midiPitch << std::endl;
 		CI_LOG_V("Midi: " + ss.str());
 		break;
 	case MIDI_NOTE_OFF:
 		midiPitch = msg.pitch;
+		if (midiPitch > 17 && midiPitch < 24) {
+			mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80 - 17, false);
+		}
 		// midimix solo mode
 		/*if (midiPitch == 27) {
 			midiStickyPrevIndex = 0;
 			midiSticky = false;
 		}
 		if (!midiSticky) {*/
-			mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80, false);
+			//mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80, false);
 		/*}
 		else {
 			if (midiPitch == midiStickyPrevIndex) {

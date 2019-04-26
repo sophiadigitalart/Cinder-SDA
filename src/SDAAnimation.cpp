@@ -107,13 +107,17 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		// slitscan (or other) Param2 
 		createFloatUniform("pixelY", mSDASettings->IPIXELY, 1.0f, 0.01f, 100.0f); // 24
 		// iFreq0  
-		createFloatUniform("iFreq0", mSDASettings->IFREQ0, 0.0f, 0.01f, 256.0f); // 25 
-		// iFreq1  
-		createFloatUniform("iFreq1", mSDASettings->IFREQ1, 0.0f, 0.01f, 256.0f); // 26
-		// iFreq2  
-		createFloatUniform("iFreq2", mSDASettings->IFREQ2, 0.0f, 0.01f, 256.0f); // 27
-		// iFreq3  
-		createFloatUniform("iFreq3", mSDASettings->IFREQ3, 0.0f, 0.01f, 256.0f); // 28
+		createFloatUniform("iFreq0", mSDASettings->IFREQ0, 0.0f, 0.01f, 256.0f); // 25 				
+		 // background red
+		createFloatUniform("iBR", mSDASettings->IBR, 0.1f); // 26 was 36
+		// background green
+		createFloatUniform("iBG", mSDASettings->IBG, 0.5f); // 27 was 37
+		// background blue
+		createFloatUniform("iBB", mSDASettings->IBB, 0.1f); // 28 was 38
+		// background alpha
+		//createFloatUniform("iBA", mSDASettings->IBA, 0.2f); // 39
+
+
 		// iResolutionX (should be fbowidth) 
 		createFloatUniform("iResolutionX", mSDASettings->IRESX, mSDASettings->mRenderWidth, 320.01f, 4280.0f); // 29
 		// iResolutionY (should be fboheight)  
@@ -130,14 +134,15 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		createFloatUniform("iWeight3", mSDASettings->IWEIGHT3, 0.0f); // 34
 		// weight texture 4
 		createFloatUniform("iWeight4", mSDASettings->IWEIGHT4, 0.0f); // 35
-		// background red
-		createFloatUniform("iBR", mSDASettings->IBR, 0.1f); // 36
-		// background green
-		createFloatUniform("iBG", mSDASettings->IBG, 0.5f); // 37
-		// background blue
-		createFloatUniform("iBB", mSDASettings->IBB, 0.1f); // 38
-		// background alpha
-		createFloatUniform("iBA", mSDASettings->IBA, 0.2f); // 39
+		// weight texture 
+		createFloatUniform("iWeight5", mSDASettings->IWEIGHT5, 0.0f); // 36
+		// weight texture 
+		createFloatUniform("iWeight6", mSDASettings->IWEIGHT6, 0.0f); // 37
+		// weight texture 
+		createFloatUniform("iWeight7", mSDASettings->IWEIGHT7, 0.0f); // 38
+
+		// iFreq1  
+		createFloatUniform("iFreq1", mSDASettings->IFREQ1, 0.0f, 0.01f, 256.0f); // 39 was 26
 		// contour
 		createFloatUniform("iContour", mSDASettings->ICONTOUR, 0.0f, 0.0f, 0.5f); // 40
 		// RotationSpeed
@@ -155,9 +160,13 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		createFloatUniform("iVFallOff", mSDASettings->IVFALLOFF, 0.31f, 0.0f, 1.0f); // 46
 		// hydra time
 		createFloatUniform("time", mSDASettings->TIME, 0.0f); // 47
+		// iFreq2  
+		createFloatUniform("iFreq2", mSDASettings->IFREQ2, 0.0f, 0.01f, 256.0f); // 48 was 27
+		// iFreq3  
+		createFloatUniform("iFreq3", mSDASettings->IFREQ3, 0.0f, 0.01f, 256.0f); // 49 was  28
 		// int
 		// blend mode 
-		createIntUniform("iBlendmode", 50, 0);
+		createIntUniform("iBlendmode", mSDASettings->IBLENDMODE, 0); // 50
 		// greyscale 
 		createIntUniform("iGreyScale", 51, 0);
 		// current beat
@@ -195,6 +204,12 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 
 		// vec2
 		createVec2Uniform("resolution", mSDASettings->RESOLUTION, vec2(1280.0f, 720.0f)); // 120
+		// floats for warps
+		// srcArea 
+		createFloatUniform("srcXLeft", mSDASettings->SRCXLEFT, 0.0f, 0.0f, 4280.0f); // 130
+		createFloatUniform("srcXRight", mSDASettings->SRCXRIGHT, mSDASettings->mRenderWidth, 320.01f, 4280.0f); // 131
+		createFloatUniform("srcYLeft", mSDASettings->SRCYLEFT, 0.0f, 0.0f, 1024.0f); // 132
+		createFloatUniform("srcYRight", mSDASettings->SRCYRIGHT, mSDASettings->mRenderHeight, 0.0f, 1024.0f); // 133
 
 		// vec4 kinect2
 		createVec4Uniform("iSpineBase", 200, vec4(320.0f, 240.0f, 0.0f, 0.0f));

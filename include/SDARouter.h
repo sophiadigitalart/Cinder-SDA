@@ -71,6 +71,8 @@ namespace SophiaDigitalArt
 		int							selectedWarp() { return mSelectedWarp; };
 		int							selectedFboA() { return mSelectedFboA; };
 		int							selectedFboB() { return mSelectedFboB; };
+		bool						hasFBOAChanged() { if (mFBOAChanged) { mFBOAChanged = false; return true; } else { return false; } };
+		bool						hasFBOBChanged() { if (mFBOBChanged) { mFBOBChanged = false; return true; } else { return false; } };
 		void						setWarpAFboIndex(unsigned int aWarpIndex, unsigned int aWarpFboIndex) { mSelectedFboA = aWarpFboIndex; }
 		void						setWarpBFboIndex(unsigned int aWarpIndex, unsigned int aWarpFboIndex) { mSelectedFboB = aWarpFboIndex; }
 	private:
@@ -82,6 +84,8 @@ namespace SophiaDigitalArt
 		SDAWebsocketRef				mSDAWebsocket;
 		// lights4events
 		void						colorWrite();
+		bool						mFBOAChanged;
+		bool						mFBOBChanged;
 		// MIDI
 		vector<midiInput>			mMidiInputs;
 		// midi inputs: couldn't make a vector
