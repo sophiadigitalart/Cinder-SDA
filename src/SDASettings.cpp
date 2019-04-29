@@ -599,7 +599,7 @@ void SDASettings::reset()
 	mAreWebSocketsEnabledAtStartup = true;
 	mIsWebSocketsServer = false;
 	mWebSocketsProtocol = "ws://";
-	mWebSocketsHost = "localhost";
+	mWebSocketsHost = "127.0.0.1";
 	mWebSocketsPort = 8088;
 	// Blendmode 
 	iBlendmode = 0;
@@ -678,6 +678,44 @@ void SDASettings::reset()
 		"gl_FragColor = vec4(c.r, c.g, c.b, 1.0);\n"
 		"}";
 	//mPostFragmentShaderString;uv.y = 1.0 - uv.y;
+	mPostFragmentShaderString = "uniform vec3 iResolution;\n"
+		"uniform float iTime;\n"
+		"uniform sampler2D 	iChannel0;\n"
+		"uniform sampler2D 	iChannel1;\n"
+		"uniform float		iExposure;\n"
+		"uniform float		iSobel;\n"
+		"uniform float		iChromatic;\n"
+		"vec2  fragCoord = gl_FragCoord.xy; // keep the 2 spaces between vec2 and fragCoord\n"
+		"float intensity(in vec4 c){return sqrt((c.x*c.x)+(c.y*c.y)+(c.z*c.z));}\n"
+		"vec4 sobel(float stepx, float stepy, vec2 center) {\n"
+		"float tleft = intensity(texture(iChannel0, center + vec2(-stepx, stepy)));\n"
+		"float left = intensity(texture(iChannel0, center + vec2(-stepx, 0)));\n"
+		"float bleft = intensity(texture(iChannel0, center + vec2(-stepx, -stepy)));\n"
+		"float top = intensity(texture(iChannel0, center + vec2(0, stepy)));\n"
+		"float bottom = intensity(texture(iChannel0, center + vec2(0, -stepy)));\n"
+		"float tright = intensity(texture(iChannel0, center + vec2(stepx, stepy)));\n"
+		"float right = intensity(texture(iChannel0, center + vec2(stepx, 0)));\n"
+		"float bright = intensity(texture(iChannel0, center + vec2(stepx, -stepy)));\n"
+		"float x = tleft + 2.0*left + bleft - tright - 2.0*right - bright;\n"
+		"float y = -tleft - 2.0*top - tright + bleft + 2.0 * bottom + bright;\n"
+		"return vec4(sqrt((x*x) + (y*y)));\n"
+		"}\n"
+		"vec4 chromatic(vec2 uv) {\n"
+		"vec2 offset = vec2(iChromatic / 36., .0);\n"
+		"return vec4(texture(iChannel0, uv + offset.xy).r, texture(iChannel0, uv).g, texture(iChannel0, uv + offset.yx).b, 1.0);\n"
+		"}\n"
+		"void main () {\n"
+		"vec2 uv = gl_FragCoord.xy/iResolution.xy;\n"
+		"uv.y = 1.0 - uv.y;\n"
+		"vec4 t0 = texture(iChannel0, uv);\n"
+		"vec4 c = vec4(0.0);\n"
+		"if (iSobel > 0.03) { t0 = sobel(iSobel * 3.0 / iResolution.x, iSobel * 3.0 / iResolution.y, uv); }\n"
+		"if (iChromatic > 0.0) { t0 = chromatic(uv) * t0; }\n"
+		"c = t0;\n"
+		"c *= iExposure;\n"
+		"gl_FragColor = c; \n"
+		"}\n";
+
 	mMixFragmentShaderString = "#version 150\n"
 		"uniform vec3 iResolution;\n"
 		"uniform sampler2D iChannel0;\n"

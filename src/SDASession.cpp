@@ -17,8 +17,6 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 	// Animation
 	mSDAAnimation = SDAAnimation::create(mSDASettings);
 	// TODO: needed? mSDAAnimation->tapTempo();
-		// allow log to file
-	mSDALog = SDALog::create();
 	// init fbo format
 	//fmt.setWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
 	//fmt.setBorderColor(Color::black());		
@@ -87,13 +85,13 @@ SDASession::SDASession(SDASettingsRef aSDASettings)
 		mGlslMixette = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getMixetteFragmentShaderString());
 		mGlslRender = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mSDASettings->getPostFragmentShaderString());
 
-		fs::path mPostFilePath = getAssetPath("") / "post.glsl";
+		/*fs::path mPostFilePath = getAssetPath("") / "post.glsl";
 		if (!fs::exists(mPostFilePath)) {
 			mError = mPostFilePath.string() + " does not exist";
 			CI_LOG_V(mError);
 		}
 		mGlslRender = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), loadString(loadFile(mPostFilePath))); 
-		/*
+		
 		
 		fs::path mMixetteFilePath = getAssetPath("") / "mixette.glsl";
 		if (!fs::exists(mMixetteFilePath)) {
@@ -593,12 +591,12 @@ bool SDASession::handleKeyDown(KeyEvent &event)
 				handled = false;
 			}
 			break;
-		case KeyEvent::KEY_v:
+		/*case KeyEvent::KEY_v:
 			mSDASettings->mFlipV = !mSDASettings->mFlipV;
 			break;
 		case KeyEvent::KEY_h:
 			mSDASettings->mFlipH = !mSDASettings->mFlipH;
-			break;
+			break;*/
 		case KeyEvent::KEY_F1:
 			mMode = 0;
 			break;
@@ -998,7 +996,7 @@ void SDASession::updateHydraUniforms() {
 		else {
 			if (name != "ciModelViewProjection") {
 				mSDASettings->mMsg = "mHydraShader, uniform not found:" + name + " type:" + toString(uniform.getType());
-				CI_LOG_V(mSDASettings->mMsg);
+				//CI_LOG_V(mSDASettings->mMsg);
 				firstDigit = name.find_first_of("0123456789");
 				// if contains a digit
 				if (firstDigit > -1) {
