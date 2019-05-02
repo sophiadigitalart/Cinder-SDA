@@ -242,6 +242,7 @@ void SDARouter::shutdown() {
 void SDARouter::midiSetup() {
 	stringstream ss;
 	ss << "setupMidi: ";
+	CI_LOG_V("midiSetup: " + ss.str());
 
 	if (mMidiIn0.getNumPorts() > 0)
 	{
@@ -273,9 +274,8 @@ void SDARouter::midiSetup() {
 		ss << "No MIDI in ports found!" << std::endl;
 	}
 	ss << std::endl;
+	CI_LOG_V(ss.str());
 
-	mSDASettings->mNewMsg = true;
-	mSDASettings->mMsg = ss.str();
 	// midi out
 	//mMidiOut0.getPortList();
 	if (mMidiOut0.getNumPorts() > 0) {
@@ -302,10 +302,13 @@ void SDARouter::midiSetup() {
 	}
 	midiControlType = "none";
 	midiControl = midiPitch = midiVelocity = midiNormalizedValue = midiValue = midiChannel = 0;
+	mSDASettings->mNewMsg = true;
+	mSDASettings->mMidiMsg = ss.str();
+	CI_LOG_V(ss.str());
 }
 
 void SDARouter::openMidiInPort(int i) {
-
+		CI_LOG_V("openMidiInPort: " + toString( i));
 		stringstream ss;
 		if (i < mMidiIn0.getNumPorts()) {
 			if (i == 0) {
@@ -323,7 +326,8 @@ void SDARouter::openMidiInPort(int i) {
 		}
 		mMidiInputs[i].isConnected = true;
 		ss << "Opening MIDI in port " << i << " " << mMidiInputs[i].portName << std::endl;
-		mSDASettings->mMsg = ss.str();
+		mSDASettings->mMidiMsg = ss.str();
+		CI_LOG_V(ss.str());
 		mSDASettings->mNewMsg = true;
 }
 void SDARouter::closeMidiInPort(int i) {
@@ -395,9 +399,9 @@ void SDARouter::openMidiOutPort(int i) {
 			}
 		}
 	}
-	mSDASettings->mMsg = ss.str();
+	mSDASettings->mMidiMsg = ss.str();
 	mSDASettings->mNewMsg = true;
-
+	CI_LOG_V(ss.str());
 }
 void SDARouter::closeMidiOutPort(int i) {
 
