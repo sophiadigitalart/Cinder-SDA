@@ -11,18 +11,18 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-namespace SophiaDigitalArt
+namespace VideoDromm
 {
-	// stores the pointer to the SDALog instance
-	typedef std::shared_ptr<class SDALog> SDALogRef;
+	// stores the pointer to the VDLog instance
+	typedef std::shared_ptr<class VDLog> VDLogRef;
 
-	class SDALog {
+	class VDLog {
 	public:		
-		SDALog();
+		VDLog();
 
-		static SDALogRef	create()
+		static VDLogRef	create()
 		{
-			return shared_ptr<SDALog>(new SDALog());
+			return shared_ptr<VDLog>(new VDLog());
 		}
 
 	private:

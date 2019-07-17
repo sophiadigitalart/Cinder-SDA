@@ -10,13 +10,13 @@
 #include "cinder/Timeline.h"
 
 // Settings
-#include "SDASettings.h"
+#include "VDSettings.h"
 // Animation
-#include "SDAAnimation.h"
+#include "VDAnimation.h"
 // textures
-#include "SDATexture.h"
+#include "VDTexture.h"
 // shaders
-#include "SDAShader.h"
+#include "VDShader.h"
 
 #include <atomic>
 #include <vector>
@@ -24,23 +24,23 @@
 using namespace ci;
 using namespace ci::app;
 using namespace std;
-using namespace SophiaDigitalArt;
+using namespace VideoDromm;
 
-namespace SophiaDigitalArt
+namespace VideoDromm
 {
-	// stores the pointer to the SDAFbo instance
-	typedef std::shared_ptr<class SDAFbo> 			SDAFboRef;
-	typedef std::vector<SDAFboRef>					SDAFboList;
+	// stores the pointer to the VDFbo instance
+	typedef std::shared_ptr<class VDFbo> 			VDFboRef;
+	typedef std::vector<VDFboRef>					VDFboList;
 
-	class SDAFbo : public SDATexture{
+	class VDFbo : public VDTexture{
 	public:
-		SDAFbo(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation);
-		~SDAFbo(void);
-		static SDAFboRef create(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation) {
-			return std::make_shared<SDAFbo>(aSDASettings, aSDAAnimation);
+		VDFbo(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation);
+		~VDFbo(void);
+		static VDFboRef create(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation) {
+			return std::make_shared<VDFbo>(aVDSettings, aVDAnimation);
 		}
 		//! returns a shared pointer to this fbo
-		SDAFboRef						getPtr() { return std::static_pointer_cast<SDAFbo>(shared_from_this()); }
+		VDFboRef						getPtr() { return std::static_pointer_cast<VDFbo>(shared_from_this()); }
 		ci::ivec2						getSize();
 		ci::Area						getBounds();
 		GLuint							getId();
@@ -64,7 +64,7 @@ namespace SophiaDigitalArt
 		unsigned int					getShaderIndex() { return mShaderIndex; };
 		void							setFragmentShader(unsigned int aShaderIndex, string aFragmentShaderString, string aName);
 		// textures
-		void							setInputTexture(SDATextureList aTextureList, unsigned int aTextureIndex = 0);
+		void							setInputTexture(VDTextureList aTextureList, unsigned int aTextureIndex = 0);
 		unsigned int					getInputTextureIndex() { return mInputTextureIndex; };
 		ci::gl::Texture2dRef			getFboTexture();
 		void							updateThumbFile();
@@ -89,9 +89,9 @@ namespace SophiaDigitalArt
 		string							mError;
 	private:
 		// Settings
-		SDASettingsRef					mSDASettings;
+		VDSettingsRef					mVDSettings;
 		// Animation
-		SDAAnimationRef					mSDAAnimation;
+		VDAnimationRef					mVDAnimation;
 
 		//! Fbo
 		gl::FboRef						mFbo;
@@ -100,7 +100,7 @@ namespace SophiaDigitalArt
 		gl::Fbo::Format					fboFmt;
 		//! Input textures
 		//map<int, ci::gl::Texture2dRef>	mInputTextures;
-		SDATextureList					mTextureList;
+		VDTextureList					mTextureList;
 		unsigned int					mInputTextureIndex;
 		//! Shaders
 		//string							mShaderName;

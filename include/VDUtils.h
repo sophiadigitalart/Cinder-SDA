@@ -5,25 +5,25 @@
 #include "cinder/Utilities.h"
 
 // parameters
-#include "SDASettings.h"
+#include "VDSettings.h"
 // logger
-#include "SDALog.h"
+#include "VDLog.h"
 
 using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-namespace SophiaDigitalArt
+namespace VideoDromm
 {
-	// stores the pointer to the SDAUtils instance
-	typedef std::shared_ptr<class SDAUtils> SDAUtilsRef;
+	// stores the pointer to the VDUtils instance
+	typedef std::shared_ptr<class VDUtils> VDUtilsRef;
 
-	class SDAUtils {
+	class VDUtils {
 	public:
-		SDAUtils(SDASettingsRef aSDASettings);
-		static SDAUtilsRef	create(SDASettingsRef aSDASettings)
+		VDUtils(VDSettingsRef aVDSettings);
+		static VDUtilsRef	create(VDSettingsRef aVDSettings)
 		{
-			return shared_ptr<SDAUtils>(new SDAUtils(aSDASettings));
+			return shared_ptr<VDUtils>(new VDUtils(aVDSettings));
 		}
 		void						setup();
 		// TODO move to private when shadamixa upgraded
@@ -39,7 +39,7 @@ namespace SophiaDigitalArt
 		string						getFileNameFromFullPath(string path);
 	private:
 		// Settings
-		SDASettingsRef				mSDASettings;
+		VDSettingsRef				mVDSettings;
 		Area						mSrcAreaLeftOrTop; // left or top
 		Area						mSrcAreaRightOrBottom; // right or bottom
 		int							x1LeftOrTop;

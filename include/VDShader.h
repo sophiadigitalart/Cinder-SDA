@@ -8,11 +8,11 @@
 
 #include "Resources.h"
 // Logger
-#include "SDALog.h"
+#include "VDLog.h"
 // Settings
-#include "SDASettings.h"
+#include "VDSettings.h"
 // Animation
-#include "SDAAnimation.h"
+#include "VDAnimation.h"
 // Watchdog
 #include "Watchdog.h"
 // std regex
@@ -25,20 +25,20 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-namespace SophiaDigitalArt
+namespace VideoDromm
 {
-	// stores the pointer to the SDAShader instance
-	typedef std::shared_ptr<class SDAShader>	SDAShaderRef;
-	typedef std::vector<SDAShaderRef>			SDAShaderList;
+	// stores the pointer to the VDShader instance
+	typedef std::shared_ptr<class VDShader>	VDShaderRef;
+	typedef std::vector<VDShaderRef>			VDShaderList;
 
 
-	class SDAShader {
+	class VDShader {
 	public:
-		SDAShader(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation, string aFragmentShaderFilePath, string aFragmentShaderString = "");
+		VDShader(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, string aFragmentShaderFilePath, string aFragmentShaderString = "");
 		//void update();
-		static SDAShaderRef	create(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation, string aFragmentShaderFilePath, string aFragmentShaderString = "")
+		static VDShaderRef	create(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, string aFragmentShaderFilePath, string aFragmentShaderString = "")
 		{
-			return shared_ptr<SDAShader>(new SDAShader(aSDASettings, aSDAAnimation, aFragmentShaderFilePath, aFragmentShaderString));
+			return shared_ptr<VDShader>(new VDShader(aVDSettings, aVDAnimation, aFragmentShaderFilePath, aFragmentShaderString));
 		}
 		//void fromXml(const XmlTree &xml);
 		gl::GlslProgRef					getShader();
@@ -58,9 +58,9 @@ namespace SophiaDigitalArt
 		void							removeShader();
 	private:
 		// Settings
-		SDASettingsRef					mSDASettings;
+		VDSettingsRef					mVDSettings;
 		// Animation
-		SDAAnimationRef					mSDAAnimation;
+		VDAnimationRef					mVDAnimation;
 
 		string							mId;
 		gl::GlslProgRef					mShader;

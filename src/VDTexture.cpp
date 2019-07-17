@@ -1,4 +1,4 @@
-#include "SDATexture.h"
+#include "VDTexture.h"
 
 #include "cinder/gl/Texture.h"
 #include "cinder/Xml.h"
@@ -6,8 +6,8 @@
 using namespace ci;
 using namespace ci::app;
 
-namespace SophiaDigitalArt {
-	SDATexture::SDATexture(TextureType aType)
+namespace VideoDromm {
+	VDTexture::VDTexture(TextureType aType)
 		: mPath("")
 		, mName("")
 		, mFlipV(false)
@@ -42,13 +42,13 @@ namespace SophiaDigitalArt {
 		mFbo = gl::Fbo::create(mWidth, mHeight, fboFmt);
 
 	}
-	SDATexture::~SDATexture(void) {
+	VDTexture::~VDTexture(void) {
 
 	}
-	SDATextureList SDATexture::readSettings(SDAAnimationRef aSDAAnimation, const DataSourceRef &source)
+	VDTextureList VDTexture::readSettings(VDAnimationRef aVDAnimation, const DataSourceRef &source)
 	{
 		XmlTree			doc;
-		SDATextureList	vdtexturelist;
+		VDTextureList	vdtexturelist;
 		bool            isValid = true;
 		// try to load the specified xml file
 		try { doc = XmlTree(source); }
@@ -76,7 +76,7 @@ namespace SophiaDigitalArt {
 					vdtexturelist.push_back(t);
 				}
 				else if (texturetype == "imagesequence") {
-					TextureImageSequenceRef t(new TextureImageSequence(aSDAAnimation));
+					TextureImageSequenceRef t(new TextureImageSequence(aVDAnimation));
 					t->fromXml(detailsXml);
 					vdtexturelist.push_back(t);
 				}
@@ -103,12 +103,12 @@ namespace SophiaDigitalArt {
 #endif
 				}
 				else if (texturetype == "audio") {
-					TextureAudioRef t(new TextureAudio(aSDAAnimation));
+					TextureAudioRef t(new TextureAudio(aVDAnimation));
 					t->fromXml(detailsXml);
 					vdtexturelist.push_back(t);
 				}
 				else if (texturetype == "stream") {
-					TextureStreamRef t(new TextureStream(aSDAAnimation));
+					TextureStreamRef t(new TextureStream(aVDAnimation));
 					t->fromXml(detailsXml);
 					vdtexturelist.push_back(t);
 				}
@@ -145,7 +145,7 @@ namespace SophiaDigitalArt {
 		return vdtexturelist;
 	}
 
-	void SDATexture::writeSettings(const SDATextureList &vdtexturelist, const ci::DataTargetRef &target) {
+	void VDTexture::writeSettings(const VDTextureList &vdtexturelist, const ci::DataTargetRef &target) {
 
 		// create config document and root <textures>
 		XmlTree			doc;
@@ -177,7 +177,7 @@ namespace SophiaDigitalArt {
 		// write file
 		doc.write(target);
 	}
-	XmlTree	SDATexture::toXml() const
+	XmlTree	VDTexture::toXml() const
 	{
 		XmlTree		xml;
 		xml.setTag("details");
@@ -188,116 +188,116 @@ namespace SophiaDigitalArt {
 		return xml;
 	}
 
-	bool SDATexture::fromXml(const XmlTree &xml)
+	bool VDTexture::fromXml(const XmlTree &xml)
 	{
 		return true;
 	}
-	void SDATexture::toggleLoadingFromDisk() {
+	void VDTexture::toggleLoadingFromDisk() {
 
 	}
-	bool SDATexture::isLoadingFromDisk() {
+	bool VDTexture::isLoadingFromDisk() {
 		return false;
 	}
 	// play/pause (sequence/movie)
-	void SDATexture::togglePlayPause() {
+	void VDTexture::togglePlayPause() {
 
 		mPlaying = !mPlaying;
 	}
 
 	// sync to beat
-	void SDATexture::syncToBeat() {
+	void VDTexture::syncToBeat() {
 
 		mSyncToBeat = !mSyncToBeat;
 	}
-	void SDATexture::reverse() {
+	void VDTexture::reverse() {
 	}
-	float SDATexture::getSpeed() {
+	float VDTexture::getSpeed() {
 		return 1;
 	}
-	void SDATexture::setSpeed(float speed) {
+	void VDTexture::setSpeed(float speed) {
 	}
 
-	void SDATexture::setPlayheadPosition(int position) {
+	void VDTexture::setPlayheadPosition(int position) {
 	}
-	int SDATexture::getMaxFrame() {
+	int VDTexture::getMaxFrame() {
 		return 1;
 	}
-	bool SDATexture::loadFromFullPath(string aPath) {
+	bool VDTexture::loadFromFullPath(string aPath) {
 		// initialize texture
 		mTexture = ci::gl::Texture::create(mWidth, mHeight, ci::gl::Texture::Format().loadTopDown(mFlipV));
 		return true;
 	}
-	void SDATexture::lockBounds(bool lock, unsigned int aWidth, unsigned int aHeight) {
+	void VDTexture::lockBounds(bool lock, unsigned int aWidth, unsigned int aHeight) {
 		mBoundsLocked = lock;
 		mAreaWidth = aWidth;
 		mAreaHeight = aHeight;
 	}
-	void SDATexture::setXLeft(int aXleft) {
+	void VDTexture::setXLeft(int aXleft) {
 		mXLeft = aXleft;
 		if (mBoundsLocked) {
 			mXRight = mXLeft + mAreaWidth;
 		}
 	};
-	void SDATexture::setYTop(int aYTop) {
+	void VDTexture::setYTop(int aYTop) {
 		mYTop = aYTop;
 		if (mBoundsLocked) {
 			mYBottom = mYTop + mAreaHeight;
 		}
 	};
-	void SDATexture::setXRight(int aXRight) {
+	void VDTexture::setXRight(int aXRight) {
 		mXRight = aXRight;
 		if (mBoundsLocked) {
 			mXLeft = mXRight - mAreaWidth;
 		}
 	};
-	void SDATexture::setYBottom(int aYBottom) {
+	void VDTexture::setYBottom(int aYBottom) {
 		mYBottom = aYBottom;
 		if (mBoundsLocked) {
 			mYTop = mYBottom - mAreaHeight;
 		}
 	}
-	void SDATexture::flipV() {
+	void VDTexture::flipV() {
 		mFlipV = !mFlipV;
 	}
-	void SDATexture::flipH() {
+	void VDTexture::flipH() {
 		mFlipH = !mFlipH;
 	}
-	bool SDATexture::getLockBounds() {
+	bool VDTexture::getLockBounds() {
 		return mBoundsLocked;
 	}
-	void SDATexture::toggleLockBounds() {
+	void VDTexture::toggleLockBounds() {
 		mBoundsLocked = !mBoundsLocked;
 	};
-	unsigned int SDATexture::getTextureWidth() {
+	unsigned int VDTexture::getTextureWidth() {
 		return mWidth;
 	};
 
-	unsigned int SDATexture::getTextureHeight() {
+	unsigned int VDTexture::getTextureHeight() {
 		return mHeight;
 	};
-	unsigned int SDATexture::getOriginalWidth() {
+	unsigned int VDTexture::getOriginalWidth() {
 		return mOriginalWidth;
 	};
-	unsigned int SDATexture::getOriginalHeight() {
+	unsigned int VDTexture::getOriginalHeight() {
 		return mOriginalHeight;
 	};
-	ci::ivec2 SDATexture::getSize() {
+	ci::ivec2 VDTexture::getSize() {
 		return mTexture->getSize();
 	}
 
-	ci::Area SDATexture::getBounds() {
+	ci::Area VDTexture::getBounds() {
 		return mTexture->getBounds();
 	}
 
-	GLuint SDATexture::getId() {
+	GLuint VDTexture::getId() {
 		return mTexture->getId();
 	}
 
-	std::string SDATexture::getName() {
+	std::string VDTexture::getName() {
 		return mName;
 	}
 
-	ci::gl::TextureRef SDATexture::getTexture() {
+	ci::gl::TextureRef VDTexture::getTexture() {
 		return mTexture;
 	}
 	/*
@@ -310,7 +310,7 @@ namespace SophiaDigitalArt {
 		mType = IMAGE;
 	}
 	XmlTree	TextureImage::toXml() const {
-		XmlTree xml = SDATexture::toXml();
+		XmlTree xml = VDTexture::toXml();
 
 		// add attributes specific to this type of texture
 		xml.setAttribute("path", mPath);
@@ -321,7 +321,7 @@ namespace SophiaDigitalArt {
 
 	bool TextureImage::fromXml(const XmlTree &xml)
 	{
-		SDATexture::fromXml(xml);
+		VDTexture::fromXml(xml);
 		// retrieve attributes specific to this type of texture
 		mFlipV = xml.getAttributeValue<bool>("flipv", "true"); // default true
 		mFlipH = xml.getAttributeValue<bool>("fliph", "true"); // default true
@@ -364,9 +364,9 @@ namespace SophiaDigitalArt {
 	/*
 	** TextureImageSequence
 	*/
-	TextureImageSequence::TextureImageSequence(SDAAnimationRef aSDAAnimation) {
+	TextureImageSequence::TextureImageSequence(VDAnimationRef aVDAnimation) {
 		// constructor
-		mSDAAnimation = aSDAAnimation;
+		mVDAnimation = aVDAnimation;
 		mType = SEQUENCE;
 		playheadFrameInc = 0.0f;
 		mLoadingFilesComplete = true;
@@ -479,14 +479,14 @@ namespace SophiaDigitalArt {
 				rtn = loadFromFullPath(mPath);
 			}
 			else {
-				fs::path fullPath = getAssetPath("") / mPath;// TODO / mSDASettings->mAssetsPath
+				fs::path fullPath = getAssetPath("") / mPath;// TODO / mVDSettings->mAssetsPath
 				rtn = loadFromFullPath(fullPath.string());
 			}
 		}
 		return rtn;
 	}
 	XmlTree	TextureImageSequence::toXml() const {
-		XmlTree xml = SDATexture::toXml();
+		XmlTree xml = VDTexture::toXml();
 
 		// add attributes specific to this type of texture
 		xml.setAttribute("path", mPath);
@@ -566,7 +566,7 @@ namespace SophiaDigitalArt {
 		if (mSequenceTextures.size() > 0) {
 			// Call on each frame to update the playhead
 			if (mPlaying) {
-				mSpeed = mSDAAnimation->getFloatUniformValueByName("speed");
+				mSpeed = mVDAnimation->getFloatUniformValueByName("speed");
 				playheadFrameInc += mSpeed;
 
 				newPosition = mPosition + (int)playheadFrameInc;
@@ -577,9 +577,9 @@ namespace SophiaDigitalArt {
 			}
 			else {
 				if (mSyncToBeat) {
-					//newPosition = (int)(((int)(mSDAAnimation->iBar / mSDAAnimation->iPhaseIndex)) % mSequenceTextures.size());
-					// TODO newPosition = (int)(((int)(mSDASettings->iPhase / mSDAAnimation->iPhaseIndex)) % mSequenceTextures.size());
-					newPosition = (int)(mSDAAnimation->getIntUniformValueByName("iPhase") % mSequenceTextures.size());
+					//newPosition = (int)(((int)(mVDAnimation->iBar / mVDAnimation->iPhaseIndex)) % mSequenceTextures.size());
+					// TODO newPosition = (int)(((int)(mVDSettings->iPhase / mVDAnimation->iPhaseIndex)) % mSequenceTextures.size());
+					newPosition = (int)(mVDAnimation->getIntUniformValueByName("iPhase") % mSequenceTextures.size());
 				}
 				else {
 					newPosition = mPosition;
@@ -686,7 +686,7 @@ namespace SophiaDigitalArt {
 		return true;
 	}
 	XmlTree	TextureCamera::toXml() const {
-		XmlTree xml = SDATexture::toXml();
+		XmlTree xml = VDTexture::toXml();
 
 		// add attributes specific to this type of texture
 		xml.setAttribute("camera", mFirstCameraDeviceName);
@@ -746,7 +746,7 @@ namespace SophiaDigitalArt {
 		return true;
 	}
 	XmlTree	TextureShared::toXml() const {
-		XmlTree xml = SDATexture::toXml();
+		XmlTree xml = VDTexture::toXml();
 
 		// add attributes specific to this type of texture
 		xml.setAttribute("path", mPath);
@@ -778,8 +778,8 @@ namespace SophiaDigitalArt {
 	/*
 	** ---- TextureAudio ------------------------------------------------
 	*/
-	TextureAudio::TextureAudio(SDAAnimationRef aSDAAnimation) {
-		mSDAAnimation = aSDAAnimation;
+	TextureAudio::TextureAudio(VDAnimationRef aVDAnimation) {
+		mVDAnimation = aVDAnimation;
 		mType = AUDIO;
 		mLineInInitialized = false;
 		mName = "audio";
@@ -789,25 +789,25 @@ namespace SophiaDigitalArt {
 		mTexture = gl::Texture::create(dTexture, GL_RED, 64, 2, fmt);
 	}
 	XmlTree	TextureAudio::toXml() const {
-		XmlTree xml = SDATexture::toXml();
+		XmlTree xml = VDTexture::toXml();
 
 		// add attributes specific to this type of texture
 		xml.setAttribute("path", mPath);
 		xml.setAttribute("flipv", mFlipV);
 		xml.setAttribute("fliph", mFlipH);
-		xml.setAttribute("uselinein", mSDAAnimation->getUseLineIn());
+		xml.setAttribute("uselinein", mVDAnimation->getUseLineIn());
 
 		return xml;
 	}
 
 	bool TextureAudio::fromXml(const XmlTree &xml)
 	{
-		SDATexture::fromXml(xml);
+		VDTexture::fromXml(xml);
 		// retrieve attributes specific to this type of texture
 		mFlipV = xml.getAttributeValue<bool>("flipv", "false");
 		mFlipH = xml.getAttributeValue<bool>("fliph", "false");
-		// prevent linein not present crash mSDAAnimation->setUseLineIn(xml.getAttributeValue<bool>("uselinein", "true"));
-		mName = (mSDAAnimation->getUseLineIn()) ? "line in" : "wave";
+		// prevent linein not present crash mVDAnimation->setUseLineIn(xml.getAttributeValue<bool>("uselinein", "true"));
+		mName = (mVDAnimation->getUseLineIn()) ? "line in" : "wave";
 		auto fmt = gl::Texture2d::Format().swizzleMask(GL_RED, GL_RED, GL_RED, GL_ONE).internalFormat(GL_RED);
 		for (int i = 0; i < 128; ++i) dTexture[i] = (unsigned char)(Rand::randUint() & 0xFF);
 		mTexture = gl::Texture::create(dTexture, GL_RED, 64, 2, fmt);
@@ -822,7 +822,7 @@ namespace SophiaDigitalArt {
 
 				auto ctx = audio::Context::master(); // was audio::master(); !?!
 				mSourceFile = audio::load(loadFile(aPath), audio::master()->getSampleRate());
-				if (mSDAAnimation->isAudioBuffered()) {
+				if (mVDAnimation->isAudioBuffered()) {
 					mBufferPlayerNode = ctx->makeNode(new audio::BufferPlayerNode());
 					mBufferPlayerNode->loadBuffer(mSourceFile);
 					//mWaveformPlot.load(mBufferPlayerNode->getBuffer(), mFbo->getBounds());
@@ -847,7 +847,7 @@ namespace SophiaDigitalArt {
 
 				}
 
-				mSDAAnimation->setUseLineIn(false);
+				mVDAnimation->setUseLineIn(false);
 			}
 		}
 		catch (...) {
@@ -862,37 +862,37 @@ namespace SophiaDigitalArt {
 		if (!mLineInInitialized) {
 			auto ctx = audio::Context::master();
 #if (defined( CINDER_MSW ) || defined( CINDER_MAC ))
-			if (mSDAAnimation->getUseLineIn()) {
+			if (mVDAnimation->getUseLineIn()) {
 				// linein
-				mSDAAnimation->preventLineInCrash(); // at next launch
-				CI_LOG_W("trying to open mic/line in, if no line follows in the log, the app crashed so put UseLineIn to false in the SDASettings.xml file");
+				mVDAnimation->preventLineInCrash(); // at next launch
+				CI_LOG_W("trying to open mic/line in, if no line follows in the log, the app crashed so put UseLineIn to false in the VDSettings.xml file");
 				mLineIn = ctx->createInputDeviceNode(); //crashes if linein is present but disabled, doesn't go to catch block
 				CI_LOG_V("mic/line in opened");
-				mSDAAnimation->saveLineIn();
+				mVDAnimation->saveLineIn();
 				mName = mLineIn->getDevice()->getName();
-				auto scopeLineInFmt = audio::MonitorSpectralNode::Format().fftSize(mSDAAnimation->mWindowSize * 2).windowSize(mSDAAnimation->mWindowSize);// CHECK is * 2 needed
+				auto scopeLineInFmt = audio::MonitorSpectralNode::Format().fftSize(mVDAnimation->mWindowSize * 2).windowSize(mVDAnimation->mWindowSize);// CHECK is * 2 needed
 				mMonitorLineInSpectralNode = ctx->makeNode(new audio::MonitorSpectralNode(scopeLineInFmt));
 				mLineIn >> mMonitorLineInSpectralNode;
 				mLineIn->enable();
 				mLineInInitialized = true;
 			}
 #endif
-			if (mSDAAnimation->getUseAudio()) {
+			if (mVDAnimation->getUseAudio()) {
 				// also initialize wave monitor
-				auto scopeWaveFmt = audio::MonitorSpectralNode::Format().fftSize(mSDAAnimation->mWindowSize * 2).windowSize(mSDAAnimation->mWindowSize);
+				auto scopeWaveFmt = audio::MonitorSpectralNode::Format().fftSize(mVDAnimation->mWindowSize * 2).windowSize(mVDAnimation->mWindowSize);
 				mMonitorWaveSpectralNode = ctx->makeNode(new audio::MonitorSpectralNode(scopeWaveFmt));
 
 				ctx->enable();
 			}
 		}
 #if (defined( CINDER_MSW ) || defined( CINDER_MAC ))
-		if (mSDAAnimation->getUseLineIn()) {
+		if (mVDAnimation->getUseLineIn()) {
 			mMagSpectrum = mMonitorLineInSpectralNode->getMagSpectrum();
 		}
 		else {
 #endif
-			if (mSDAAnimation->getUseAudio()) {
-				if (mSDAAnimation->isAudioBuffered()) {
+			if (mVDAnimation->getUseAudio()) {
+				if (mVDAnimation->isAudioBuffered()) {
 					if (mBufferPlayerNode) {
 						mMagSpectrum = mMonitorWaveSpectralNode->getMagSpectrum();
 					}
@@ -909,25 +909,25 @@ namespace SophiaDigitalArt {
 #endif
 		if (!mMagSpectrum.empty()) {
 
-			mSDAAnimation->maxVolume = 0.0f;//mIntensity
+			mVDAnimation->maxVolume = 0.0f;//mIntensity
 			size_t mDataSize = mMagSpectrum.size();
-			if (mDataSize > 0 && mDataSize < mSDAAnimation->mWindowSize + 1) {
+			if (mDataSize > 0 && mDataSize < mVDAnimation->mWindowSize + 1) {
 				float db;
 				unsigned char signal[kBands];
 				for (size_t i = 0; i < mDataSize; i++) {
 					float f = mMagSpectrum[i];
 					db = audio::linearToDecibel(f);
-					f = db * mSDAAnimation->getFloatUniformValueByName("iAudioMult");
-					if (f > mSDAAnimation->maxVolume)
+					f = db * mVDAnimation->getFloatUniformValueByName("iAudioMult");
+					if (f > mVDAnimation->maxVolume)
 					{
-						mSDAAnimation->maxVolume = f;
+						mVDAnimation->maxVolume = f;
 					}
-					mSDAAnimation->iFreqs[i] = f;
+					mVDAnimation->iFreqs[i] = f;
 					// update iFreq uniforms 
-					if (i == mSDAAnimation->getFreqIndex(0)) mSDAAnimation->setFloatUniformValueByName("iFreq0", f);
-					if (i == mSDAAnimation->getFreqIndex(1)) mSDAAnimation->setFloatUniformValueByName("iFreq1", f);
-					if (i == mSDAAnimation->getFreqIndex(2)) mSDAAnimation->setFloatUniformValueByName("iFreq2", f);
-					if (i == mSDAAnimation->getFreqIndex(3)) mSDAAnimation->setFloatUniformValueByName("iFreq3", f);
+					if (i == mVDAnimation->getFreqIndex(0)) mVDAnimation->setFloatUniformValueByName("iFreq0", f);
+					if (i == mVDAnimation->getFreqIndex(1)) mVDAnimation->setFloatUniformValueByName("iFreq1", f);
+					if (i == mVDAnimation->getFreqIndex(2)) mVDAnimation->setFloatUniformValueByName("iFreq2", f);
+					if (i == mVDAnimation->getFreqIndex(3)) mVDAnimation->setFloatUniformValueByName("iFreq3", f);
 
 					if (i < 16) {
 						int ger = f;
@@ -936,7 +936,7 @@ namespace SophiaDigitalArt {
 				}
 				// store it as a 512x2 texture
 				mTexture = gl::Texture::create(signal, GL_RED, 64, 2, fmt);
-				if (mSDAAnimation->isAudioBuffered() && mBufferPlayerNode) {
+				if (mVDAnimation->isAudioBuffered() && mBufferPlayerNode) {
 					gl::ScopedFramebuffer fbScp(mFbo);
 					gl::clear(Color::black());
 
@@ -966,14 +966,14 @@ namespace SophiaDigitalArt {
 	/*
 	** ---- TextureStream ------------------------------------------------
 	*/
-	TextureStream::TextureStream(SDAAnimationRef aSDAAnimation) {
-		mSDAAnimation = aSDAAnimation;
+	TextureStream::TextureStream(VDAnimationRef aVDAnimation) {
+		mVDAnimation = aVDAnimation;
 		mType = STREAM;
 		mName = "stream";
 		mTexture = gl::Texture::create(mWidth, mHeight);
 	}
 	XmlTree	TextureStream::toXml() const {
-		XmlTree xml = SDATexture::toXml();
+		XmlTree xml = VDTexture::toXml();
 
 		// add attributes specific to this type of texture
 		xml.setAttribute("path", mPath);
@@ -985,7 +985,7 @@ namespace SophiaDigitalArt {
 
 	bool TextureStream::fromXml(const XmlTree &xml)
 	{
-		SDATexture::fromXml(xml);
+		VDTexture::fromXml(xml);
 		// retrieve attributes specific to this type of texture
 		mFlipV = xml.getAttributeValue<bool>("flipv", "false");
 		mFlipH = xml.getAttributeValue<bool>("fliph", "false");
@@ -1020,4 +1020,4 @@ namespace SophiaDigitalArt {
 	}
 	TextureStream::~TextureStream(void) {
 	}
-	} // namespace SophiaDigitalArt
+	} // namespace VideoDromm

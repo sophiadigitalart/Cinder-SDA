@@ -25,7 +25,7 @@
 #endif
 
 // Settings
-#include "SDAAnimation.h"
+#include "VDAnimation.h"
 
 // audio
 #include "cinder/audio/Context.h"
@@ -49,27 +49,27 @@ using namespace ci::app;
 using namespace std;
 
 
-namespace SophiaDigitalArt
+namespace VideoDromm
 {
 	/*
 	** ---- Texture parent class ------------------------------------------------
 	*/
-	// stores the pointer to the SDATexture instance
-	typedef std::shared_ptr<class SDATexture> 	SDATextureRef;
-	typedef std::vector<SDATextureRef>			SDATextureList;
+	// stores the pointer to the VDTexture instance
+	typedef std::shared_ptr<class VDTexture> 	VDTextureRef;
+	typedef std::vector<VDTextureRef>			VDTextureList;
 	// for profiling
 	typedef std::chrono::high_resolution_clock Clock;
 
-	class SDATexture : public std::enable_shared_from_this < SDATexture > {
+	class VDTexture : public std::enable_shared_from_this < VDTexture > {
 	public:
 		typedef enum { UNKNOWN, IMAGE, SEQUENCE, CAMERA, SHARED, AUDIO, STREAM } TextureType;
 	public:
-		SDATexture(TextureType aType = UNKNOWN);
-		virtual ~SDATexture(void);
+		VDTexture(TextureType aType = UNKNOWN);
+		virtual ~VDTexture(void);
 
 		virtual ci::gl::Texture2dRef	getTexture();
 		//! returns a shared pointer to this input texture
-		SDATextureRef					getPtr() { return shared_from_this(); }
+		VDTextureRef					getPtr() { return shared_from_this(); }
 		ci::ivec2						getSize();
 		ci::Area						getBounds();
 		GLuint							getId();
@@ -84,10 +84,10 @@ namespace SophiaDigitalArt
 		virtual bool					fromXml(const ci::XmlTree &xml);
 		//!
 		virtual XmlTree					toXml() const;
-		//! read a xml file and pass back a vector of SDATextures
-		static SDATextureList			readSettings(SDAAnimationRef aSDAAnimation, const ci::DataSourceRef &source);
+		//! read a xml file and pass back a vector of VDTextures
+		static VDTextureList			readSettings(VDAnimationRef aVDAnimation, const ci::DataSourceRef &source);
 		//! write a xml file
-		static void						writeSettings(const SDATextureList &vdtexturelist, const ci::DataTargetRef &target);
+		static void						writeSettings(const VDTextureList &vdtexturelist, const ci::DataTargetRef &target);
 		virtual bool					loadFromFullPath(string aPath);
 		string							getStatus() { return mStatus; };
 		//! area to display
@@ -157,7 +157,7 @@ namespace SophiaDigitalArt
 	typedef std::shared_ptr<class TextureImage>	TextureImageRef;
 
 	class TextureImage
-		: public SDATexture {
+		: public VDTexture {
 	public:
 		//
 		static TextureImageRef	create() { return std::make_shared<TextureImage>(); }
@@ -184,17 +184,17 @@ namespace SophiaDigitalArt
 	typedef std::shared_ptr<class TextureImageSequence>	TextureImageSequenceRef;
 
 	class TextureImageSequence
-		: public SDATexture {
+		: public VDTexture {
 	public:
 		//
-		static TextureImageSequenceRef	create(SDAAnimationRef aSDAAnimation) { return std::make_shared<TextureImageSequence>(aSDAAnimation); }
+		static TextureImageSequenceRef	create(VDAnimationRef aVDAnimation) { return std::make_shared<TextureImageSequence>(aVDAnimation); }
 		//!
 		bool					fromXml(const XmlTree &xml) override;
 		//!
 		virtual	XmlTree			toXml() const override;
 		//!
 		virtual bool			loadFromFullPath(string aPath) override;
-		TextureImageSequence(SDAAnimationRef aSDAAnimation);
+		TextureImageSequence(VDAnimationRef aVDAnimation);
 		virtual ~TextureImageSequence(void);
 
 		//! returns a shared pointer 
@@ -219,7 +219,7 @@ namespace SophiaDigitalArt
 
 	private:
 		// Animation
-		SDAAnimationRef				mSDAAnimation;
+		VDAnimationRef				mVDAnimation;
 
 		float						playheadFrameInc;
 		void						loadNextImageFromDisk();
@@ -246,7 +246,7 @@ namespace SophiaDigitalArt
 	typedef std::shared_ptr<class TextureCamera>	TextureCameraRef;
 
 	class TextureCamera
-		: public SDATexture {
+		: public VDTexture {
 	public:
 		//
 		static TextureCameraRef create() { return std::make_shared<TextureCamera>(); }
@@ -277,7 +277,7 @@ namespace SophiaDigitalArt
 	typedef std::shared_ptr<class TextureShared>	TextureSharedRef;
 
 	class TextureShared
-		: public SDATexture {
+		: public VDTexture {
 	public:
 		//
 		static TextureSharedRef create() { return std::make_shared<TextureShared>(); }
@@ -313,10 +313,10 @@ namespace SophiaDigitalArt
 	typedef std::shared_ptr<class TextureAudio>	TextureAudioRef;
 
 	class TextureAudio
-		: public SDATexture {
+		: public VDTexture {
 	public:
 		//
-		static TextureAudioRef	create(SDAAnimationRef aSDAAnimation) { return std::make_shared<TextureAudio>(aSDAAnimation); }
+		static TextureAudioRef	create(VDAnimationRef aVDAnimation) { return std::make_shared<TextureAudio>(aVDAnimation); }
 		//!
 		bool					fromXml(const XmlTree &xml) override;
 		//!
@@ -325,7 +325,7 @@ namespace SophiaDigitalArt
 		virtual bool			loadFromFullPath(string aPath) override;
 
 	public:
-		TextureAudio(SDAAnimationRef aSDAAnimation);
+		TextureAudio(VDAnimationRef aVDAnimation);
 		virtual ~TextureAudio(void);
 
 		//! returns a shared pointer 
@@ -336,7 +336,7 @@ namespace SophiaDigitalArt
 		//float							getIntensity() override;
 	private:
 		// Animation
-		SDAAnimationRef					mSDAAnimation;
+		VDAnimationRef					mVDAnimation;
 		// init
 		bool							mLineInInitialized;
 		//void							initializeLineIn();
@@ -356,7 +356,7 @@ namespace SophiaDigitalArt
 		static const int				kBands = 16;
 
 		// textures
-		unsigned char					dTexture[256];// MUST be < mSDAAnimation->mWindowSize
+		unsigned char					dTexture[256];// MUST be < mVDAnimation->mWindowSize
 		ci::gl::Texture2dRef			mTexture;
 		//WaveformPlot					mWaveformPlot;
 	};
@@ -367,10 +367,10 @@ namespace SophiaDigitalArt
 	typedef std::shared_ptr<class TextureStream>	TextureStreamRef;
 
 	class TextureStream
-		: public SDATexture {
+		: public VDTexture {
 	public:
 		//
-		static TextureStreamRef	create(SDAAnimationRef aSDAAnimation) { return std::make_shared<TextureStream>(aSDAAnimation); }
+		static TextureStreamRef	create(VDAnimationRef aVDAnimation) { return std::make_shared<TextureStream>(aVDAnimation); }
 		//!
 		bool					fromXml(const XmlTree &xml) override;
 		//!
@@ -379,7 +379,7 @@ namespace SophiaDigitalArt
 		virtual bool			loadFromFullPath(string aStream) override;
 
 	public:
-		TextureStream(SDAAnimationRef aSDAAnimation);
+		TextureStream(VDAnimationRef aVDAnimation);
 		virtual ~TextureStream(void);
 
 		//! returns a shared pointer 
@@ -389,7 +389,7 @@ namespace SophiaDigitalArt
 		virtual ci::gl::Texture2dRef	getTexture() override;
 	private:
 		// Animation
-		SDAAnimationRef					mSDAAnimation;
+		VDAnimationRef					mVDAnimation;
 		// textures
 		ci::gl::Texture2dRef			mTexture;
 

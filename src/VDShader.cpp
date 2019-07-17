@@ -1,8 +1,8 @@
-#include "SDAShader.h"
+#include "VDShader.h"
 
-using namespace SophiaDigitalArt;
+using namespace VideoDromm;
 
-SDAShader::SDAShader(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation, string aFragmentShaderFilePath, string aFragmentShaderString) {
+VDShader::VDShader(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, string aFragmentShaderFilePath, string aFragmentShaderString) {
 	mFragmentShaderFilePath = aFragmentShaderFilePath;
 	mFragmentShaderString = aFragmentShaderString;
 	mValid = false;
@@ -40,8 +40,8 @@ SDAShader::SDAShader(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation,
 		"out vec4 fragColor;\n"
 		"vec2  fragCoord = gl_FragCoord.xy; // keep the 2 spaces between vec2 and fragCoord\n"
 		"float time = iTime;\n";
-	mSDASettings = aSDASettings;
-	mSDAAnimation = aSDAAnimation;
+	mVDSettings = aVDSettings;
+	mVDAnimation = aVDAnimation;
 	mError = "";
 	// priority to loading from string 
 	if (mFragmentShaderString.length() > 0) {
@@ -51,14 +51,14 @@ SDAShader::SDAShader(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation,
 		loadFragmentStringFromFile(mFragmentShaderFilePath);
 	}
 	if (mValid) {
-		CI_LOG_V("SDAShaders constructor success");
+		CI_LOG_V("VDShaders constructor success");
 	}
 	else {
-		CI_LOG_V("SDAShaders constructor failed, do not use");
+		CI_LOG_V("VDShaders constructor failed, do not use");
 	}
 }
 
-bool SDAShader::loadFragmentStringFromFile(string aFileName) {
+bool VDShader::loadFragmentStringFromFile(string aFileName) {
 	mValid = false;
 	// load fragment shader
 	CI_LOG_V("loadFragmentStringFromFile, loading " + aFileName);
@@ -93,7 +93,7 @@ bool SDAShader::loadFragmentStringFromFile(string aFileName) {
 	CI_LOG_V(mFragFile.string() + " loaded and compiled");
 	return mValid;
 }// aName = fullpath
-bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
+bool VDShader::setFragmentString(string aFragmentShaderString, string aName) {
 
 	string mOriginalFragmentString = aFragmentShaderString;
 	string mISFString = aFragmentShaderString;
@@ -287,10 +287,10 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		CI_LOG_V("file saved:" + receivedFile.string());
 
 		// try to compile a first time to get active uniforms
-		mShader = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), aFragmentShaderString);
+		mShader = gl::GlslProg::create(mVDSettings->getDefaultVextexShaderString(), aFragmentShaderString);
 		// update only if success
 		mFragmentShaderString = aFragmentShaderString;
-		mSDASettings->mMsg = aName + " loaded and compiled";
+		mVDSettings->mMsg = aName + " loaded and compiled";
 		// name of the shader
 		mName = aName;
 		mValid = true;
@@ -311,54 +311,54 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 			uniformName = uniform.getName();
 			CI_LOG_V(aName + ", uniform name:" + uniformName);
 			// if uniform is handled
-			if (mSDAAnimation->isExistingUniform(uniformName)) {
-				int uniformType = mSDAAnimation->getUniformType(uniformName);
+			if (mVDAnimation->isExistingUniform(uniformName)) {
+				int uniformType = mVDAnimation->getUniformType(uniformName);
 				switch (uniformType)
 				{
 				case 0:
 					// float
-					mShader->uniform(uniformName, mSDAAnimation->getFloatUniformValueByName(uniformName));
-					mCurrentUniformsString += "uniform float " + uniformName + "; // " + toString(mSDAAnimation->getFloatUniformValueByName(uniformName)) + "\n";
+					mShader->uniform(uniformName, mVDAnimation->getFloatUniformValueByName(uniformName));
+					mCurrentUniformsString += "uniform float " + uniformName + "; // " + toString(mVDAnimation->getFloatUniformValueByName(uniformName)) + "\n";
 					if (uniformName != "iTime") {
 						mISFUniforms += ",\n"
 							"		{\n"
 							"			\"NAME\": \"" + uniformName + "\", \n"
 							"			\"TYPE\" : \"float\", \n"
-							"			\"MIN\" : " + toString(mSDAAnimation->getMinUniformValueByName(uniformName)) + ",\n"
-							"			\"MAX\" : " + toString(mSDAAnimation->getMaxUniformValueByName(uniformName)) + ",\n"
-							"			\"DEFAULT\" : " + toString(mSDAAnimation->getFloatUniformValueByName(uniformName)) + "\n"
+							"			\"MIN\" : " + toString(mVDAnimation->getMinUniformValueByName(uniformName)) + ",\n"
+							"			\"MAX\" : " + toString(mVDAnimation->getMaxUniformValueByName(uniformName)) + ",\n"
+							"			\"DEFAULT\" : " + toString(mVDAnimation->getFloatUniformValueByName(uniformName)) + "\n"
 							"		}\n";
 					}
 					break;
 				case 1:
 					// sampler2D
-					mShader->uniform(uniformName, mSDAAnimation->getSampler2DUniformValueByName(uniformName));
-					mCurrentUniformsString += "uniform sampler2D " + uniformName + "; // " + toString(mSDAAnimation->getSampler2DUniformValueByName(uniformName)) + "\n";
+					mShader->uniform(uniformName, mVDAnimation->getSampler2DUniformValueByName(uniformName));
+					mCurrentUniformsString += "uniform sampler2D " + uniformName + "; // " + toString(mVDAnimation->getSampler2DUniformValueByName(uniformName)) + "\n";
 					break;
 				case 2:
 					// vec2
-					mShader->uniform(uniformName, mSDAAnimation->getVec2UniformValueByName(uniformName));
-					mCurrentUniformsString += "uniform vec2 " + uniformName + "; // " + toString(mSDAAnimation->getVec2UniformValueByName(uniformName)) + "\n";
+					mShader->uniform(uniformName, mVDAnimation->getVec2UniformValueByName(uniformName));
+					mCurrentUniformsString += "uniform vec2 " + uniformName + "; // " + toString(mVDAnimation->getVec2UniformValueByName(uniformName)) + "\n";
 					break;
 				case 3:
 					// vec3
-					mShader->uniform(uniformName, mSDAAnimation->getVec3UniformValueByName(uniformName));
-					mCurrentUniformsString += "uniform vec3 " + uniformName + "; // " + toString(mSDAAnimation->getVec3UniformValueByName(uniformName)) + "\n";
+					mShader->uniform(uniformName, mVDAnimation->getVec3UniformValueByName(uniformName));
+					mCurrentUniformsString += "uniform vec3 " + uniformName + "; // " + toString(mVDAnimation->getVec3UniformValueByName(uniformName)) + "\n";
 					break;
 				case 4:
 					// vec4
-					mShader->uniform(uniformName, mSDAAnimation->getVec4UniformValueByName(uniformName));
-					mCurrentUniformsString += "uniform vec4 " + uniformName + "; // " + toString(mSDAAnimation->getVec4UniformValueByName(uniformName)) + "\n";
+					mShader->uniform(uniformName, mVDAnimation->getVec4UniformValueByName(uniformName));
+					mCurrentUniformsString += "uniform vec4 " + uniformName + "; // " + toString(mVDAnimation->getVec4UniformValueByName(uniformName)) + "\n";
 					break;
 				case 5:
 					// int
-					mShader->uniform(uniformName, mSDAAnimation->getIntUniformValueByName(uniformName));
-					mCurrentUniformsString += "uniform int " + uniformName + "; // " + toString(mSDAAnimation->getIntUniformValueByName(uniformName)) + "\n";
+					mShader->uniform(uniformName, mVDAnimation->getIntUniformValueByName(uniformName));
+					mCurrentUniformsString += "uniform int " + uniformName + "; // " + toString(mVDAnimation->getIntUniformValueByName(uniformName)) + "\n";
 					break;
 				case 6:
 					// bool
-					mShader->uniform(uniformName, mSDAAnimation->getBoolUniformValueByName(uniformName));
-					mCurrentUniformsString += "uniform bool " + uniformName + "; // " + toString(mSDAAnimation->getBoolUniformValueByName(uniformName)) + "\n";
+					mShader->uniform(uniformName, mVDAnimation->getBoolUniformValueByName(uniformName));
+					mCurrentUniformsString += "uniform bool " + uniformName + "; // " + toString(mVDAnimation->getBoolUniformValueByName(uniformName)) + "\n";
 					break;
 				default:
 					break;
@@ -450,11 +450,11 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		CI_LOG_V("processed file saved:" + processedFile.string());
 		// 20161209 problem on Mac mShader->setLabel(mName);
 		// try to compile a second time 
-		// 20180310 avoid errors mShader = gl::GlslProg::create(mSDASettings->getDefaultVextexShaderString(), mProcessedShaderString);
+		// 20180310 avoid errors mShader = gl::GlslProg::create(mVDSettings->getDefaultVextexShaderString(), mProcessedShaderString);
 		// 20180310 avoid errors mFragmentShaderString = mProcessedShaderString;
 		// update only if success
-		// 20180310 avoid errors mSDASettings->mMsg = aName + " loaded and compiled";
-		// 20180310 avoid errors CI_LOG_V(mSDASettings->mMsg);
+		// 20180310 avoid errors mVDSettings->mMsg = aName + " loaded and compiled";
+		// 20180310 avoid errors CI_LOG_V(mVDSettings->mMsg);
 		// 20180310 avoid errors mValid = true;
 	}
 	catch (gl::GlslProgCompileExc &exc)
@@ -467,18 +467,18 @@ bool SDAShader::setFragmentString(string aFragmentShaderString, string aName) {
 		mError = aName + string(e.what());
 		CI_LOG_V("setFragmentString, error on live fragment shader:" + mError + " frag:" + aFragmentShaderString);
 	}
-	mSDASettings->mMsg = mError;
+	mVDSettings->mMsg = mError;
 	return mValid;
 }
 
-gl::GlslProgRef SDAShader::getShader() {
+gl::GlslProgRef VDShader::getShader() {
 	return mShader;
 }
-string SDAShader::getName() {
+string VDShader::getName() {
 	return mName;
 }
 
-void SDAShader::removeShader() {
+void VDShader::removeShader() {
 	CI_LOG_V("remove shader");
 	mValid = false;
 	mActive = false;

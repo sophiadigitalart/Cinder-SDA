@@ -1,12 +1,12 @@
-#include "SDAWebsocket.h"
+#include "VDWebsocket.h"
 
-using namespace SophiaDigitalArt;
+using namespace VideoDromm;
 
-SDAWebsocket::SDAWebsocket(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation) {
-	mSDASettings = aSDASettings;
-	mSDAAnimation = aSDAAnimation;
+VDWebsocket::VDWebsocket(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation) {
+	mVDSettings = aVDSettings;
+	mVDAnimation = aVDAnimation;
 
-	CI_LOG_V("SDAWebsocket constructor");
+	CI_LOG_V("VDWebsocket constructor");
 	shaderReceived = false;
 	receivedFragString = "";
 	shaderUniforms = false;
@@ -15,77 +15,77 @@ SDAWebsocket::SDAWebsocket(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnim
 	// WebSockets
 	clientConnected = false;
 
-	if (mSDASettings->mAreWebSocketsEnabledAtStartup) wsConnect();
+	if (mVDSettings->mAreWebSocketsEnabledAtStartup) wsConnect();
 	mPingTime = getElapsedSeconds();
 
 }
 
-void SDAWebsocket::updateParams(int iarg0, float farg1) {
+void VDWebsocket::updateParams(int iarg0, float farg1) {
 	if (farg1 > 0.1) {
 		//avoid to send twice
 		if (iarg0 == 61) {
 			// right arrow
-			mSDASettings->iBlendmode--;
-			if (mSDASettings->iBlendmode < 0) mSDASettings->iBlendmode = mSDAAnimation->getBlendModesCount() - 1;
+			mVDSettings->iBlendmode--;
+			if (mVDSettings->iBlendmode < 0) mVDSettings->iBlendmode = mVDAnimation->getBlendModesCount() - 1;
 		}
 		if (iarg0 == 62) {
 			// left arrow
-			mSDASettings->iBlendmode++;
-			if (mSDASettings->iBlendmode > mSDAAnimation->getBlendModesCount() - 1) mSDASettings->iBlendmode = 0;
+			mVDSettings->iBlendmode++;
+			if (mVDSettings->iBlendmode > mVDAnimation->getBlendModesCount() - 1) mVDSettings->iBlendmode = 0;
 		}
 	}
 	if (iarg0 > 0 && iarg0 < 9) {
 		// sliders 
-		mSDAAnimation->setFloatUniformValueByIndex(iarg0, farg1);
+		mVDAnimation->setFloatUniformValueByIndex(iarg0, farg1);
 	}
 	if (iarg0 > 10 && iarg0 < 19) {
 		// rotary 
-		mSDAAnimation->setFloatUniformValueByIndex(iarg0, farg1);
+		mVDAnimation->setFloatUniformValueByIndex(iarg0, farg1);
 		// audio multfactor
-		if (iarg0 == 13) mSDAAnimation->setFloatUniformValueByIndex(iarg0, (farg1 + 0.01) * 10);
+		if (iarg0 == 13) mVDAnimation->setFloatUniformValueByIndex(iarg0, (farg1 + 0.01) * 10);
 		// exposure
-		if (iarg0 == 14) mSDAAnimation->setFloatUniformValueByIndex(iarg0, (farg1 + 0.01) * mSDAAnimation->getMaxUniformValueByIndex(14));
+		if (iarg0 == 14) mVDAnimation->setFloatUniformValueByIndex(iarg0, (farg1 + 0.01) * mVDAnimation->getMaxUniformValueByIndex(14));
 
-		wsWrite("{\"params\" :[{\"name\":" + toString(iarg0) + ",\"value\":" + toString(mSDAAnimation->getFloatUniformValueByIndex(iarg0)) + "}]}");
+		wsWrite("{\"params\" :[{\"name\":" + toString(iarg0) + ",\"value\":" + toString(mVDAnimation->getFloatUniformValueByIndex(iarg0)) + "}]}");
 
 	}
 	// buttons
 	if (iarg0 > 20 && iarg0 < 29) {
 		// select index
-		mSDASettings->selectedWarp = iarg0 - 21;
+		mVDSettings->selectedWarp = iarg0 - 21;
 	}
 	/*if (iarg0 > 30 && iarg0 < 39)
 	{
 	// select input
-	mSDASettings->mWarpFbos[mSDASettings->selectedWarp].textureIndex = iarg0 - 31;
+	mVDSettings->mWarpFbos[mVDSettings->selectedWarp].textureIndex = iarg0 - 31;
 	// activate
-	mSDASettings->mWarpFbos[mSDASettings->selectedWarp].active = !mSDASettings->mWarpFbos[mSDASettings->selectedWarp].active;
+	mVDSettings->mWarpFbos[mVDSettings->selectedWarp].active = !mVDSettings->mWarpFbos[mVDSettings->selectedWarp].active;
 	}*/
 	if (iarg0 > 40 && iarg0 < 49) {
 		// low row 
-		mSDAAnimation->setFloatUniformValueByIndex(iarg0, farg1);
+		mVDAnimation->setFloatUniformValueByIndex(iarg0, farg1);
 	}
 }
 
-void SDAWebsocket::wsPing() {
+void VDWebsocket::wsPing() {
 #if defined( CINDER_MSW )
 	if (clientConnected) {
-		if (!mSDASettings->mIsWebSocketsServer) {
+		if (!mVDSettings->mIsWebSocketsServer) {
 			mClient.ping();
 		}
 	}
 #endif
 }
-string * SDAWebsocket::getBase64Image() { 
+string * VDWebsocket::getBase64Image() { 
 	streamReceived = false; 
 	return &mBase64String; 
 }
 //dreads(1, 0, 0.8).out(o0)
-void SDAWebsocket::parseMessage(string msg) {
-	mSDASettings->mWebSocketsMsg = "WS onRead";
-	mSDASettings->mWebSocketsNewMsg = true;
+void VDWebsocket::parseMessage(string msg) {
+	mVDSettings->mWebSocketsMsg = "WS onRead";
+	mVDSettings->mWebSocketsNewMsg = true;
 	if (!msg.empty()) {
-		mSDASettings->mWebSocketsMsg += ": " + msg.substr(0, 50);
+		mVDSettings->mWebSocketsMsg += ": " + msg.substr(0, 50);
 		CI_LOG_V("ws msg: " + msg);
 		string first = msg.substr(0, 1);
 		if (first == "{") {
@@ -100,9 +100,9 @@ void SDAWebsocket::parseMessage(string msg) {
 						int name = jsonElement->getChild("name").getValue<int>();
 						float value = jsonElement->getChild("value").getValue<float>();
 						// basic name value 
-						mSDAAnimation->setFloatUniformValueByIndex(name, value);
+						mVDAnimation->setFloatUniformValueByIndex(name, value);
 						// dispatch to clients
-						if (mSDASettings->mIsWebSocketsServer) {
+						if (mVDSettings->mIsWebSocketsServer) {
 							wsWrite(msg);
 						}
 					}
@@ -116,7 +116,7 @@ void SDAWebsocket::parseMessage(string msg) {
 						vector<string> vs = split(value, ",");
 						vec4 v = vec4(strtof((vs[0]).c_str(), 0), strtof((vs[1]).c_str(), 0), strtof((vs[2]).c_str(), 0), strtof((vs[3]).c_str(), 0));
 						// basic name value 
-						mSDAAnimation->setVec4UniformValueByIndex(name, v);
+						mVDAnimation->setVec4UniformValueByIndex(name, v);
 					}
 				}
 
@@ -136,29 +136,29 @@ void SDAWebsocket::parseMessage(string msg) {
 							for (JsonTree::ConstIter jsonElement = jsonParams.begin(); jsonElement != jsonParams.end(); ++jsonElement) {
 								int name = jsonElement->getChild("name").getValue<int>();
 								float value = jsonElement->getChild("value").getValue<float>();
-								CI_LOG_V("SDAWebsocket jsonParams.mValue:" + toString(name));
+								CI_LOG_V("VDWebsocket jsonParams.mValue:" + toString(name));
 								// basic name value 
-								mSDAAnimation->setFloatUniformValueByIndex(name, value);
+								mVDAnimation->setFloatUniformValueByIndex(name, value);
 							}
 						}
 						else if (val == "hydra") {
 							receivedUniformsString = json.getChild("message").getValue<string>();
 							shaderUniforms = true;
 							// force to display
-							mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, 0);
-							mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, 1);
+							mVDAnimation->setIntUniformValueByIndex(mVDSettings->IFBOA, 0);
+							mVDAnimation->setIntUniformValueByIndex(mVDSettings->IFBOB, 1);
 						}
 						else if (val == "frag") {
 							// we received a fragment shader string
 							receivedFragString = json.getChild("message").getValue<string>();
 							shaderReceived = true;
 							// force to display
-							mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, 0);
-							mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, 1);
+							mVDAnimation->setIntUniformValueByIndex(mVDSettings->IFBOA, 0);
+							mVDAnimation->setIntUniformValueByIndex(mVDSettings->IFBOB, 1);
 						}
 						else {
 							// we received a fragment shader string
-							CI_LOG_V("SDAWebsocket unknown event: " + val);
+							CI_LOG_V("VDWebsocket unknown event: " + val);
 						}
 						//string evt = json.getChild("event").getValue<string>();
 					}
@@ -177,10 +177,10 @@ void SDAWebsocket::parseMessage(string msg) {
 							receivedFboIndex = jsonElement->getChild("fbo").getValue<float>(); // TODO int
 							receivedSlot = jsonElement->getChild("slot").getValue<float>(); // TODO int
 							if (receivedSlot == 0) {
-								mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, receivedFboIndex);
+								mVDAnimation->setIntUniformValueByIndex(mVDSettings->IFBOA, receivedFboIndex);
 							}
 							else {
-								mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, receivedFboIndex);
+								mVDAnimation->setIntUniformValueByIndex(mVDSettings->IFBOB, receivedFboIndex);
 							}
 							break;
 						case 1:
@@ -197,20 +197,20 @@ void SDAWebsocket::parseMessage(string msg) {
 							//break;
 						case 2:
 							// change tempo
-							mSDAAnimation->useTimeWithTempo();
-							mSDAAnimation->setBpm(jsonElement->getChild("tempo").getValue<float>());
-							CI_LOG_E("tempo:" + toString(mSDAAnimation->getBpm()));
+							mVDAnimation->useTimeWithTempo();
+							mVDAnimation->setBpm(jsonElement->getChild("tempo").getValue<float>());
+							CI_LOG_E("tempo:" + toString(mVDAnimation->getBpm()));
 							break;
 						case 3:
 							// change beat
-							mSDAAnimation->setFloatUniformValueByIndex(mSDASettings->ITIME, jsonElement->getChild("beat").getValue<float>());
-							CI_LOG_E("beat:" + toString(mSDASettings->ITIME) + " " + toString(mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ITIME)));
+							mVDAnimation->setFloatUniformValueByIndex(mVDSettings->ITIME, jsonElement->getChild("beat").getValue<float>());
+							CI_LOG_E("beat:" + toString(mVDSettings->ITIME) + " " + toString(mVDAnimation->getFloatUniformValueByIndex(mVDSettings->ITIME)));
 							break;
 						case 4:
 							// change phase
-							mSDAAnimation->setFloatUniformValueByIndex(mSDASettings->ITEMPOTIME, jsonElement->getChild("phase").getValue<float>());
-							CI_LOG_E("phase:" + toString(mSDASettings->ITEMPOTIME) + " " + toString(mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->ITEMPOTIME)));
-							mSDAAnimation->setIntUniformValueByName("iBeat", (int)jsonElement->getChild("phase").getValue<float>());
+							mVDAnimation->setFloatUniformValueByIndex(mVDSettings->ITEMPOTIME, jsonElement->getChild("phase").getValue<float>());
+							CI_LOG_E("phase:" + toString(mVDSettings->ITEMPOTIME) + " " + toString(mVDAnimation->getFloatUniformValueByIndex(mVDSettings->ITEMPOTIME)));
+							mVDAnimation->setIntUniformValueByName("iBeat", (int)jsonElement->getChild("phase").getValue<float>());
 							break;
 						default:
 							break;
@@ -221,9 +221,9 @@ void SDAWebsocket::parseMessage(string msg) {
 				}
 			}
 			catch (cinder::JsonTree::Exception exception) {
-				mSDASettings->mWebSocketsMsg += " error jsonparser exception: ";
-				mSDASettings->mWebSocketsMsg += exception.what();
-				mSDASettings->mWebSocketsMsg += "  ";
+				mVDSettings->mWebSocketsMsg += " error jsonparser exception: ";
+				mVDSettings->mWebSocketsMsg += exception.what();
+				mVDSettings->mWebSocketsMsg += "  ";
 			}
 		}
 		else if (msg.substr(0, 2) == "/*") {
@@ -263,7 +263,7 @@ void SDAWebsocket::parseMessage(string msg) {
 						mFrag << msg;
 						mFrag.close();
 						CI_LOG_V("received file saved:" + currentFile.string());
-						//mSDASettings->mShaderToLoad = currentFile.string(); 
+						//mVDSettings->mShaderToLoad = currentFile.string(); 
 						// uniforms not found, add include
 						processedContent += "#include shadertoy.inc";
 					}
@@ -271,7 +271,7 @@ void SDAWebsocket::parseMessage(string msg) {
 
 					//mShaders->loadLiveShader(processedContent); // need uniforms declared
 					// route it to websockets clients
-					if (mSDASettings->mIsRouter) {
+					if (mVDSettings->mIsRouter) {
 						wsWrite(msg);
 					}
 
@@ -281,21 +281,21 @@ void SDAWebsocket::parseMessage(string msg) {
 					mFragProcessed << processedContent;
 					mFragProcessed.close();
 					CI_LOG_V("processed file saved:" + processedFile.string());
-					// USELESS? mSDASettings->mShaderToLoad = processedFile.string();
+					// USELESS? mVDSettings->mShaderToLoad = processedFile.string();
 				}
 				catch (cinder::JsonTree::Exception exception) {
-					mSDASettings->mWebSocketsMsg += " error jsonparser exception: ";
-					mSDASettings->mWebSocketsMsg += exception.what();
-					mSDASettings->mWebSocketsMsg += "  ";
+					mVDSettings->mWebSocketsMsg += " error jsonparser exception: ";
+					mVDSettings->mWebSocketsMsg += exception.what();
+					mVDSettings->mWebSocketsMsg += "  ";
 				}
 			}
 		}
 		/* OBSOLETE
 		else if (msg.substr(0, 7) == "uniform") {
 			// fragment shader from live coding
-			mSDASettings->mShaderToLoad = msg;
+			mVDSettings->mShaderToLoad = msg;
 			// route it to websockets clients
-			if (mSDASettings->mIsRouter) {
+			if (mVDSettings->mIsRouter) {
 				wsWrite(msg);
 			}
 		}*/
@@ -303,7 +303,7 @@ void SDAWebsocket::parseMessage(string msg) {
 			// fragment shader from live coding
 			//mShaders->loadLiveShader(msg);
 			// route it to websockets clients
-			if (mSDASettings->mIsRouter) {
+			if (mVDSettings->mIsRouter) {
 				wsWrite(msg);
 			}
 		}
@@ -343,82 +343,82 @@ void SDAWebsocket::parseMessage(string msg) {
 		}
 	}
 }
-string SDAWebsocket::getReceivedShader() {
+string VDWebsocket::getReceivedShader() {
 	shaderReceived = false;
 	return receivedFragString;
 }
-string SDAWebsocket::getReceivedUniforms() {
+string VDWebsocket::getReceivedUniforms() {
 	shaderUniforms = false;
 	return receivedUniformsString;
 }
 
-void SDAWebsocket::wsConnect() {
+void VDWebsocket::wsConnect() {
 
 	// either a client or a server
-	if (mSDASettings->mIsWebSocketsServer) {
+	if (mVDSettings->mIsWebSocketsServer) {
 		mServer.connectOpenEventHandler([&]() {
 			clientConnected = true;
-			mSDASettings->mWebSocketsMsg = "Connected";
-			mSDASettings->mWebSocketsNewMsg = true;
+			mVDSettings->mWebSocketsMsg = "Connected";
+			mVDSettings->mWebSocketsNewMsg = true;
 		});
 		mServer.connectCloseEventHandler([&]() {
 			clientConnected = false;
-			mSDASettings->mWebSocketsMsg = "Disconnected";
-			mSDASettings->mWebSocketsNewMsg = true;
+			mVDSettings->mWebSocketsMsg = "Disconnected";
+			mVDSettings->mWebSocketsNewMsg = true;
 		});
 		mServer.connectFailEventHandler([&](string err) {
-			mSDASettings->mWebSocketsMsg = "WS Error";
-			mSDASettings->mWebSocketsNewMsg = true;
+			mVDSettings->mWebSocketsMsg = "WS Error";
+			mVDSettings->mWebSocketsNewMsg = true;
 			if (!err.empty()) {
-				mSDASettings->mWebSocketsMsg += ": " + err;
+				mVDSettings->mWebSocketsMsg += ": " + err;
 			}
 		});
 		mServer.connectInterruptEventHandler([&]() {
-			mSDASettings->mWebSocketsMsg = "WS Interrupted";
-			mSDASettings->mWebSocketsNewMsg = true;
+			mVDSettings->mWebSocketsMsg = "WS Interrupted";
+			mVDSettings->mWebSocketsNewMsg = true;
 		});
 		mServer.connectPingEventHandler([&](string msg) {
-			mSDASettings->mWebSocketsMsg = "WS Pinged";
-			mSDASettings->mWebSocketsNewMsg = true;
+			mVDSettings->mWebSocketsMsg = "WS Pinged";
+			mVDSettings->mWebSocketsNewMsg = true;
 			if (!msg.empty())
 			{
-				mSDASettings->mWebSocketsMsg += ": " + msg;
+				mVDSettings->mWebSocketsMsg += ": " + msg;
 			}
 		});
 		mServer.connectMessageEventHandler([&](string msg) {
 			parseMessage(msg);
 		});
-		mServer.listen(mSDASettings->mWebSocketsPort);
+		mServer.listen(mVDSettings->mWebSocketsPort);
 	}
 	else
 	{
 		mClient.connectOpenEventHandler([&]() {
 			clientConnected = true;
-			mSDASettings->mWebSocketsMsg = "Connected";
-			mSDASettings->mWebSocketsNewMsg = true;
+			mVDSettings->mWebSocketsMsg = "Connected";
+			mVDSettings->mWebSocketsNewMsg = true;
 		});
 		mClient.connectCloseEventHandler([&]() {
 			clientConnected = false;
-			mSDASettings->mWebSocketsMsg = "Disconnected";
-			mSDASettings->mWebSocketsNewMsg = true;
+			mVDSettings->mWebSocketsMsg = "Disconnected";
+			mVDSettings->mWebSocketsNewMsg = true;
 		});
 		mClient.connectFailEventHandler([&](string err) {
-			mSDASettings->mWebSocketsMsg = "WS Error";
-			mSDASettings->mWebSocketsNewMsg = true;
+			mVDSettings->mWebSocketsMsg = "WS Error";
+			mVDSettings->mWebSocketsNewMsg = true;
 			if (!err.empty()) {
-				mSDASettings->mWebSocketsMsg += ": " + err;
+				mVDSettings->mWebSocketsMsg += ": " + err;
 			}
 		});
 		mClient.connectInterruptEventHandler([&]() {
-			mSDASettings->mWebSocketsMsg = "WS Interrupted";
-			mSDASettings->mWebSocketsNewMsg = true;
+			mVDSettings->mWebSocketsMsg = "WS Interrupted";
+			mVDSettings->mWebSocketsNewMsg = true;
 		});
 		mClient.connectPingEventHandler([&](string msg) {
-			mSDASettings->mWebSocketsMsg = "WS Ponged";
-			mSDASettings->mWebSocketsNewMsg = true;
+			mVDSettings->mWebSocketsMsg = "WS Ponged";
+			mVDSettings->mWebSocketsNewMsg = true;
 			if (!msg.empty())
 			{
-				mSDASettings->mWebSocketsMsg += ": " + msg;
+				mVDSettings->mWebSocketsMsg += ": " + msg;
 			}
 		});
 		mClient.connectMessageEventHandler([&](string msg) {
@@ -426,35 +426,35 @@ void SDAWebsocket::wsConnect() {
 		});
 		wsClientConnect();
 	}
-	mSDASettings->mAreWebSocketsEnabledAtStartup = true;
+	mVDSettings->mAreWebSocketsEnabledAtStartup = true;
 	clientConnected = true;
 	// light4vents
 	/*mL4EClient.connectOpenEventHandler([&]() {
-		mSDASettings->mOSCMsg = "Connected";
-		mSDASettings->mOSCNewMsg = true;
+		mVDSettings->mOSCMsg = "Connected";
+		mVDSettings->mOSCNewMsg = true;
 	});
 	mL4EClient.connectCloseEventHandler([&]() {
 		clientConnected = false;
-		mSDASettings->mOSCMsg = "Disconnected";
-		mSDASettings->mOSCNewMsg = true;
+		mVDSettings->mOSCMsg = "Disconnected";
+		mVDSettings->mOSCNewMsg = true;
 	});
 	mL4EClient.connectFailEventHandler([&](string err) {
-		mSDASettings->mOSCMsg = "WS Error";
-		mSDASettings->mOSCNewMsg = true;
+		mVDSettings->mOSCMsg = "WS Error";
+		mVDSettings->mOSCNewMsg = true;
 		if (!err.empty()) {
-			mSDASettings->mOSCMsg += ": " + err;
+			mVDSettings->mOSCMsg += ": " + err;
 		}
 	});
 	mL4EClient.connectInterruptEventHandler([&]() {
-		mSDASettings->mOSCMsg = "WS Interrupted";
-		mSDASettings->mOSCNewMsg = true;
+		mVDSettings->mOSCMsg = "WS Interrupted";
+		mVDSettings->mOSCNewMsg = true;
 	});
 	mL4EClient.connectPingEventHandler([&](string msg) {
-		mSDASettings->mOSCMsg = "WS Ponged";
-		mSDASettings->mOSCNewMsg = true;
+		mVDSettings->mOSCMsg = "WS Ponged";
+		mVDSettings->mOSCNewMsg = true;
 		if (!msg.empty())
 		{
-			mSDASettings->mOSCMsg += ": " + msg;
+			mVDSettings->mOSCMsg += ": " + msg;
 		}
 	});
 	mL4EClient.connectMessageEventHandler([&](string msg) {
@@ -462,27 +462,27 @@ void SDAWebsocket::wsConnect() {
 	});
 	wsL4EClientConnect();
 }
-void SDAWebsocket::wsL4EClientConnect()
+void VDWebsocket::wsL4EClientConnect()
 {
 	stringstream s;
-	s << mSDASettings->mWebSocketsProtocol << "light4eventsws.herokuapp.com/bruce";
+	s << mVDSettings->mWebSocketsProtocol << "light4eventsws.herokuapp.com/bruce";
 	mL4EClient.connect(s.str());*/
 }
-void SDAWebsocket::wsClientConnect()
+void VDWebsocket::wsClientConnect()
 {
 
 	stringstream s;
-	if (mSDASettings->mWebSocketsPort == 80) {
-		s << mSDASettings->mWebSocketsProtocol << mSDASettings->mWebSocketsHost;
+	if (mVDSettings->mWebSocketsPort == 80) {
+		s << mVDSettings->mWebSocketsProtocol << mVDSettings->mWebSocketsHost;
 	}
 	else {
-		s << mSDASettings->mWebSocketsProtocol << mSDASettings->mWebSocketsHost << ":" << mSDASettings->mWebSocketsPort;
+		s << mVDSettings->mWebSocketsProtocol << mVDSettings->mWebSocketsHost << ":" << mVDSettings->mWebSocketsPort;
 	}
-	// BL TEMP s << "https://" << mSDASettings->mWebSocketsHost << ":" << mSDASettings->mWebSocketsPort;
+	// BL TEMP s << "https://" << mVDSettings->mWebSocketsHost << ":" << mVDSettings->mWebSocketsPort;
 	mClient.connect(s.str());
 
 }
-void SDAWebsocket::wsClientDisconnect()
+void VDWebsocket::wsClientDisconnect()
 {
 
 	if (clientConnected)
@@ -491,12 +491,12 @@ void SDAWebsocket::wsClientDisconnect()
 	}
 
 }
-void SDAWebsocket::wsWrite(string msg)
+void VDWebsocket::wsWrite(string msg)
 {
-	if (mSDASettings->mAreWebSocketsEnabledAtStartup)
+	if (mVDSettings->mAreWebSocketsEnabledAtStartup)
 	{
 		CI_LOG_V("wsWrite send: " + msg);
-		if (mSDASettings->mIsWebSocketsServer)
+		if (mVDSettings->mIsWebSocketsServer)
 		{
 			mServer.write(msg);
 		}
@@ -507,39 +507,39 @@ void SDAWebsocket::wsWrite(string msg)
 	}
 }
 
-void SDAWebsocket::sendJSON(string params) {
+void VDWebsocket::sendJSON(string params) {
 
 	wsWrite(params);
 
 }
-void SDAWebsocket::toggleAuto(unsigned int aIndex) {
+void VDWebsocket::toggleAuto(unsigned int aIndex) {
 	// toggle
-	mSDAAnimation->toggleAuto(aIndex);
+	mVDAnimation->toggleAuto(aIndex);
 	// TODO send json	
 }
-void SDAWebsocket::toggleTempo(unsigned int aIndex) {
+void VDWebsocket::toggleTempo(unsigned int aIndex) {
 	// toggle
-	mSDAAnimation->toggleTempo(aIndex);
+	mVDAnimation->toggleTempo(aIndex);
 	// TODO send json	
 }
-void SDAWebsocket::toggleValue(unsigned int aIndex) {
+void VDWebsocket::toggleValue(unsigned int aIndex) {
 	// toggle
-	mSDAAnimation->toggleValue(aIndex);
+	mVDAnimation->toggleValue(aIndex);
 	stringstream sParams;
 	// TODO check boolean value:
-	sParams << "{\"params\" :[{\"name\" : " << aIndex << ",\"value\" : " << (int)mSDAAnimation->getBoolUniformValueByIndex(aIndex) << "}]}";
+	sParams << "{\"params\" :[{\"name\" : " << aIndex << ",\"value\" : " << (int)mVDAnimation->getBoolUniformValueByIndex(aIndex) << "}]}";
 	string strParams = sParams.str();
 	sendJSON(strParams);
 }
-void SDAWebsocket::resetAutoAnimation(unsigned int aIndex) {
+void VDWebsocket::resetAutoAnimation(unsigned int aIndex) {
 	// reset
-	mSDAAnimation->resetAutoAnimation(aIndex);
+	mVDAnimation->resetAutoAnimation(aIndex);
 	// TODO: send json	
 }
 
-void SDAWebsocket::changeBoolValue(unsigned int aControl, bool aValue) {
+void VDWebsocket::changeBoolValue(unsigned int aControl, bool aValue) {
 	// check if changed
-	mSDAAnimation->setBoolUniformValueByIndex(aControl, aValue);
+	mVDAnimation->setBoolUniformValueByIndex(aControl, aValue);
 	stringstream sParams;
 	// TODO: check boolean value:
 	sParams << "{\"params\" :[{\"name\" : " << aControl << ",\"value\" : " << (int)aValue << "}]}";
@@ -547,28 +547,28 @@ void SDAWebsocket::changeBoolValue(unsigned int aControl, bool aValue) {
 	sendJSON(strParams);
 }
 
-void SDAWebsocket::changeFloatValue(unsigned int aControl, float aValue, bool forceSend, bool toggle, bool increase, bool decrease) {
+void VDWebsocket::changeFloatValue(unsigned int aControl, float aValue, bool forceSend, bool toggle, bool increase, bool decrease) {
 	/*if (aControl == 31) {
-		CI_LOG_V("old value " + toString(mSDAAnimation->getFloatUniformValueByIndex(aControl)) + " newvalue " + toString(aValue));
+		CI_LOG_V("old value " + toString(mVDAnimation->getFloatUniformValueByIndex(aControl)) + " newvalue " + toString(aValue));
 	}*/
 	float newValue;
 	if (increase) {
 		// increase
-		newValue = mSDAAnimation->getFloatUniformValueByIndex(aControl) + 0.1f;
+		newValue = mVDAnimation->getFloatUniformValueByIndex(aControl) + 0.1f;
 		if (newValue > 1.0f) newValue = 1.0f;
 		aValue = newValue;
 	}
 	else {
 		// decrease
 		if (decrease) {
-			newValue = mSDAAnimation->getFloatUniformValueByIndex(aControl) - 0.1f;
+			newValue = mVDAnimation->getFloatUniformValueByIndex(aControl) - 0.1f;
 			if (newValue < 0.0f) newValue = 0.0f;
 			aValue = newValue;
 		}
 		else { 
 			// toggle
 			if (toggle) {
-				newValue = mSDAAnimation->getFloatUniformValueByIndex(aControl);
+				newValue = mVDAnimation->getFloatUniformValueByIndex(aControl);
 				if (newValue > 0.0f) { newValue = 0.0f; }
 				else { newValue = 1.0f; } // Check for max instead?
 				aValue = newValue;
@@ -576,44 +576,44 @@ void SDAWebsocket::changeFloatValue(unsigned int aControl, float aValue, bool fo
 		}
 	}
 	// check if changed
-	if ( (mSDAAnimation->setFloatUniformValueByIndex(aControl, aValue) && aControl != mSDASettings->IFPS) || forceSend) {
+	if ( (mVDAnimation->setFloatUniformValueByIndex(aControl, aValue) && aControl != mVDSettings->IFPS) || forceSend) {
 		stringstream sParams;
 		// update color vec3
 		if (aControl > 0 && aControl < 4) {
-			mSDAAnimation->setVec3UniformValueByIndex(61, vec3(mSDAAnimation->getFloatUniformValueByIndex(1), mSDAAnimation->getFloatUniformValueByIndex(2), mSDAAnimation->getFloatUniformValueByIndex(3)));
+			mVDAnimation->setVec3UniformValueByIndex(61, vec3(mVDAnimation->getFloatUniformValueByIndex(1), mVDAnimation->getFloatUniformValueByIndex(2), mVDAnimation->getFloatUniformValueByIndex(3)));
 			colorWrite(); //lights4events
 		}
 		if (aControl == 29 || aControl ==30) {
-			mSDAAnimation->setVec3UniformValueByIndex(60, vec3(mSDAAnimation->getFloatUniformValueByIndex(29), mSDAAnimation->getFloatUniformValueByIndex(30), 1.0));
+			mVDAnimation->setVec3UniformValueByIndex(60, vec3(mVDAnimation->getFloatUniformValueByIndex(29), mVDAnimation->getFloatUniformValueByIndex(30), 1.0));
 		}
-		sParams << "{\"params\" :[{\"name\" : " << aControl << ",\"value\" : " << mSDAAnimation->getFloatUniformValueByIndex(aControl) << "}]}";
+		sParams << "{\"params\" :[{\"name\" : " << aControl << ",\"value\" : " << mVDAnimation->getFloatUniformValueByIndex(aControl) << "}]}";
 		string strParams = sParams.str();
 		
 		sendJSON(strParams);
 	}
 }
-void SDAWebsocket::changeShaderIndex(unsigned int aWarpIndex, unsigned int aWarpShaderIndex, unsigned int aSlot) {
+void VDWebsocket::changeShaderIndex(unsigned int aWarpIndex, unsigned int aWarpShaderIndex, unsigned int aSlot) {
 	//aSlot 0 = A, 1 = B,...
 	stringstream sParams;
 	sParams << "{\"cmd\" :[{\"type\" : 1,\"warp\" : " << aWarpIndex << ",\"shader\" : " << aWarpShaderIndex << ",\"slot\" : " << aSlot << "}]}";
 	string strParams = sParams.str();
 	sendJSON(strParams);
 }
-void SDAWebsocket::changeWarpFboIndex(unsigned int aWarpIndex, unsigned int aWarpFboIndex, unsigned int aSlot) {
+void VDWebsocket::changeWarpFboIndex(unsigned int aWarpIndex, unsigned int aWarpFboIndex, unsigned int aSlot) {
 	//aSlot 0 = A, 1 = B,...
 	stringstream sParams;
 	sParams << "{\"cmd\" :[{\"type\" : 0,\"warp\" : " << aWarpIndex << ",\"fbo\" : " << aWarpFboIndex << ",\"slot\" : " << aSlot << "}]}";
 	string strParams = sParams.str();
 	sendJSON(strParams);
 }
-void SDAWebsocket::changeFragmentShader(string aFragmentShaderText) {
+void VDWebsocket::changeFragmentShader(string aFragmentShaderText) {
 
 	stringstream sParams;
 	sParams << "{\"event\" : \"frag\",\"message\" : \"" << aFragmentShaderText << "\"}";
 	string strParams = sParams.str();
 	sendJSON(strParams);
 }
-void SDAWebsocket::colorWrite()
+void VDWebsocket::colorWrite()
 {
 	/* remove apache untick proxy mode in nginx
 	location /ws {
@@ -625,23 +625,23 @@ void SDAWebsocket::colorWrite()
 	*/
 	// lights4events
 	char col[97];
-	int r = (int)(mSDAAnimation->getFloatUniformValueByIndex(1) * 255);
-	int g = (int)(mSDAAnimation->getFloatUniformValueByIndex(2) * 255);
-	int b = (int)(mSDAAnimation->getFloatUniformValueByIndex(3) * 255);
-	int a = (int)(mSDAAnimation->getFloatUniformValueByIndex(4) * 255);
+	int r = (int)(mVDAnimation->getFloatUniformValueByIndex(1) * 255);
+	int g = (int)(mVDAnimation->getFloatUniformValueByIndex(2) * 255);
+	int b = (int)(mVDAnimation->getFloatUniformValueByIndex(3) * 255);
+	int a = (int)(mVDAnimation->getFloatUniformValueByIndex(4) * 255);
 	//sprintf(col, "#%02X%02X%02X", r, g, b);
 	sprintf(col, "{\"type\":\"action\", \"parameters\":{\"name\":\"FC\",\"parameters\":{\"color\":\"#%02X%02X%02X%02X\",\"fading\":\"NONE\"}}}", a, r, g, b);
 	wsWrite(col);
 	//mL4EClient.write(col);
 }
 
-void SDAWebsocket::update() {
+void VDWebsocket::update() {
 
 	// websockets
 
-	if (mSDASettings->mAreWebSocketsEnabledAtStartup)
+	if (mVDSettings->mAreWebSocketsEnabledAtStartup)
 	{
-		if (mSDASettings->mIsWebSocketsServer)
+		if (mVDSettings->mIsWebSocketsServer)
 		{
 			mServer.poll();
 		}
@@ -819,7 +819,7 @@ void SDAWebsocket::update() {
 	ss << a << ":" << sargs[a] << " ";
 	}
 	ss << std::endl;
-	mSDASettings->mWebSocketsNewMsg = true;
-	mSDASettings->mWebSocketsMsg = ss.str();
+	mVDSettings->mWebSocketsNewMsg = true;
+	mVDSettings->mWebSocketsMsg = ss.str();
 	*/
 }

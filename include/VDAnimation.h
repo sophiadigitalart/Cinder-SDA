@@ -6,7 +6,7 @@
 // json
 #include "cinder/Json.h"
 // Settings
-#include "SDASettings.h"
+#include "VDSettings.h"
 // Live json params
 #include "LiveParam.h"
 
@@ -15,14 +15,14 @@ using namespace ci::app;
 using namespace std;
 using namespace live;
 
-namespace SophiaDigitalArt
+namespace VideoDromm
 {
-	// stores the pointer to the SDAAnimation instance
-	typedef std::shared_ptr<class SDAAnimation> SDAAnimationRef;
+	// stores the pointer to the VDAnimation instance
+	typedef std::shared_ptr<class VDAnimation> VDAnimationRef;
 
 	//enum class UniformTypes { FLOAT, SAMPLER2D, VEC2, VEC3, VEC4, INT, BOOL };
 
-	struct SDAUniform
+	struct VDUniform
 	{
 		int								uniformType;
 		int								index;
@@ -41,13 +41,13 @@ namespace SophiaDigitalArt
 		bool							isValid;
 	};
 
-	class SDAAnimation {
+	class VDAnimation {
 	public:
-		SDAAnimation(SDASettingsRef aSDASettings);
+		VDAnimation(VDSettingsRef aVDSettings);
 
-		static SDAAnimationRef			create(SDASettingsRef aSDASettings)
+		static VDAnimationRef			create(VDSettingsRef aVDSettings)
 		{
-			return shared_ptr<SDAAnimation>(new SDAAnimation(aSDASettings));
+			return shared_ptr<VDAnimation>(new VDAnimation(aVDSettings));
 		}
 		void							update();
 		void							load();
@@ -69,13 +69,13 @@ namespace SophiaDigitalArt
 		void							useTimeWithTempo() { mUseTimeWithTempo = true; };
 		float							iTempoTimeBeatPerBar;
 		float							getBpm() {
-			return getFloatUniformValueByIndex(mSDASettings->IBPM);
+			return getFloatUniformValueByIndex(mVDSettings->IBPM);
 		};
 		void							setBpm(float aBpm) {
 			CI_LOG_W("setBpm " + toString(aBpm));
 
 			if (aBpm > 0.0f) {
-				setFloatUniformValueByIndex(mSDASettings->IBPM, aBpm);
+				setFloatUniformValueByIndex(mVDSettings->IBPM, aBpm);
 				iDeltaTime = 60 / aBpm;
 			}
 		};
@@ -98,15 +98,15 @@ namespace SophiaDigitalArt
 		void							preventLineInCrash(); // at next launch
 		void							saveLineIn();
 		bool							getUseAudio() {
-			return mSDASettings->mUseAudio;
+			return mVDSettings->mUseAudio;
 		};
 		bool							getUseLineIn() {
-			return mSDASettings->mUseLineIn;
+			return mVDSettings->mUseLineIn;
 		};
 		void							setUseLineIn(bool useLineIn) {
-			mSDASettings->mUseLineIn = useLineIn;
+			mVDSettings->mUseLineIn = useLineIn;
 		};
-		void							toggleUseLineIn() { mSDASettings->mUseLineIn = !mSDASettings->mUseLineIn; };
+		void							toggleUseLineIn() { mVDSettings->mUseLineIn = !mVDSettings->mUseLineIn; };
 
 		// audio
 		bool							isAudioBuffered() { return mAudioBuffered; };
@@ -183,7 +183,7 @@ namespace SophiaDigitalArt
 			return shaderUniforms[getUniformNameForIndex(aIndex)].vec4Value;
 		};
 		float							getFloatUniformValueByIndex(unsigned int aIndex) {
-			if (aIndex == mSDASettings->IBPM) {
+			if (aIndex == mVDSettings->IBPM) {
 				string s = getUniformNameForIndex(aIndex);
 				float f = shaderUniforms[getUniformNameForIndex(aIndex)].floatValue;
 			}
@@ -230,7 +230,7 @@ namespace SophiaDigitalArt
 		void							createSampler2DUniform(string aName, int aCtrlIndex, int aTextureIndex = 0);
 	private:
 		// Settings
-		SDASettingsRef					mSDASettings;
+		VDSettingsRef					mVDSettings;
 		map<int, int>					freqIndexes;
 		bool							mAudioBuffered;
 		// Live json params
@@ -241,7 +241,7 @@ namespace SophiaDigitalArt
 		Parameter<bool>					mAutoBeatAnimation;
 		// shaders
 		map<int, string>				controlIndexes;
-		map<string, SDAUniform>			shaderUniforms;
+		map<string, VDUniform>			shaderUniforms;
 		//! read a uniforms json file 
 		void							loadUniforms(const ci::DataSourceRef &source);
 		void							floatFromJson(const ci::JsonTree &json);

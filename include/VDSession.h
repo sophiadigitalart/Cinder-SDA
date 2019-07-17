@@ -7,47 +7,47 @@
 #include "cinder/Json.h"
 
 // Settings
-#include "SDASettings.h"
+#include "VDSettings.h"
 // Utils
-#include "SDAUtils.h"
+#include "VDUtils.h"
 // Message router
-#include "SDARouter.h"
+#include "VDRouter.h"
 // Websocket
-#include "SDAWebsocket.h"
+#include "VDWebsocket.h"
 // Animation
-#include "SDAAnimation.h"
+#include "VDAnimation.h"
 // Fbos
-#include "SDAFbo.h"
+#include "VDFbo.h"
 // Logger
-#include "SDALog.h"
+#include "VDLog.h"
 
 using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-namespace SophiaDigitalArt {
+namespace VideoDromm {
 
-	typedef std::shared_ptr<class SDASession> SDASessionRef;
+	typedef std::shared_ptr<class VDSession> VDSessionRef;
 
-	struct SDAMixFbo
+	struct VDMixFbo
 	{
 		ci::gl::FboRef					fbo;
 		ci::gl::Texture2dRef			texture;
 		string							name;
 	};
-	class SDASession {
+	class VDSession {
 	public:
-		SDASession(SDASettingsRef aSDASettings);
-		static SDASessionRef				create(SDASettingsRef aSDASettings);
+		VDSession(VDSettingsRef aVDSettings);
+		static VDSessionRef				create(VDSettingsRef aVDSettings);
 
 		//!
 		void							fromXml(const ci::XmlTree &xml);
 		//!
 		//XmlTree							toXml() const;
-		//! read a xml file and pass back a vector of SDAMixs
-		void							readSettings(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation, const ci::DataSourceRef &source);
+		//! read a xml file and pass back a vector of VDMixs
+		void							readSettings(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, const ci::DataSourceRef &source);
 		//! write a xml file
-		//static void						writeSettings(const SDAMixList &SDAMixlist, const ci::DataTargetRef &target);
+		//static void						writeSettings(const VDMixList &VDMixlist, const ci::DataTargetRef &target);
 
 		bool							handleMouseMove(MouseEvent &event);
 		bool							handleMouseDown(MouseEvent &event);
@@ -55,7 +55,7 @@ namespace SophiaDigitalArt {
 		bool							handleMouseUp(MouseEvent &event);
 		bool							handleKeyDown(KeyEvent &event);
 		bool							handleKeyUp(KeyEvent &event);
-		void							resize(){mRenderFbo = gl::Fbo::create(mSDASettings->mRenderWidth, mSDASettings->mRenderHeight, fboFmt);}
+		void							resize(){mRenderFbo = gl::Fbo::create(mVDSettings->mRenderWidth, mVDSettings->mRenderHeight, fboFmt);}
 		void							update(unsigned int aClassIndex = 0);
 		bool							save();
 		void							restore();
@@ -86,84 +86,84 @@ namespace SophiaDigitalArt {
 		float							getMinUniformValueByIndex(unsigned int aIndex);
 		float							getMaxUniformValueByIndex(unsigned int aIndex);
 		vec2							getVec2UniformValueByIndex(unsigned int aIndex) {
-			return mSDAAnimation->getVec2UniformValueByIndex(aIndex);
+			return mVDAnimation->getVec2UniformValueByIndex(aIndex);
 		};
 		vec3							getVec3UniformValueByIndex(unsigned int aIndex) {
-			return mSDAAnimation->getVec3UniformValueByIndex(aIndex);
+			return mVDAnimation->getVec3UniformValueByIndex(aIndex);
 		};
 		vec4							getVec4UniformValueByIndex(unsigned int aIndex) {
-			return mSDAAnimation->getVec4UniformValueByIndex(aIndex);
+			return mVDAnimation->getVec4UniformValueByIndex(aIndex);
 		};
 		int								getSampler2DUniformValueByName(string aName) {
-			return mSDAAnimation->getSampler2DUniformValueByName(aName);
+			return mVDAnimation->getSampler2DUniformValueByName(aName);
 		};
 		vec2							getVec2UniformValueByName(string aName) {
-			return mSDAAnimation->getVec2UniformValueByName(aName);
+			return mVDAnimation->getVec2UniformValueByName(aName);
 		};
 		vec3							getVec3UniformValueByName(string aName) {
-			return mSDAAnimation->getVec3UniformValueByName(aName);
+			return mVDAnimation->getVec3UniformValueByName(aName);
 		};
 		vec4							getVec4UniformValueByName(string aName) {
-			return mSDAAnimation->getVec4UniformValueByName(aName);
+			return mVDAnimation->getVec4UniformValueByName(aName);
 		};
 		int								getIntUniformValueByName(string aName) {
-			return mSDAAnimation->getIntUniformValueByName(aName);
+			return mVDAnimation->getIntUniformValueByName(aName);
 		};
 		bool							getBoolUniformValueByName(string aName) {
-			return mSDAAnimation->getBoolUniformValueByName(aName);
+			return mVDAnimation->getBoolUniformValueByName(aName);
 		};
 		bool							getBoolUniformValueByIndex(unsigned int aCtrl) {
-			return mSDAAnimation->getBoolUniformValueByIndex(aCtrl);
+			return mVDAnimation->getBoolUniformValueByIndex(aCtrl);
 		}
 		float							getFloatUniformValueByIndex(unsigned int aCtrl) {
-			return mSDAAnimation->getFloatUniformValueByIndex(aCtrl);
+			return mVDAnimation->getFloatUniformValueByIndex(aCtrl);
 		};
 		float							getFloatUniformValueByName(string aCtrlName) {
-			return mSDAAnimation->getFloatUniformValueByName(aCtrlName);
+			return mVDAnimation->getFloatUniformValueByName(aCtrlName);
 		};
 		void							setFloatUniformValueByIndex(unsigned int aCtrl, float aValue) {
-			// done in router mSDAAnimation->changeFloatValue(aCtrl, aValue);
-			mSDAWebsocket->changeFloatValue(aCtrl, aValue);
+			// done in router mVDAnimation->changeFloatValue(aCtrl, aValue);
+			mVDWebsocket->changeFloatValue(aCtrl, aValue);
 		};
 		void							setBoolUniformValueByIndex(unsigned int aCtrl, float aValue) {
-			// done in router mSDAAnimation->changeFloatValue(aCtrl, aValue);
-			mSDAWebsocket->changeBoolValue(aCtrl, aValue);
+			// done in router mVDAnimation->changeFloatValue(aCtrl, aValue);
+			mVDWebsocket->changeBoolValue(aCtrl, aValue);
 		};
 
 		// tempo
-		float							getBpm() { return mSDAAnimation->getBpm(); };
-		void							setBpm(float aBpm) { mSDAAnimation->setBpm(aBpm); };
-		void							tapTempo() { mSDAAnimation->tapTempo(); };
-		void							toggleUseTimeWithTempo() { mSDAAnimation->toggleUseTimeWithTempo(); };
-		void							useTimeWithTempo() { mSDAAnimation->useTimeWithTempo(); };
+		float							getBpm() { return mVDAnimation->getBpm(); };
+		void							setBpm(float aBpm) { mVDAnimation->setBpm(aBpm); };
+		void							tapTempo() { mVDAnimation->tapTempo(); };
+		void							toggleUseTimeWithTempo() { mVDAnimation->toggleUseTimeWithTempo(); };
+		void							useTimeWithTempo() { mVDAnimation->useTimeWithTempo(); };
 		// audio
-		float							getMaxVolume() { return mSDAAnimation->maxVolume; };
-		float *							getFreqs() { return mSDAAnimation->iFreqs; };
-		int								getFreqIndexSize() { return mSDAAnimation->getFreqIndexSize(); };
-		float							getFreq(unsigned int aFreqIndex) { return mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IFREQ0 + aFreqIndex); };
-		int								getFreqIndex(unsigned int aFreqIndex) { return mSDAAnimation->getFreqIndex(aFreqIndex); };
-		void							setFreqIndex(unsigned int aFreqIndex, unsigned int aFreq) { mSDAAnimation->setFreqIndex(aFreqIndex, aFreq); };
-		int								getWindowSize() { return mSDAAnimation->mWindowSize; };
-		bool							isAudioBuffered() { return mSDAAnimation->isAudioBuffered(); };
-		void							toggleAudioBuffered() { mSDAAnimation->toggleAudioBuffered(); };
-		bool							getUseLineIn() { return mSDAAnimation->getUseLineIn(); };
-		void							setUseLineIn(bool useLineIn) { mSDAAnimation->setUseLineIn(useLineIn); };
-		void							toggleUseLineIn() { mSDAAnimation->toggleUseLineIn(); };
+		float							getMaxVolume() { return mVDAnimation->maxVolume; };
+		float *							getFreqs() { return mVDAnimation->iFreqs; };
+		int								getFreqIndexSize() { return mVDAnimation->getFreqIndexSize(); };
+		float							getFreq(unsigned int aFreqIndex) { return mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IFREQ0 + aFreqIndex); };
+		int								getFreqIndex(unsigned int aFreqIndex) { return mVDAnimation->getFreqIndex(aFreqIndex); };
+		void							setFreqIndex(unsigned int aFreqIndex, unsigned int aFreq) { mVDAnimation->setFreqIndex(aFreqIndex, aFreq); };
+		int								getWindowSize() { return mVDAnimation->mWindowSize; };
+		bool							isAudioBuffered() { return mVDAnimation->isAudioBuffered(); };
+		void							toggleAudioBuffered() { mVDAnimation->toggleAudioBuffered(); };
+		bool							getUseLineIn() { return mVDAnimation->getUseLineIn(); };
+		void							setUseLineIn(bool useLineIn) { mVDAnimation->setUseLineIn(useLineIn); };
+		void							toggleUseLineIn() { mVDAnimation->toggleUseLineIn(); };
 		bool							getFreqWSSend() { return mFreqWSSend; };
 		void							toggleFreqWSSend() { mFreqWSSend = !mFreqWSSend; };
 		// uniforms
-		//void							setMixCrossfade(unsigned int aWarpIndex, float aCrossfade) { mSDASettings->xFade = aCrossfade; mSDASettings->xFadeChanged = true; };
-		//float							getMixCrossfade(unsigned int aWarpIndex) { return mSDASettings->xFade; };
+		//void							setMixCrossfade(unsigned int aWarpIndex, float aCrossfade) { mVDSettings->xFade = aCrossfade; mVDSettings->xFadeChanged = true; };
+		//float							getMixCrossfade(unsigned int aWarpIndex) { return mVDSettings->xFade; };
 		float							getCrossfade() {
-			return mSDAAnimation->getFloatUniformValueByIndex(mSDASettings->IXFADE);
+			return mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IXFADE);
 		};
 		void							setCrossfade(float aCrossfade) {
-			mSDAAnimation->setFloatUniformValueByIndex(mSDASettings->IXFADE, aCrossfade);
+			mVDAnimation->setFloatUniformValueByIndex(mVDSettings->IXFADE, aCrossfade);
 		};
 		void							setFboAIndex(unsigned int aIndex, unsigned int aFboIndex);
 		void							setFboBIndex(unsigned int aIndex, unsigned int aFboIndex);
-		unsigned int					getFboAIndex(unsigned int aIndex) { return mSDAAnimation->getIntUniformValueByName("iFboA"); };
-		unsigned int					getFboBIndex(unsigned int aIndex) { return mSDAAnimation->getIntUniformValueByName("iFboB"); };
+		unsigned int					getFboAIndex(unsigned int aIndex) { return mVDAnimation->getIntUniformValueByName("iFboA"); };
+		unsigned int					getFboBIndex(unsigned int aIndex) { return mVDAnimation->getIntUniformValueByName("iFboB"); };
 
 		void							setFboFragmentShaderIndex(unsigned int aFboIndex, unsigned int aFboShaderIndex);
 		unsigned int					getFboFragmentShaderIndex(unsigned int aFboIndex);
@@ -174,9 +174,9 @@ namespace SophiaDigitalArt {
 		ci::gl::TextureRef				getShaderThumb(unsigned int aShaderIndex);
 		string							getFragmentString(unsigned int aShaderIndex) { return mShaderList[aShaderIndex]->getFragmentString(); };
 		void							setFragmentShaderString(unsigned int aShaderIndex, string aFragmentShaderString, string aName = "");
-		//string							getVertexShaderString(unsigned int aShaderIndex) { return mSDAMix->getVertexShaderString(aShaderIndex); };
+		//string							getVertexShaderString(unsigned int aShaderIndex) { return mVDMix->getVertexShaderString(aShaderIndex); };
 		string							getFragmentShaderString(unsigned int aShaderIndex);
-		//string							getVertexShaderString(unsigned int aShaderIndex) { return mSDAMix->getVertexShaderString(aShaderIndex); };
+		//string							getVertexShaderString(unsigned int aShaderIndex) { return mVDMix->getVertexShaderString(aShaderIndex); };
 		void							setHydraFragmentShaderString(string aFragmentShaderString, string aName = "");
 		string							getHydraFragmentShaderString();
 		void							updateShaderThumbFile(unsigned int aShaderIndex);
@@ -207,31 +207,31 @@ namespace SophiaDigitalArt {
 		//string							getFboFragmentShaderText(unsigned int aFboIndex);
 		// feedback get/set
 		/*int								getFeedbackFrames() {
-			return mSDAMix->getFeedbackFrames();
+			return mVDMix->getFeedbackFrames();
 		};
 		void							setFeedbackFrames(int aFeedbackFrames) {
-			mSDAMix->setFeedbackFrames(aFeedbackFrames);
+			mVDMix->setFeedbackFrames(aFeedbackFrames);
 		};*/
 		string							getMixFboName(unsigned int aMixFboIndex);
 		ci::gl::TextureRef				getMixTexture(unsigned int aMixFboIndex = 0);
 		ci::gl::TextureRef				getMixetteTexture();
 		unsigned int					getMixFbosCount() { return mMixFbos.size(); };
-		// RTE in release mode ci::gl::Texture2dRef			getRenderedTexture(bool reDraw = true) { return mSDAMix->getRenderedTexture(reDraw); };
+		// RTE in release mode ci::gl::Texture2dRef			getRenderedTexture(bool reDraw = true) { return mVDMix->getRenderedTexture(reDraw); };
 		ci::gl::TextureRef				getRenderTexture();
 		bool							isEnabledAlphaBlending() { return mEnabledAlphaBlending; };
 		void							toggleEnabledAlphaBlending() { mEnabledAlphaBlending = !mEnabledAlphaBlending; }
 		bool							isRenderTexture() { return mRenderTexture; };
 		void							toggleRenderTexture() { mRenderTexture = !mRenderTexture; }
-		bool							isAutoLayout() { return mSDASettings->mAutoLayout; };
-		void							toggleAutoLayout() { mSDASettings->mAutoLayout = !mSDASettings->mAutoLayout; }
-		bool							isFlipH() { return mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPH); };
-		bool							isFlipV() { return mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPV); };
-		void							flipH(){mSDAAnimation->setBoolUniformValueByIndex(mSDASettings->IFLIPH, !mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPH));};
-		void							flipV(){ mSDAAnimation->setBoolUniformValueByIndex(mSDASettings->IFLIPV, !mSDAAnimation->getBoolUniformValueByIndex(mSDASettings->IFLIPV));};
+		bool							isAutoLayout() { return mVDSettings->mAutoLayout; };
+		void							toggleAutoLayout() { mVDSettings->mAutoLayout = !mVDSettings->mAutoLayout; }
+		bool							isFlipH() { return mVDAnimation->getBoolUniformValueByIndex(mVDSettings->IFLIPH); };
+		bool							isFlipV() { return mVDAnimation->getBoolUniformValueByIndex(mVDSettings->IFLIPV); };
+		void							flipH(){mVDAnimation->setBoolUniformValueByIndex(mVDSettings->IFLIPH, !mVDAnimation->getBoolUniformValueByIndex(mVDSettings->IFLIPH));};
+		void							flipV(){ mVDAnimation->setBoolUniformValueByIndex(mVDSettings->IFLIPV, !mVDAnimation->getBoolUniformValueByIndex(mVDSettings->IFLIPV));};
 
 		// blendmodes
 		unsigned int					getFboBlendCount() { return mBlendFbos.size(); };
-		void							useBlendmode(unsigned int aBlendIndex) { mSDASettings->iBlendmode = aBlendIndex; };
+		void							useBlendmode(unsigned int aBlendIndex) { mVDSettings->iBlendmode = aBlendIndex; };
 
 		// textures
 		ci::gl::TextureRef				getInputTexture(unsigned int aTextureIndex);
@@ -243,8 +243,8 @@ namespace SophiaDigitalArt {
 		void							loadMovie(string aFile, unsigned int aTextureIndex);
 		bool							loadImageSequence(string aFolder, unsigned int aTextureIndex);
 		//void							toggleSharedOutput(unsigned int aMixFboIndex = 0);
-		//bool							isSharedOutputActive() { return mSDAMix->isSharedOutputActive(); };
-		//unsigned int					getSharedMixIndex() { return mSDAMix->getSharedMixIndex(); };
+		//bool							isSharedOutputActive() { return mVDMix->isSharedOutputActive(); };
+		//unsigned int					getSharedMixIndex() { return mVDMix->getSharedMixIndex(); };
 		// move, rotate, zoom methods
 		//void							setPosition(int x, int y);
 		//void							setZoom(float aZoom);
@@ -284,25 +284,25 @@ namespace SophiaDigitalArt {
 		void							wsWrite(std::string msg);
 		void							sendFragmentShader(unsigned int aShaderIndex);
 		// midi
-		void							midiSetup() { mSDARouter->midiSetup(); };
-		void							midiOutSendNoteOn(int i, int channel, int pitch, int velocity) { mSDARouter->midiOutSendNoteOn(i, channel, pitch, velocity); };
+		void							midiSetup() { mVDRouter->midiSetup(); };
+		void							midiOutSendNoteOn(int i, int channel, int pitch, int velocity) { mVDRouter->midiOutSendNoteOn(i, channel, pitch, velocity); };
 
-		int								getMidiInPortsCount() { return mSDARouter->getMidiInPortsCount(); };
-		string							getMidiInPortName(int i) { return mSDARouter->getMidiInPortName(i); };
-		bool							isMidiInConnected(int i) { return mSDARouter->isMidiInConnected(i); };
-		int								getMidiOutPortsCount() { return mSDARouter->getMidiOutPortsCount(); };
-		string							getMidiOutPortName(int i) { return mSDARouter->getMidiOutPortName(i); };
-		bool							isMidiOutConnected(int i) { return mSDARouter->isMidiOutConnected(i); };
-		void							openMidiInPort(int i) { mSDARouter->openMidiInPort(i); };
-		void							closeMidiInPort(int i) { mSDARouter->closeMidiInPort(i); };
-		void							openMidiOutPort(int i) { mSDARouter->openMidiOutPort(i); };
-		void							closeMidiOutPort(int i) { mSDARouter->closeMidiOutPort(i); };
+		int								getMidiInPortsCount() { return mVDRouter->getMidiInPortsCount(); };
+		string							getMidiInPortName(int i) { return mVDRouter->getMidiInPortName(i); };
+		bool							isMidiInConnected(int i) { return mVDRouter->isMidiInConnected(i); };
+		int								getMidiOutPortsCount() { return mVDRouter->getMidiOutPortsCount(); };
+		string							getMidiOutPortName(int i) { return mVDRouter->getMidiOutPortName(i); };
+		bool							isMidiOutConnected(int i) { return mVDRouter->isMidiOutConnected(i); };
+		void							openMidiInPort(int i) { mVDRouter->openMidiInPort(i); };
+		void							closeMidiInPort(int i) { mVDRouter->closeMidiInPort(i); };
+		void							openMidiOutPort(int i) { mVDRouter->openMidiOutPort(i); };
+		void							closeMidiOutPort(int i) { mVDRouter->closeMidiOutPort(i); };
 		//! window management
 		void							createWindow() { cmd = 0; };
 		void							deleteWindow() { cmd = 1; };
 		int								getCmd() { int rtn = cmd; cmd = -1; return rtn; };
 		// utils
-		float							formatFloat(float f) { return mSDAUtils->formatFloat(f); };
+		float							formatFloat(float f) { return mVDUtils->formatFloat(f); };
 		
 		void							load();
 		void							updateAudio() {mTextureList[0]->getTexture();}
@@ -318,17 +318,17 @@ namespace SophiaDigitalArt {
 	private:
 		int								mMode;
 		// Settings
-		SDASettingsRef					mSDASettings;
+		VDSettingsRef					mVDSettings;
 		// Utils
-		SDAUtilsRef						mSDAUtils;
+		VDUtilsRef						mVDUtils;
 		// Message router
-		SDARouterRef					mSDARouter;
-		// SDAWebsocket
-		SDAWebsocketRef					mSDAWebsocket;
+		VDRouterRef					mVDRouter;
+		// VDWebsocket
+		VDWebsocketRef					mVDWebsocket;
 		// Animation
-		SDAAnimationRef					mSDAAnimation;
+		VDAnimationRef					mVDAnimation;
 		// Log
-		SDALogRef						mSDALog;
+		VDLogRef						mVDLog;
 
 		const string					sessionFileName = "session.json";
 		fs::path						sessionPath;
@@ -353,7 +353,7 @@ namespace SophiaDigitalArt {
 		int								mTextPlaybackEnd;
 		//! Fbos
 		// maintain a list of fbo for right only or left/right or more fbos specific to this mix
-		//SDAFboList						mFboList;
+		//VDFboList						mFboList;
 		fs::path						mFbosFilepath;
 		// fbo 
 		gl::Texture::Format				fmt;
@@ -393,19 +393,19 @@ namespace SophiaDigitalArt {
 		string							mError;
 
 		//! Fbos
-		map<int, SDAMixFbo>				mMixFbos;
+		map<int, VDMixFbo>				mMixFbos;
 		
 		// maintain a list of fbos specific to this mix
-		SDAFboList						mFboList;
+		VDFboList						mFboList;
 		fs::path						mMixesFilepath;
 		//unsigned int					mAFboIndex;
 		//unsigned int					mBFboIndex;
 
 		//! Shaders
-		SDAShaderList					mShaderList;
+		VDShaderList					mShaderList;
 		void							initShaderList();
 		//! Textures
-		SDATextureList					mTextureList;
+		VDTextureList					mTextureList;
 		fs::path						mTexturesFilepath;
 		bool							initTextureList();
 		// blendmodes fbos

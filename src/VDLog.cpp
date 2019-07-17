@@ -1,8 +1,8 @@
-#include "SDALog.h"
+#include "VDLog.h"
 
-using namespace SophiaDigitalArt;
+using namespace VideoDromm;
 
-SDALog::SDALog()
+VDLog::VDLog()
 {
 	auto sysLogger = log::makeLogger<log::LoggerSystem>();
 	sysLogger->setLoggingLevel(log::LEVEL_WARNING);

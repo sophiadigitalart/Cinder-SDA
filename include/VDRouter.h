@@ -4,11 +4,11 @@
 #include "cinder/Json.h"
 
 // Settings
-#include "SDASettings.h"
+#include "VDSettings.h"
 // Animation
-#include "SDAAnimation.h"
+#include "VDAnimation.h"
 // Websocket
-#include "SDAWebsocket.h"
+#include "VDWebsocket.h"
 // Midi
 #include "MidiIn.h"
 // OSC
@@ -19,15 +19,15 @@ using namespace ci::app;
 using namespace std;
 using namespace asio;
 using namespace asio::ip; 
-using namespace SophiaDigitalArt;
+using namespace VideoDromm;
 
 using Receiver = osc::ReceiverUdp;
 using protocol = asio::ip::udp;
 
-namespace SophiaDigitalArt
+namespace VideoDromm
 {
-	// stores the pointer to the SDARouter instance
-	typedef std::shared_ptr<class SDARouter> SDARouterRef;
+	// stores the pointer to the VDRouter instance
+	typedef std::shared_ptr<class VDRouter> VDRouterRef;
 	// midi
 	typedef std::shared_ptr<class MIDI> MIDIRef;
 
@@ -42,12 +42,12 @@ namespace SophiaDigitalArt
 		bool			isConnected;
 	};
 
-	class SDARouter {
+	class VDRouter {
 	public:
-		SDARouter(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation, SDAWebsocketRef aSDAWebsocket);
-		static SDARouterRef	create(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation, SDAWebsocketRef aSDAWebsocket)
+		VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWebsocketRef aVDWebsocket);
+		static VDRouterRef	create(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWebsocketRef aVDWebsocket)
 		{
-			return shared_ptr<SDARouter>(new SDARouter(aSDASettings, aSDAAnimation, aSDAWebsocket));
+			return shared_ptr<VDRouter>(new VDRouter(aVDSettings, aVDAnimation, aVDWebsocket));
 		}
 		//void						update();
 		void						shutdown();
@@ -77,11 +77,11 @@ namespace SophiaDigitalArt
 		void						setWarpBFboIndex(unsigned int aWarpIndex, unsigned int aWarpFboIndex) { mSelectedFboB = aWarpFboIndex; }
 	private:
 		// Settings
-		SDASettingsRef				mSDASettings;
+		VDSettingsRef				mVDSettings;
 		// Animation
-		SDAAnimationRef				mSDAAnimation;
-		// SDAWebsocket
-		SDAWebsocketRef				mSDAWebsocket;
+		VDAnimationRef				mVDAnimation;
+		// VDWebsocket
+		VDWebsocketRef				mVDWebsocket;
 		// lights4events
 		void						colorWrite();
 		bool						mFBOAChanged;

@@ -1,9 +1,9 @@
-#include "SDAAnimation.h"
+#include "VDAnimation.h"
 
-using namespace SophiaDigitalArt;
+using namespace VideoDromm;
 
-SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
-	mSDASettings = aSDASettings;
+VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
+	mVDSettings = aVDSettings;
 
 	mBlendRender = false;
 	//audio
@@ -19,7 +19,7 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		iFreqs[i] = i;
 	}
 	// live json params
-	mJsonFilePath = app::getAssetPath("") / mSDASettings->mAssetsPath / "live_params.json";
+	mJsonFilePath = app::getAssetPath("") / mVDSettings->mAssetsPath / "live_params.json";
 	JsonBag::add(&mBackgroundColor, "background_color");
 	JsonBag::add(&mExposure, "exposure", []() {
 		app::console() << "Updated exposure" << endl;
@@ -42,142 +42,142 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 	startTime = currentTime = mTimer.getSeconds();
 	//mBpm = 166;
 	//iDeltaTime = 60 / mBpm;//mTempo;
-	//setFloatUniformValueByIndex(mSDASettings->IBPM, 166.0f);
+	//setFloatUniformValueByIndex(mVDSettings->IBPM, 166.0f);
 	iDeltaTime = 60.0f / 166.0f;
 	//iBar = 0;
 	//iBadTvRunning = false;
 	//int ctrl;
 
-	mUniformsJson = getAssetPath("") / mSDASettings->mAssetsPath / "uniforms.json";
+	mUniformsJson = getAssetPath("") / mVDSettings->mAssetsPath / "uniforms.json";
 	if (fs::exists(mUniformsJson)) {
 		loadUniforms(loadFile(mUniformsJson));
 	}
 	else {
 		// global time in seconds
-		createFloatUniform("iTime", mSDASettings->ITIME, 0.0f); // 0
+		createFloatUniform("iTime", mVDSettings->ITIME, 0.0f); // 0
 		// sliders
 		// red
-		createFloatUniform("r", mSDASettings->IFR, 1.0f); // 1
+		createFloatUniform("r", mVDSettings->IFR, 1.0f); // 1
 		// green
-		createFloatUniform("g", mSDASettings->IFG, 0.3f); // 2
+		createFloatUniform("g", mVDSettings->IFG, 0.3f); // 2
 		// blue
-		createFloatUniform("b", mSDASettings->IFB, 0.0f); // 3
+		createFloatUniform("b", mVDSettings->IFB, 0.0f); // 3
 		// Alpha 
-		createFloatUniform("iAlpha", mSDASettings->IFA, 1.0f); // 4
+		createFloatUniform("iAlpha", mVDSettings->IFA, 1.0f); // 4
 		// red multiplier 
-		createFloatUniform("iRedMultiplier", mSDASettings->IFRX, 1.0f, 0.0f, 3.0f); // 5
+		createFloatUniform("iRedMultiplier", mVDSettings->IFRX, 1.0f, 0.0f, 3.0f); // 5
 		// green multiplier 
-		createFloatUniform("iGreenMultiplier", mSDASettings->IFGX, 1.0f, 0.0f, 3.0f); // 6
+		createFloatUniform("iGreenMultiplier", mVDSettings->IFGX, 1.0f, 0.0f, 3.0f); // 6
 		// blue multiplier 
-		createFloatUniform("iBlueMultiplier", mSDASettings->IFBX, 1.0f, 0.0f, 3.0f); // 7
+		createFloatUniform("iBlueMultiplier", mVDSettings->IFBX, 1.0f, 0.0f, 3.0f); // 7
 		// gstnsmk
-		createFloatUniform("iSobel", mSDASettings->ISOBEL, 0.02f, 0.02f, 1.0f); // 8
+		createFloatUniform("iSobel", mVDSettings->ISOBEL, 0.02f, 0.02f, 1.0f); // 8
 		// bad tv
-		createFloatUniform("iBadTv", mSDASettings->IBADTV, 0.0f, 0.0f, 5.0f); // 9
+		createFloatUniform("iBadTv", mVDSettings->IBADTV, 0.0f, 0.0f, 5.0f); // 9
 		// Steps
-		createFloatUniform("iSteps", mSDASettings->ISTEPS, 16.0f, 1.0f, 128.0f); // 10
+		createFloatUniform("iSteps", mVDSettings->ISTEPS, 16.0f, 1.0f, 128.0f); // 10
 
 		// rotary
 		// ratio
-		createFloatUniform("iRatio", mSDASettings->IRATIO, 20.0f, 0.00000000001f, 20.0f); // 11
+		createFloatUniform("iRatio", mVDSettings->IRATIO, 20.0f, 0.00000000001f, 20.0f); // 11
 		// zoom
-		createFloatUniform("iZoom", mSDASettings->IZOOM, 1.0f, 0.95f, 1.1f); // 12
+		createFloatUniform("iZoom", mVDSettings->IZOOM, 1.0f, 0.95f, 1.1f); // 12
 		// Audio multfactor 
-		createFloatUniform("iAudioMult", mSDASettings->IAUDIOX, 1.0f, 0.01f, 12.0f); // 13
+		createFloatUniform("iAudioMult", mVDSettings->IAUDIOX, 1.0f, 0.01f, 12.0f); // 13
 		// exposure
-		createFloatUniform("iExposure", mSDASettings->IEXPOSURE, 1.0f, 0.0f, 3.0f); // 14
+		createFloatUniform("iExposure", mVDSettings->IEXPOSURE, 1.0f, 0.0f, 3.0f); // 14
 		// Pixelate
-		createFloatUniform("iPixelate", mSDASettings->IPIXELATE, 1.0f, 0.01f); // 15
+		createFloatUniform("iPixelate", mVDSettings->IPIXELATE, 1.0f, 0.01f); // 15
 		// Trixels
-		createFloatUniform("iTrixels", mSDASettings->ITRIXELS, 0.0f); // 16
+		createFloatUniform("iTrixels", mVDSettings->ITRIXELS, 0.0f); // 16
 		// iChromatic
-		createFloatUniform("iChromatic", mSDASettings->ICHROMATIC, 0.0f, 0.000000001f); // 17
+		createFloatUniform("iChromatic", mVDSettings->ICHROMATIC, 0.0f, 0.000000001f); // 17
 		// iCrossfade
-		createFloatUniform("iCrossfade", mSDASettings->IXFADE, 1.0f); // 18
+		createFloatUniform("iCrossfade", mVDSettings->IXFADE, 1.0f); // 18
 		// tempo time
-		createFloatUniform("iTempoTime", mSDASettings->ITEMPOTIME, 0.1f); // 19
+		createFloatUniform("iTempoTime", mVDSettings->ITEMPOTIME, 0.1f); // 19
 		// fps
-		createFloatUniform("iFps", mSDASettings->IFPS, 60.0f, 0.0f, 500.0f); // 20	
+		createFloatUniform("iFps", mVDSettings->IFPS, 60.0f, 0.0f, 500.0f); // 20	
 		// iBpm 
-		createFloatUniform("iBpm", mSDASettings->IBPM, 165.0f, 0.000000001f, 400.0f); // 21
+		createFloatUniform("iBpm", mVDSettings->IBPM, 165.0f, 0.000000001f, 400.0f); // 21
 		// Speed 
-		createFloatUniform("speed", mSDASettings->ISPEED, 0.01f, 0.01f, 1.0f); // 22
+		createFloatUniform("speed", mVDSettings->ISPEED, 0.01f, 0.01f, 1.0f); // 22
 		// slitscan (or other) Param1 
-		createFloatUniform("pixelX", mSDASettings->IPIXELX, 1.0f, 0.01f, 100.0f); // 23
+		createFloatUniform("pixelX", mVDSettings->IPIXELX, 1.0f, 0.01f, 100.0f); // 23
 		// slitscan (or other) Param2 
-		createFloatUniform("pixelY", mSDASettings->IPIXELY, 1.0f, 0.01f, 100.0f); // 24
+		createFloatUniform("pixelY", mVDSettings->IPIXELY, 1.0f, 0.01f, 100.0f); // 24
 			
 		 // background red
-		createFloatUniform("iBR", mSDASettings->IBR, 0.1f); // 26 was 36
+		createFloatUniform("iBR", mVDSettings->IBR, 0.1f); // 26 was 36
 		// background green
-		createFloatUniform("iBG", mSDASettings->IBG, 0.5f); // 27 was 37
+		createFloatUniform("iBG", mVDSettings->IBG, 0.5f); // 27 was 37
 		// background blue
-		createFloatUniform("iBB", mSDASettings->IBB, 0.1f); // 28 was 38
+		createFloatUniform("iBB", mVDSettings->IBB, 0.1f); // 28 was 38
 		// background alpha
-		//createFloatUniform("iBA", mSDASettings->IBA, 0.2f); // 39
+		//createFloatUniform("iBA", mVDSettings->IBA, 0.2f); // 39
 
 
 		// iResolutionX (should be fbowidth) 
-		createFloatUniform("iResolutionX", mSDASettings->IRESX, mSDASettings->mRenderWidth, 320.01f, 4280.0f); // 29
+		createFloatUniform("iResolutionX", mVDSettings->IRESX, mVDSettings->mRenderWidth, 320.01f, 4280.0f); // 29
 		// iResolutionY (should be fboheight)  
-		createFloatUniform("iResolutionY", mSDASettings->IRESY, mSDASettings->mRenderHeight, 240.01f, 2160.0f); // 30
+		createFloatUniform("iResolutionY", mVDSettings->IRESY, mVDSettings->mRenderHeight, 240.01f, 2160.0f); // 30
 
 		// TODO: double 
 		// weight mix fbo texture 0
-		createFloatUniform("iWeight0", mSDASettings->IWEIGHT0, 1.0f); // 31
+		createFloatUniform("iWeight0", mVDSettings->IWEIGHT0, 1.0f); // 31
 		// weight texture 1
-		createFloatUniform("iWeight1", mSDASettings->IWEIGHT1, 0.0f); // 32
+		createFloatUniform("iWeight1", mVDSettings->IWEIGHT1, 0.0f); // 32
 		// weight texture 2
-		createFloatUniform("iWeight2", mSDASettings->IWEIGHT2, 0.0f); // 33
+		createFloatUniform("iWeight2", mVDSettings->IWEIGHT2, 0.0f); // 33
 		// weight texture 3
-		createFloatUniform("iWeight3", mSDASettings->IWEIGHT3, 0.0f); // 34
+		createFloatUniform("iWeight3", mVDSettings->IWEIGHT3, 0.0f); // 34
 		// weight texture 4
-		createFloatUniform("iWeight4", mSDASettings->IWEIGHT4, 0.0f); // 35
+		createFloatUniform("iWeight4", mVDSettings->IWEIGHT4, 0.0f); // 35
 		// weight texture 
-		createFloatUniform("iWeight5", mSDASettings->IWEIGHT5, 0.0f); // 36
+		createFloatUniform("iWeight5", mVDSettings->IWEIGHT5, 0.0f); // 36
 		// weight texture 
-		createFloatUniform("iWeight6", mSDASettings->IWEIGHT6, 0.0f); // 37
+		createFloatUniform("iWeight6", mVDSettings->IWEIGHT6, 0.0f); // 37
 		// weight texture 
-		createFloatUniform("iWeight7", mSDASettings->IWEIGHT7, 0.0f); // 38
+		createFloatUniform("iWeight7", mVDSettings->IWEIGHT7, 0.0f); // 38
 
 
 		// contour
-		createFloatUniform("iContour", mSDASettings->ICONTOUR, 0.0f, 0.0f, 0.5f); // 40
+		createFloatUniform("iContour", mVDSettings->ICONTOUR, 0.0f, 0.0f, 0.5f); // 40
 		// RotationSpeed
-		createFloatUniform("iRotationSpeed", mSDASettings->IROTATIONSPEED, 0.0f, -2.0f, 2.0f); // 41
+		createFloatUniform("iRotationSpeed", mVDSettings->IROTATIONSPEED, 0.0f, -2.0f, 2.0f); // 41
 	
 		// iMouseX  
-		createFloatUniform("iMouseX", mSDASettings->IMOUSEX, 320.0f, 0.0f, 1280.0f); // 42
+		createFloatUniform("iMouseX", mVDSettings->IMOUSEX, 320.0f, 0.0f, 1280.0f); // 42
 		// iMouseY  
-		createFloatUniform("iMouseY", mSDASettings->IMOUSEY, 240.0f, 0.0f, 800.0f); // 43
+		createFloatUniform("iMouseY", mVDSettings->IMOUSEY, 240.0f, 0.0f, 800.0f); // 43
 		// iMouseZ  
-		createFloatUniform("iMouseZ", mSDASettings->IMOUSEZ, 0.0f, 0.0f, 1.0f); // 44
+		createFloatUniform("iMouseZ", mVDSettings->IMOUSEZ, 0.0f, 0.0f, 1.0f); // 44
 		// vignette amount
-		createFloatUniform("iVAmount", mSDASettings->IVAMOUNT, 0.91f, 0.0f, 1.0f); // 45
+		createFloatUniform("iVAmount", mVDSettings->IVAMOUNT, 0.91f, 0.0f, 1.0f); // 45
 		// vignette falloff
-		createFloatUniform("iVFallOff", mSDASettings->IVFALLOFF, 0.31f, 0.0f, 1.0f); // 46
+		createFloatUniform("iVFallOff", mVDSettings->IVFALLOFF, 0.31f, 0.0f, 1.0f); // 46
 		// hydra time
-		createFloatUniform("time", mSDASettings->TIME, 0.0f); // 47
+		createFloatUniform("time", mVDSettings->TIME, 0.0f); // 47
 
 		// int
 		// blend mode 
-		createIntUniform("iBlendmode", mSDASettings->IBLENDMODE, 0); // 50
+		createIntUniform("iBlendmode", mVDSettings->IBLENDMODE, 0); // 50
 		// greyscale 
 		createIntUniform("iGreyScale", 51, 0);
 		// current beat
-		createIntUniform("iPhase", mSDASettings->IPHASE, 0); // 52
+		createIntUniform("iPhase", mVDSettings->IPHASE, 0); // 52
 		// beats per bar 
 		createIntUniform("iBeatsPerBar", 53, 4);
 		// fbo A
-		createIntUniform("iFboA", mSDASettings->IFBOA, 0); // 54
+		createIntUniform("iFboA", mVDSettings->IFBOA, 0); // 54
 		// fbo B
-		createIntUniform("iFboB", mSDASettings->IFBOB, 1); // 55
+		createIntUniform("iFboB", mVDSettings->IFBOB, 1); // 55
 
 		// vec3
 		createVec3Uniform("iResolution", 60, vec3(getFloatUniformValueByName("iResolutionX"), getFloatUniformValueByName("iResolutionY"), 1.0));
 		createVec3Uniform("iColor", 61, vec3(1.0, 0.5, 0.0));
 		createVec3Uniform("iBackgroundColor", 62);
-		//createVec3Uniform("iChannelResolution[0]", 63, vec3(mSDASettings->mFboWidth, mSDASettings->mFboHeight, 1.0));
+		//createVec3Uniform("iChannelResolution[0]", 63, vec3(mVDSettings->mFboWidth, mVDSettings->mFboHeight, 1.0));
 
 		// vec4
 		createVec4Uniform("iMouse", 70, vec4(320.0f, 240.0f, 0.0f, 0.0f));
@@ -186,33 +186,33 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		// boolean
 		// invert
 		// glitch
-		createBoolUniform("iGlitch", mSDASettings->IGLITCH); // 81
+		createBoolUniform("iGlitch", mVDSettings->IGLITCH); // 81
 		// vignette
-		createBoolUniform("iVignette", mSDASettings->IVIGN); // 82 toggle
+		createBoolUniform("iVignette", mVDSettings->IVIGN); // 82 toggle
 		// toggle
-		createBoolUniform("iToggle", mSDASettings->ITOGGLE); // 83
+		createBoolUniform("iToggle", mVDSettings->ITOGGLE); // 83
 		// invert
-		createBoolUniform("iInvert", mSDASettings->IINVERT); // 86
-		createBoolUniform("iXorY", mSDASettings->IXORY); // was 87
-		createBoolUniform("iFlipH", mSDASettings->IFLIPH); // 100 toggle was 90
-		createBoolUniform("iFlipV", mSDASettings->IFLIPV); // 103 toggle was 92
+		createBoolUniform("iInvert", mVDSettings->IINVERT); // 86
+		createBoolUniform("iXorY", mVDSettings->IXORY); // was 87
+		createBoolUniform("iFlipH", mVDSettings->IFLIPH); // 100 toggle was 90
+		createBoolUniform("iFlipV", mVDSettings->IFLIPV); // 103 toggle was 92
 
 		// vec2
-		createVec2Uniform("resolution", mSDASettings->RESOLUTION, vec2(1280.0f, 720.0f)); // 120
+		createVec2Uniform("resolution", mVDSettings->RESOLUTION, vec2(1280.0f, 720.0f)); // 120
 		// floats for warps
 		// srcArea 
-		createFloatUniform("srcXLeft", mSDASettings->SRCXLEFT, 0.0f, 0.0f, 4280.0f); // 130
-		createFloatUniform("srcXRight", mSDASettings->SRCXRIGHT, mSDASettings->mRenderWidth, 320.01f, 4280.0f); // 131
-		createFloatUniform("srcYLeft", mSDASettings->SRCYLEFT, 0.0f, 0.0f, 1024.0f); // 132
-		createFloatUniform("srcYRight", mSDASettings->SRCYRIGHT, mSDASettings->mRenderHeight, 0.0f, 1024.0f); // 133
+		createFloatUniform("srcXLeft", mVDSettings->SRCXLEFT, 0.0f, 0.0f, 4280.0f); // 130
+		createFloatUniform("srcXRight", mVDSettings->SRCXRIGHT, mVDSettings->mRenderWidth, 320.01f, 4280.0f); // 131
+		createFloatUniform("srcYLeft", mVDSettings->SRCYLEFT, 0.0f, 0.0f, 1024.0f); // 132
+		createFloatUniform("srcYRight", mVDSettings->SRCYRIGHT, mVDSettings->mRenderHeight, 0.0f, 1024.0f); // 133
 		// iFreq0  
-		createFloatUniform("iFreq0", mSDASettings->IFREQ0, 0.0f, 0.01f, 256.0f); //  140 was 25 	
+		createFloatUniform("iFreq0", mVDSettings->IFREQ0, 0.0f, 0.01f, 256.0f); //  140 was 25 	
 		// iFreq1  
-		createFloatUniform("iFreq1", mSDASettings->IFREQ1, 0.0f, 0.01f, 256.0f); // 141 was  39 was 26
+		createFloatUniform("iFreq1", mVDSettings->IFREQ1, 0.0f, 0.01f, 256.0f); // 141 was  39 was 26
 		// iFreq2  
-		createFloatUniform("iFreq2", mSDASettings->IFREQ2, 0.0f, 0.01f, 256.0f); // 142 was  48 was 27
+		createFloatUniform("iFreq2", mVDSettings->IFREQ2, 0.0f, 0.01f, 256.0f); // 142 was  48 was 27
 		// iFreq3  
-		createFloatUniform("iFreq3", mSDASettings->IFREQ3, 0.0f, 0.01f, 256.0f); // 143 was  49 was  28
+		createFloatUniform("iFreq3", mVDSettings->IFREQ3, 0.0f, 0.01f, 256.0f); // 143 was  49 was  28
 		// vec4 kinect2
 		createVec4Uniform("iSpineBase", 200, vec4(320.0f, 240.0f, 0.0f, 0.0f));
 		createVec4Uniform("SpineMid", 201, vec4(320.0f, 240.0f, 0.0f, 0.0f));
@@ -248,24 +248,24 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		createSampler2DUniform("iChannel" + toString(i), 300 + i, i);// TODO verify doesn't mess up type (uint!)
 	}
 	// iRHandX  
-	//createFloatUniform("iRHandX", mSDASettings->IRHANDX, 320.0f, 0.0f, 1280.0f);
+	//createFloatUniform("iRHandX", mVDSettings->IRHANDX, 320.0f, 0.0f, 1280.0f);
 	//// iRHandY  
-	//createFloatUniform("iRHandY", mSDASettings->IRHANDY, 240.0f, 0.0f, 800.0f);
+	//createFloatUniform("iRHandY", mVDSettings->IRHANDY, 240.0f, 0.0f, 800.0f);
 	//// iLHandX  
-	//createFloatUniform("iLHandX", mSDASettings->ILHANDX, 320.0f, 0.0f, 1280.0f);
+	//createFloatUniform("iLHandX", mVDSettings->ILHANDX, 320.0f, 0.0f, 1280.0f);
 	//// iLHandY  
-	//createFloatUniform("iLHandY", mSDASettings->ILHANDY, 240.0f, 0.0f, 800.0f);
+	//createFloatUniform("iLHandY", mVDSettings->ILHANDY, 240.0f, 0.0f, 800.0f);
 
 	load();
 	loadAnimation();
-	CI_LOG_V("SDAAnimation, iResX:" + toString(getFloatUniformValueByIndex(29)));
-	CI_LOG_V("SDAAnimation, iResY:" + toString(getFloatUniformValueByIndex(30)));
+	CI_LOG_V("VDAnimation, iResX:" + toString(getFloatUniformValueByIndex(29)));
+	CI_LOG_V("VDAnimation, iResY:" + toString(getFloatUniformValueByIndex(30)));
 
 	setVec3UniformValueByIndex(60, vec3(getFloatUniformValueByIndex(29), getFloatUniformValueByIndex(30), 1.0));
-	CI_LOG_V("SDAAnimation, iResolution:" + toString(shaderUniforms[getUniformNameForIndex(60)].vec3Value));
+	CI_LOG_V("VDAnimation, iResolution:" + toString(shaderUniforms[getUniformNameForIndex(60)].vec3Value));
 
 }
-void SDAAnimation::loadUniforms(const ci::DataSourceRef &source) {
+void VDAnimation::loadUniforms(const ci::DataSourceRef &source) {
 
 	JsonTree json(source);
 
@@ -315,7 +315,7 @@ void SDAAnimation::loadUniforms(const ci::DataSourceRef &source) {
 		}
 	}
 }
-void SDAAnimation::floatFromJson(const ci::JsonTree &json) {
+void VDAnimation::floatFromJson(const ci::JsonTree &json) {
 	string jName;
 	int jCtrlIndex;
 	float jValue, jMin, jMax;
@@ -329,7 +329,7 @@ void SDAAnimation::floatFromJson(const ci::JsonTree &json) {
 		createFloatUniform(jName, jCtrlIndex, jValue, jMin, jMax);
 	}
 }
-void SDAAnimation::sampler2dFromJson(const ci::JsonTree &json) {
+void VDAnimation::sampler2dFromJson(const ci::JsonTree &json) {
 	string jName;
 	int jCtrlIndex;
 	int jTextureIndex;
@@ -341,7 +341,7 @@ void SDAAnimation::sampler2dFromJson(const ci::JsonTree &json) {
 		createSampler2DUniform(jName, jTextureIndex);
 	}
 }
-void SDAAnimation::vec2FromJson(const ci::JsonTree &json) {
+void VDAnimation::vec2FromJson(const ci::JsonTree &json) {
 	string jName;
 	int jCtrlIndex;
 	if (json.hasChild("uniform")) {
@@ -351,7 +351,7 @@ void SDAAnimation::vec2FromJson(const ci::JsonTree &json) {
 		createVec2Uniform(jName, jCtrlIndex);
 	}
 }
-void SDAAnimation::vec3FromJson(const ci::JsonTree &json) {
+void VDAnimation::vec3FromJson(const ci::JsonTree &json) {
 	string jName;
 	int jCtrlIndex;
 	if (json.hasChild("uniform")) {
@@ -361,7 +361,7 @@ void SDAAnimation::vec3FromJson(const ci::JsonTree &json) {
 		createVec3Uniform(jName, jCtrlIndex);
 	}
 }
-void SDAAnimation::vec4FromJson(const ci::JsonTree &json) {
+void VDAnimation::vec4FromJson(const ci::JsonTree &json) {
 	string jName;
 	int jCtrlIndex;
 	if (json.hasChild("uniform")) {
@@ -371,7 +371,7 @@ void SDAAnimation::vec4FromJson(const ci::JsonTree &json) {
 		createVec4Uniform(jName, jCtrlIndex);
 	}
 }
-void SDAAnimation::intFromJson(const ci::JsonTree &json) {
+void VDAnimation::intFromJson(const ci::JsonTree &json) {
 	string jName;
 	int jCtrlIndex, jValue;
 	if (json.hasChild("uniform")) {
@@ -383,7 +383,7 @@ void SDAAnimation::intFromJson(const ci::JsonTree &json) {
 	}
 
 }
-void SDAAnimation::boolFromJson(const ci::JsonTree &json) {
+void VDAnimation::boolFromJson(const ci::JsonTree &json) {
 	string jName;
 	int jCtrlIndex;
 	bool jValue;
@@ -396,7 +396,7 @@ void SDAAnimation::boolFromJson(const ci::JsonTree &json) {
 	}
 }
 //! uniform to json
-JsonTree SDAAnimation::uniformToJson(int i)
+JsonTree VDAnimation::uniformToJson(int i)
 {
 	stringstream svec4;
 	JsonTree		json;
@@ -441,7 +441,7 @@ JsonTree SDAAnimation::uniformToJson(int i)
 	json.pushBack(u);
 	return json;
 }
-void SDAAnimation::saveUniforms()
+void VDAnimation::saveUniforms()
 {
 	string jName;
 	int ctrlSize = math<int>::min(310,controlIndexes.size());
@@ -460,7 +460,7 @@ void SDAAnimation::saveUniforms()
 	json.write(mUniformsJson);
 }
 
-void SDAAnimation::createFloatUniform(string aName, int aCtrlIndex, float aValue, float aMin, float aMax) {
+void VDAnimation::createFloatUniform(string aName, int aCtrlIndex, float aValue, float aMin, float aMax) {
 	controlIndexes[aCtrlIndex] = aName;
 	shaderUniforms[aName].minValue = aMin;
 	shaderUniforms[aName].maxValue = aMax;
@@ -473,41 +473,41 @@ void SDAAnimation::createFloatUniform(string aName, int aCtrlIndex, float aValue
 	shaderUniforms[aName].uniformType = 0;
 	shaderUniforms[aName].isValid = true;
 }
-void SDAAnimation::createSampler2DUniform(string aName, int aCtrlIndex, int aTextureIndex) {
+void VDAnimation::createSampler2DUniform(string aName, int aCtrlIndex, int aTextureIndex) {
 	shaderUniforms[aName].textureIndex = aTextureIndex;
 	shaderUniforms[aName].index = aCtrlIndex;
 	shaderUniforms[aName].uniformType = 1;
 	shaderUniforms[aName].isValid = true;
 }
-void SDAAnimation::createVec2Uniform(string aName, int aCtrlIndex, vec2 aValue) {
+void VDAnimation::createVec2Uniform(string aName, int aCtrlIndex, vec2 aValue) {
 	controlIndexes[aCtrlIndex] = aName;
 	shaderUniforms[aName].index = aCtrlIndex;
 	shaderUniforms[aName].uniformType = 2;
 	shaderUniforms[aName].isValid = true;
 	shaderUniforms[aName].vec2Value = aValue;
 }
-void SDAAnimation::createVec3Uniform(string aName, int aCtrlIndex, vec3 aValue) {
+void VDAnimation::createVec3Uniform(string aName, int aCtrlIndex, vec3 aValue) {
 	controlIndexes[aCtrlIndex] = aName;
 	shaderUniforms[aName].index = aCtrlIndex;
 	shaderUniforms[aName].uniformType = 3;
 	shaderUniforms[aName].isValid = true;
 	shaderUniforms[aName].vec3Value = aValue;
 }
-void SDAAnimation::createVec4Uniform(string aName, int aCtrlIndex, vec4 aValue) {
+void VDAnimation::createVec4Uniform(string aName, int aCtrlIndex, vec4 aValue) {
 	controlIndexes[aCtrlIndex] = aName;
 	shaderUniforms[aName].index = aCtrlIndex;
 	shaderUniforms[aName].uniformType = 4;
 	shaderUniforms[aName].isValid = true;
 	shaderUniforms[aName].vec4Value = aValue;
 }
-void SDAAnimation::createIntUniform(string aName, int aCtrlIndex, int aValue) {
+void VDAnimation::createIntUniform(string aName, int aCtrlIndex, int aValue) {
 	controlIndexes[aCtrlIndex] = aName;
 	shaderUniforms[aName].index = aCtrlIndex;
 	shaderUniforms[aName].uniformType = 5;
 	shaderUniforms[aName].isValid = true;
 	shaderUniforms[aName].intValue = aValue;
 }
-void SDAAnimation::createBoolUniform(string aName, int aCtrlIndex, bool aValue) {
+void VDAnimation::createBoolUniform(string aName, int aCtrlIndex, bool aValue) {
 	controlIndexes[aCtrlIndex] = aName;
 	shaderUniforms[aName].minValue = 0;
 	shaderUniforms[aName].maxValue = 1;
@@ -520,10 +520,10 @@ void SDAAnimation::createBoolUniform(string aName, int aCtrlIndex, bool aValue) 
 	shaderUniforms[aName].uniformType = 6;
 	shaderUniforms[aName].isValid = true;
 }
-string SDAAnimation::getUniformNameForIndex(int aIndex) {
+string VDAnimation::getUniformNameForIndex(int aIndex) {
 	return controlIndexes[aIndex];
 }
-/*bool SDAAnimation::hasFloatChanged(int aIndex) {
+/*bool VDAnimation::hasFloatChanged(int aIndex) {
 	if (shaderUniforms[getUniformNameForIndex(aIndex)].floatValue != controlValues[aIndex]) {
 	//CI_LOG_V("hasFloatChanged, aIndex:" + toString(aIndex));
 	CI_LOG_V("hasFloatChanged, shaderUniforms[getUniformNameForIndex(aIndex)].floatValue:" + toString(shaderUniforms[getUniformNameForIndex(aIndex)].floatValue));
@@ -532,25 +532,25 @@ string SDAAnimation::getUniformNameForIndex(int aIndex) {
 	}
 	return (shaderUniforms[getUniformNameForIndex(aIndex)].floatValue != controlValues[aIndex]);
 	}*/
-bool SDAAnimation::toggleValue(unsigned int aIndex) {
+bool VDAnimation::toggleValue(unsigned int aIndex) {
 	shaderUniforms[getUniformNameForIndex(aIndex)].boolValue = !shaderUniforms[getUniformNameForIndex(aIndex)].boolValue;
 	return shaderUniforms[getUniformNameForIndex(aIndex)].boolValue;
 }
-bool SDAAnimation::toggleAuto(unsigned int aIndex) {
+bool VDAnimation::toggleAuto(unsigned int aIndex) {
 	shaderUniforms[getUniformNameForIndex(aIndex)].automatic = !shaderUniforms[getUniformNameForIndex(aIndex)].automatic;
 	return shaderUniforms[getUniformNameForIndex(aIndex)].automatic;
 }
-bool SDAAnimation::toggleTempo(unsigned int aIndex) {
+bool VDAnimation::toggleTempo(unsigned int aIndex) {
 	shaderUniforms[getUniformNameForIndex(aIndex)].autotime = !shaderUniforms[getUniformNameForIndex(aIndex)].autotime;
 	return shaderUniforms[getUniformNameForIndex(aIndex)].autotime;
 }
-void SDAAnimation::resetAutoAnimation(unsigned int aIndex) {
+void VDAnimation::resetAutoAnimation(unsigned int aIndex) {
 	shaderUniforms[getUniformNameForIndex(aIndex)].automatic = false;
 	shaderUniforms[getUniformNameForIndex(aIndex)].autotime = false;
 	shaderUniforms[getUniformNameForIndex(aIndex)].floatValue = shaderUniforms[getUniformNameForIndex(aIndex)].defaultValue;
 }
 
-bool SDAAnimation::setFloatUniformValueByIndex(unsigned int aIndex, float aValue) {
+bool VDAnimation::setFloatUniformValueByIndex(unsigned int aIndex, float aValue) {
 	bool rtn = false;
 	// we can't change iTime at index 0
 	if (aIndex > 0) {
@@ -577,13 +577,13 @@ bool SDAAnimation::setFloatUniformValueByIndex(unsigned int aIndex, float aValue
 	return rtn;
 }
 
-bool SDAAnimation::isExistingUniform(string aName) {
+bool VDAnimation::isExistingUniform(string aName) {
 	return shaderUniforms[aName].isValid;
 }
-int SDAAnimation::getUniformType(string aName) {
+int VDAnimation::getUniformType(string aName) {
 	return shaderUniforms[aName].uniformType;
 }
-void SDAAnimation::load() {
+void VDAnimation::load() {
 	// Create json file if it doesn't already exist.
 #if defined( CINDER_MSW )
 	if (fs::exists(mJsonFilePath)) {
@@ -595,16 +595,16 @@ void SDAAnimation::load() {
 	}
 #endif
 }
-void SDAAnimation::save() {
+void VDAnimation::save() {
 #if defined( CINDER_MSW )
 	bag()->save(mJsonFilePath);
 	saveAnimation();
 	saveUniforms();
 #endif
 }
-void SDAAnimation::saveAnimation() {
+void VDAnimation::saveAnimation() {
 	// save 
-	/*fs::path mJsonFilePath = app::getAssetPath("") / mSDASettings->mAssetsPath / "animation.json";
+	/*fs::path mJsonFilePath = app::getAssetPath("") / mVDSettings->mAssetsPath / "animation.json";
 	JsonTree doc;
 	JsonTree badtv = JsonTree::makeArray("badtv");
 
@@ -616,12 +616,12 @@ void SDAAnimation::saveAnimation() {
 	doc.write(writeFile(mJsonFilePath), JsonTree::WriteOptions()); */
 	// backup save
 	/*string fileName = "animation" + toString(getElapsedFrames()) + ".json";
-	mJsonFilePath = app::getAssetPath("") / mSDASettings->mAssetsPath / fileName;
+	mJsonFilePath = app::getAssetPath("") / mVDSettings->mAssetsPath / fileName;
 	doc.write(writeFile(mJsonFilePath), JsonTree::WriteOptions());*/
 }
-void SDAAnimation::loadAnimation() {
+void VDAnimation::loadAnimation() {
 
-	/*fs::path mJsonFilePath = app::getAssetPath("") / mSDASettings->mAssetsPath / "animation.json";
+	/*fs::path mJsonFilePath = app::getAssetPath("") / mVDSettings->mAssetsPath / "animation.json";
 	// Create json file if it doesn't already exist.
 	if (!fs::exists(mJsonFilePath)) {
 		std::ofstream oStream(mJsonFilePath.string());
@@ -645,13 +645,13 @@ void SDAAnimation::loadAnimation() {
 	} */
 }
 
-void SDAAnimation::setExposure(float aExposure) {
+void VDAnimation::setExposure(float aExposure) {
 	mExposure = aExposure;
 }
-void SDAAnimation::setAutoBeatAnimation(bool aAutoBeatAnimation) {
+void VDAnimation::setAutoBeatAnimation(bool aAutoBeatAnimation) {
 	mAutoBeatAnimation = aAutoBeatAnimation;
 }
-bool SDAAnimation::handleKeyDown(KeyEvent &event)
+bool VDAnimation::handleKeyDown(KeyEvent &event)
 {
 	//float newValue;
 	/*bool handled = true;
@@ -666,7 +666,7 @@ bool SDAAnimation::handleKeyDown(KeyEvent &event)
 	//	//iBadTvRunning = true;
 	//	// duration = 0.2
 	//	shaderUniforms["iBadTv"].floatValue = 5.0f;
-	//	//timeline().apply(&mSDASettings->iBadTv, 60.0f, 0.0f, 0.2f, EaseInCubic());
+	//	//timeline().apply(&mVDSettings->iBadTv, 60.0f, 0.0f, 0.2f, EaseInCubic());
 	//	break;
 	case KeyEvent::KEY_d:
 		// save end keyframe
@@ -675,7 +675,7 @@ bool SDAAnimation::handleKeyDown(KeyEvent &event)
 
 		//case KeyEvent::KEY_x:
 	case KeyEvent::KEY_y:
-		mSDASettings->iXorY = !mSDASettings->iXorY;
+		mVDSettings->iXorY = !mVDSettings->iXorY;
 		break;
 
 	default:
@@ -686,7 +686,7 @@ bool SDAAnimation::handleKeyDown(KeyEvent &event)
 
 	return event.isHandled();
 }
-bool SDAAnimation::handleKeyUp(KeyEvent &event)
+bool VDAnimation::handleKeyUp(KeyEvent &event)
 {
 	bool handled = true;
 	switch (event.getCode()) {
@@ -704,21 +704,21 @@ bool SDAAnimation::handleKeyUp(KeyEvent &event)
 	return event.isHandled();
 }
 
-void SDAAnimation::update() {
+void VDAnimation::update() {
 
 	if (mBadTV[getElapsedFrames()] == 0) {
 		// TODO check shaderUniforms["iBadTv"].floatValue = 0.0f;
 	}
 	else {
 		// duration = 0.2
-		//timeline().apply(&mSDASettings->iBadTv, 60.0f, 0.0f, 0.2f, EaseInCubic());
+		//timeline().apply(&mVDSettings->iBadTv, 60.0f, 0.0f, 0.2f, EaseInCubic());
 		shaderUniforms["iBadTv"].floatValue = 5.0f;
 	}
 
-	mSDASettings->iChannelTime[0] = getElapsedSeconds();
-	mSDASettings->iChannelTime[1] = getElapsedSeconds() - 1;
-	mSDASettings->iChannelTime[2] = getElapsedSeconds() - 2;
-	mSDASettings->iChannelTime[3] = getElapsedSeconds() - 3;
+	mVDSettings->iChannelTime[0] = getElapsedSeconds();
+	mVDSettings->iChannelTime[1] = getElapsedSeconds() - 1;
+	mVDSettings->iChannelTime[2] = getElapsedSeconds() - 2;
+	mVDSettings->iChannelTime[3] = getElapsedSeconds() - 3;
 	// iTime
 	if (mUseTimeWithTempo)
 	{
@@ -733,7 +733,7 @@ void SDAAnimation::update() {
 	{
 		shaderUniforms["iTime"].floatValue = getElapsedSeconds();
 	}
-	shaderUniforms["iTime"].floatValue *= mSDASettings->iSpeedMultiplier;
+	shaderUniforms["iTime"].floatValue *= mVDSettings->iSpeedMultiplier;
 	// iDate
 	time_t now = time(0);
 	tm *   t = gmtime(&now);
@@ -743,7 +743,7 @@ void SDAAnimation::update() {
 
 	currentTime = mTimer.getSeconds();
 	// TODO check bounds
-	if (mAutoBeatAnimation) mSDASettings->liveMeter = maxVolume * 2;
+	if (mAutoBeatAnimation) mVDSettings->liveMeter = maxVolume * 2;
 
 	int time = (currentTime - startTime)*1000000.0;
 	int elapsed = iDeltaTime*1000000.0;
@@ -766,7 +766,7 @@ void SDAAnimation::update() {
 		if (shaderUniforms["iTempoTime"].floatValue < previousTime)
 		{
 			//iBar++;
-			//if (mAutoBeatAnimation) mSDASettings->iPhase++;
+			//if (mAutoBeatAnimation) mVDSettings->iPhase++;
 		}
 		previousTime = shaderUniforms["iTempoTime"].floatValue;
 
@@ -786,24 +786,24 @@ void SDAAnimation::update() {
 		}
 
 		// foreground color vec3 update
-		shaderUniforms["iColor"].vec3Value = vec3(shaderUniforms[getUniformNameForIndex(mSDASettings->IFR)].floatValue, shaderUniforms[getUniformNameForIndex(mSDASettings->IFG)].floatValue, shaderUniforms[getUniformNameForIndex(mSDASettings->IFB)].floatValue);
+		shaderUniforms["iColor"].vec3Value = vec3(shaderUniforms[getUniformNameForIndex(mVDSettings->IFR)].floatValue, shaderUniforms[getUniformNameForIndex(mVDSettings->IFG)].floatValue, shaderUniforms[getUniformNameForIndex(mVDSettings->IFB)].floatValue);
 		// background color vec3 update
-		shaderUniforms["iBackgroundColor"].vec3Value = vec3(shaderUniforms[getUniformNameForIndex(mSDASettings->IBR)].floatValue, shaderUniforms[getUniformNameForIndex(mSDASettings->IBG)].floatValue, shaderUniforms[getUniformNameForIndex(mSDASettings->IBB)].floatValue);
+		shaderUniforms["iBackgroundColor"].vec3Value = vec3(shaderUniforms[getUniformNameForIndex(mVDSettings->IBR)].floatValue, shaderUniforms[getUniformNameForIndex(mVDSettings->IBG)].floatValue, shaderUniforms[getUniformNameForIndex(mVDSettings->IBB)].floatValue);
 		// mouse vec4 update
-		shaderUniforms["iMouse"].vec4Value = vec4(shaderUniforms[getUniformNameForIndex(mSDASettings->IMOUSEX)].floatValue, shaderUniforms[getUniformNameForIndex(mSDASettings->IMOUSEY)].floatValue, shaderUniforms[getUniformNameForIndex(mSDASettings->IMOUSEZ)].floatValue, 0.0f);
+		shaderUniforms["iMouse"].vec4Value = vec4(shaderUniforms[getUniformNameForIndex(mVDSettings->IMOUSEX)].floatValue, shaderUniforms[getUniformNameForIndex(mVDSettings->IMOUSEY)].floatValue, shaderUniforms[getUniformNameForIndex(mVDSettings->IMOUSEZ)].floatValue, 0.0f);
 		// TODO migrate:
-		if (mSDASettings->autoInvert)
+		if (mVDSettings->autoInvert)
 		{
 			setBoolUniformValueByIndex(48, (modulo < 0.1) ? 1.0 : 0.0);
 		}
 
-		if (mSDASettings->tEyePointZ)
+		if (mVDSettings->tEyePointZ)
 		{
-			mSDASettings->mCamEyePointZ = (modulo < 0.1) ? mSDASettings->minEyePointZ : mSDASettings->maxEyePointZ;
+			mVDSettings->mCamEyePointZ = (modulo < 0.1) ? mVDSettings->minEyePointZ : mVDSettings->maxEyePointZ;
 		}
 		else
 		{
-			mSDASettings->mCamEyePointZ = mSDASettings->autoEyePointZ ? lmap<float>(shaderUniforms["iTempoTime"].floatValue, 0.00001, iDeltaTime, mSDASettings->minEyePointZ, mSDASettings->maxEyePointZ) : mSDASettings->mCamEyePointZ;
+			mVDSettings->mCamEyePointZ = mVDSettings->autoEyePointZ ? lmap<float>(shaderUniforms["iTempoTime"].floatValue, 0.00001, iDeltaTime, mVDSettings->minEyePointZ, mVDSettings->maxEyePointZ) : mVDSettings->mCamEyePointZ;
 		}
 
 	}
@@ -811,7 +811,7 @@ void SDAAnimation::update() {
 }
 
 // tempo
-void SDAAnimation::tapTempo()
+void VDAnimation::tapTempo()
 {
 	startTime = currentTime = mTimer.getSeconds();
 
@@ -832,7 +832,7 @@ void SDAAnimation::tapTempo()
 	}
 	counter++;
 }
-void SDAAnimation::calculateTempo()
+void VDAnimation::calculateTempo()
 {
 	// NORMAL AVERAGE
 	double tAverage = 0;
@@ -844,7 +844,7 @@ void SDAAnimation::calculateTempo()
 	iDeltaTime = averageTime;
 	setBpm(60 / averageTime);
 }
-void SDAAnimation::setTimeFactor(const int &aTimeFactor)
+void VDAnimation::setTimeFactor(const int &aTimeFactor)
 {
 	switch (aTimeFactor)
 	{
@@ -880,11 +880,11 @@ void SDAAnimation::setTimeFactor(const int &aTimeFactor)
 		break;
 	}
 }
-void SDAAnimation::preventLineInCrash() {
+void VDAnimation::preventLineInCrash() {
 	setUseLineIn(false);
-	mSDASettings->save();
+	mVDSettings->save();
 }
-void SDAAnimation::saveLineIn() {
+void VDAnimation::saveLineIn() {
 	setUseLineIn(true);
-	mSDASettings->save();
+	mVDSettings->save();
 }

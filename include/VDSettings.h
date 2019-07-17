@@ -11,15 +11,15 @@ using namespace ci;
 using namespace ci::app;
 using namespace std;
 
-namespace SophiaDigitalArt {
+namespace VideoDromm {
 
-	typedef std::shared_ptr<class SDASettings> SDASettingsRef;
+	typedef std::shared_ptr<class VDSettings> VDSettingsRef;
 
-	class SDASettings
+	class VDSettings
 	{
 	public:
-		SDASettings(string filename);
-		static SDASettingsRef create(string filename);
+		VDSettings(string filename);
+		static VDSettingsRef create(string filename);
 
 		//! maximum number of fbos, shaders, textures
 		static const int			MAX = 14;
@@ -335,7 +335,7 @@ namespace SophiaDigitalArt {
 		std::string					getMixetteFragmentShaderString() { return mMixetteFragmentShaderString; };
 		std::string					getPostFragmentShaderString() { return mPostFragmentShaderString; };
 	private:
-		std::string					settingsFileName = "SDA";
+		std::string					settingsFileName = "VD";
 		//! default vertex shader
 		std::string					mDefaultVextexShaderString;
 		std::string					mDefaultFragmentShaderString;

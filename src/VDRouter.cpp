@@ -1,17 +1,17 @@
-#include "SDARouter.h"
+#include "VDRouter.h"
 
-using namespace SophiaDigitalArt;
+using namespace VideoDromm;
 
-SDARouter::SDARouter(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation, SDAWebsocketRef aSDAWebsocket) {
-	mSDASettings = aSDASettings;
-	mSDAAnimation = aSDAAnimation;
-	mSDAWebsocket = aSDAWebsocket;
-	CI_LOG_V("SDARouter constructor");
+VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWebsocketRef aVDWebsocket) {
+	mVDSettings = aVDSettings;
+	mVDAnimation = aVDAnimation;
+	mVDWebsocket = aVDWebsocket;
+	CI_LOG_V("VDRouter constructor");
 	mFBOAChanged = false;
 	mFBOBChanged = false;
 	// Osc
-	if (mSDASettings->mOSCEnabled) {
-		mOscReceiver = std::make_shared<osc::ReceiverUdp>(mSDASettings->mOSCReceiverPort);
+	if (mVDSettings->mOSCEnabled) {
+		mOscReceiver = std::make_shared<osc::ReceiverUdp>(mVDSettings->mOSCReceiverPort);
 		mOscReceiver->setListener("/*",
 			[&](const osc::Message &msg) {
 			// touchosc
@@ -38,8 +38,8 @@ SDARouter::SDARouter(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation,
 				if (index != std::string::npos)
 				{
 					found = true;
-					mSDAAnimation->setAutoBeatAnimation(false);
-					mSDAAnimation->setBpm(msg[0].flt());
+					mVDAnimation->setAutoBeatAnimation(false);
+					mVDAnimation->setBpm(msg[0].flt());
 				}
 			}
 			if (!found)
@@ -59,7 +59,7 @@ SDARouter::SDARouter(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation,
 							found = true;
 							f = msg[0].flt();
 							i = std::stoi(addr.substr(lastSlashIndex + 1)) + 8;
-							mSDAAnimation->setFloatUniformValueByIndex(i, f);
+							mVDAnimation->setFloatUniformValueByIndex(i, f);
 						}
 
 						if (!found)
@@ -71,7 +71,7 @@ SDARouter::SDARouter(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation,
 								found = true;
 								f = msg[0].flt();
 								i = std::stoi(addr.substr(lastSlashIndex + 1)) + 32; // 24 + 8
-								mSDAAnimation->setFloatUniformValueByIndex(i, f);
+								mVDAnimation->setFloatUniformValueByIndex(i, f);
 							}
 						}
 						if (!found)
@@ -83,7 +83,7 @@ SDARouter::SDARouter(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation,
 								found = true;
 								f = msg[0].flt();
 								i = std::stoi(addr.substr(lastSlashIndex + 1)) + 56; // 48 + 8
-								mSDAAnimation->setFloatUniformValueByIndex(i, f);
+								mVDAnimation->setFloatUniformValueByIndex(i, f);
 							}
 						}
 						if (!found)
@@ -95,7 +95,7 @@ SDARouter::SDARouter(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation,
 								found = true;
 								f = msg[0].flt();
 								i = std::stoi(addr.substr(index + ctrl.length()));
-								mSDAAnimation->setFloatUniformValueByIndex(i, f);// starts at 1: mSDASettings->IFR G B
+								mVDAnimation->setFloatUniformValueByIndex(i, f);// starts at 1: mVDSettings->IFR G B
 							}
 						}
 						if (!found)
@@ -107,7 +107,7 @@ SDARouter::SDARouter(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation,
 								found = true;
 								f = msg[0].flt();
 								i = std::stoi(addr.substr(index + ctrl.length())) + 10;
-								mSDAAnimation->setFloatUniformValueByIndex(i, f);
+								mVDAnimation->setFloatUniformValueByIndex(i, f);
 							}
 						}
 						if (!found)
@@ -132,7 +132,7 @@ SDARouter::SDARouter(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation,
 								found = true;
 								f = msg[0].flt();
 								i = std::stoi(addr.substr(index + ctrl.length())) + 80;
-								mSDAAnimation->toggleValue(i);
+								mVDAnimation->toggleValue(i);
 							}
 						}
 						if (!found)
@@ -145,7 +145,7 @@ SDARouter::SDARouter(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation,
 								found = true;
 								f = msg[0].flt();
 								i = std::stoi(addr.substr(index + ctrl.length())) + 80;
-								mSDAAnimation->toggleValue(i);
+								mVDAnimation->toggleValue(i);
 							}
 						}
 						if (!found)
@@ -192,11 +192,11 @@ SDARouter::SDARouter(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation,
 				stringstream ss;
 				ss << addr << " " << f;
 				CI_LOG_I("OSC: " << ctrl << " addr: " << addr);
-				mSDASettings->mOSCMsg = ss.str();
+				mVDSettings->mOSCMsg = ss.str();
 			}
 			else {
 				CI_LOG_E("not handled: " << msg.getNumArgs() << " addr: " << addr);
-				mSDASettings->mOSCMsg = "not handled: " + addr;
+				mVDSettings->mOSCMsg = "not handled: " + addr;
 			}
 		});
 
@@ -222,13 +222,13 @@ SDARouter::SDARouter(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation,
 		});
 	}
 	// midi
-	if (mSDASettings->mMIDIOpenAllInputPorts) midiSetup();
+	if (mVDSettings->mMIDIOpenAllInputPorts) midiSetup();
 	mSelectedWarp = 0;
 	mSelectedFboA = 1;
 	mSelectedFboB = 2;
 }
 
-void SDARouter::shutdown() {
+void VDRouter::shutdown() {
 
 	mMidiIn0.closePort();
 	mMidiIn1.closePort();
@@ -239,7 +239,7 @@ void SDARouter::shutdown() {
 
 }
 
-void SDARouter::midiSetup() {
+void VDRouter::midiSetup() {
 	stringstream ss;
 	ss << "setupMidi: ";
 	CI_LOG_V("midiSetup: " + ss.str());
@@ -258,7 +258,7 @@ void SDARouter::midiSetup() {
 				midiInput mIn;
 				mIn.portName = mMidiIn0.getPortName(i);
 				mMidiInputs.push_back(mIn);
-				if (mSDASettings->mMIDIOpenAllInputPorts) {
+				if (mVDSettings->mMIDIOpenAllInputPorts) {
 					openMidiInPort(i);
 					mMidiInputs[i].isConnected = true;
 					ss << "Opening MIDI in port " << i << " " << mMidiInputs[i].portName;
@@ -302,35 +302,35 @@ void SDARouter::midiSetup() {
 	}
 	midiControlType = "none";
 	midiControl = midiPitch = midiVelocity = midiNormalizedValue = midiValue = midiChannel = 0;
-	mSDASettings->mNewMsg = true;
-	mSDASettings->mMidiMsg = ss.str();
+	mVDSettings->mNewMsg = true;
+	mVDSettings->mMidiMsg = ss.str();
 	CI_LOG_V(ss.str());
 }
 
-void SDARouter::openMidiInPort(int i) {
+void VDRouter::openMidiInPort(int i) {
 		CI_LOG_V("openMidiInPort: " + toString( i));
 		stringstream ss;
 		if (i < mMidiIn0.getNumPorts()) {
 			if (i == 0) {
 				mMidiIn0.openPort(i);
-				mMidiIn0.midiSignal.connect(std::bind(&SDARouter::midiListener, this, std::placeholders::_1));
+				mMidiIn0.midiSignal.connect(std::bind(&VDRouter::midiListener, this, std::placeholders::_1));
 			}
 			if (i == 1) {
 				mMidiIn1.openPort(i);
-				mMidiIn1.midiSignal.connect(std::bind(&SDARouter::midiListener, this, std::placeholders::_1));
+				mMidiIn1.midiSignal.connect(std::bind(&VDRouter::midiListener, this, std::placeholders::_1));
 			}
 			if (i == 2) {
 				mMidiIn2.openPort(i);
-				mMidiIn2.midiSignal.connect(std::bind(&SDARouter::midiListener, this, std::placeholders::_1));
+				mMidiIn2.midiSignal.connect(std::bind(&VDRouter::midiListener, this, std::placeholders::_1));
 			}
 		}
 		mMidiInputs[i].isConnected = true;
 		ss << "Opening MIDI in port " << i << " " << mMidiInputs[i].portName << std::endl;
-		mSDASettings->mMidiMsg = ss.str();
+		mVDSettings->mMidiMsg = ss.str();
 		CI_LOG_V(ss.str());
-		mSDASettings->mNewMsg = true;
+		mVDSettings->mNewMsg = true;
 }
-void SDARouter::closeMidiInPort(int i) {
+void VDRouter::closeMidiInPort(int i) {
 
 	if (i == 0)
 	{
@@ -347,7 +347,7 @@ void SDARouter::closeMidiInPort(int i) {
 	mMidiInputs[i].isConnected = false;
 
 }
-void SDARouter::midiOutSendNoteOn(int i, int channel, int pitch, int velocity) {
+void VDRouter::midiOutSendNoteOn(int i, int channel, int pitch, int velocity) {
 
 	if (i == 0)
 	{
@@ -363,7 +363,7 @@ void SDARouter::midiOutSendNoteOn(int i, int channel, int pitch, int velocity) {
 	}
 
 }
-void SDARouter::openMidiOutPort(int i) {
+void VDRouter::openMidiOutPort(int i) {
 
 	stringstream ss;
 	ss << "Port " << i << " ";
@@ -399,11 +399,11 @@ void SDARouter::openMidiOutPort(int i) {
 			}
 		}
 	}
-	mSDASettings->mMidiMsg = ss.str();
-	mSDASettings->mNewMsg = true;
+	mVDSettings->mMidiMsg = ss.str();
+	mVDSettings->mNewMsg = true;
 	CI_LOG_V(ss.str());
 }
-void SDARouter::closeMidiOutPort(int i) {
+void VDRouter::closeMidiOutPort(int i) {
 
 	if (i == 0)
 	{
@@ -421,7 +421,7 @@ void SDARouter::closeMidiOutPort(int i) {
 
 }
 
-void SDARouter::midiListener(midi::Message msg) {
+void VDRouter::midiListener(midi::Message msg) {
 	stringstream ss;
 	midiChannel = msg.channel;
 	switch (msg.status)
@@ -440,13 +440,13 @@ void SDARouter::midiListener(midi::Message msg) {
 			} 
 			if (midiControl > 40 && midiControl < 49) {
 				mSelectedFboB = midiControl - 41;
-				mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, mSelectedFboB);
+				mVDAnimation->setIntUniformValueByIndex(mVDSettings->IFBOB, mSelectedFboB);
 			}
 			*/
 			//if (midiControl > 30 && midiControl < 39) {
-				mSDAWebsocket->changeFloatValue(midiControl, midiNormalizedValue);
+				mVDWebsocket->changeFloatValue(midiControl, midiNormalizedValue);
 				//mSelectedFboA = midiControl - 31;
-				//mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, mSelectedFboA);
+				//mVDAnimation->setIntUniformValueByIndex(mVDSettings->IFBOA, mSelectedFboA);
 			//}
 			
 		}
@@ -463,11 +463,11 @@ void SDARouter::midiListener(midi::Message msg) {
 			}
 			if (midiControl > 30 && midiControl < 39) {
 				mSelectedFboA = midiControl - 31;
-				mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, mSelectedFboA);
+				mVDAnimation->setIntUniformValueByIndex(mVDSettings->IFBOA, mSelectedFboA);
 			}
 			if (midiControl > 40 && midiControl < 49) {
 				mSelectedFboB = midiControl - 41;
-				mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, mSelectedFboB);
+				mVDAnimation->setIntUniformValueByIndex(mVDSettings->IFBOB, mSelectedFboB);
 			}
 		*/
 		//midiControlType = "/on";
@@ -475,17 +475,17 @@ void SDARouter::midiListener(midi::Message msg) {
 		//midiVelocity = msg.velocity;
 		//midiNormalizedValue = lmap<float>(midiVelocity, 0.0, 127.0, 0.0, 1.0);
 		//// quick hack!
-		//mSDAAnimation->setFloatUniformValueByIndex(14, 1.0f + midiNormalizedValue);
+		//mVDAnimation->setFloatUniformValueByIndex(14, 1.0f + midiNormalizedValue);
 		midiPitch = msg.pitch;
 		// midimix solo mode
 		/*if (midiPitch == 27) midiSticky = true;
 		if (midiSticky) {
 			midiStickyPrevIndex = midiPitch;
-			midiStickyPrevValue = mSDAAnimation->getBoolUniformValueByIndex(midiPitch + 80);
+			midiStickyPrevValue = mVDAnimation->getBoolUniformValueByIndex(midiPitch + 80);
 		}*/
-		//mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80, true);
+		//mVDAnimation->setBoolUniformValueByIndex(midiPitch + 80, true);
 
-		// This does mSDASession->setFboFragmentShaderIndex(0, midiPitch);
+		// This does mVDSession->setFboFragmentShaderIndex(0, midiPitch);
 		if (midiPitch < 9) {
 			mSelectedFboA = midiPitch;
 			mFBOAChanged = true;
@@ -495,7 +495,7 @@ void SDARouter::midiListener(midi::Message msg) {
 			mFBOBChanged = true;
 		}
 		if (midiPitch > 17 && midiPitch < 24) {
-			mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80-17, true);
+			mVDAnimation->setBoolUniformValueByIndex(midiPitch + 80-17, true);
 		}
 		ss << "MIDI noteon Chn: " << midiChannel << " Pitch: " << midiPitch << std::endl;
 		CI_LOG_V("Midi: " + ss.str());
@@ -503,7 +503,7 @@ void SDARouter::midiListener(midi::Message msg) {
 	case MIDI_NOTE_OFF:
 		midiPitch = msg.pitch;
 		if (midiPitch > 17 && midiPitch < 24) {
-			mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80 - 17, false);
+			mVDAnimation->setBoolUniformValueByIndex(midiPitch + 80 - 17, false);
 		}
 		// midimix solo mode
 		/*if (midiPitch == 27) {
@@ -511,11 +511,11 @@ void SDARouter::midiListener(midi::Message msg) {
 			midiSticky = false;
 		}
 		if (!midiSticky) {*/
-			//mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80, false);
+			//mVDAnimation->setBoolUniformValueByIndex(midiPitch + 80, false);
 		/*}
 		else {
 			if (midiPitch == midiStickyPrevIndex) {
-				mSDAAnimation->setBoolUniformValueByIndex(midiPitch + 80, !midiStickyPrevValue);
+				mVDAnimation->setBoolUniformValueByIndex(midiPitch + 80, !midiStickyPrevValue);
 			}
 		}*/
 		ss << "MIDI noteoff Chn: " << midiChannel << " Pitch: " << midiPitch << std::endl;
@@ -531,89 +531,89 @@ void SDARouter::midiListener(midi::Message msg) {
 	//ss << "MIDI Chn: " << midiChannel << " type: " << midiControlType << " CC: " << midiControl << " Pitch: " << midiPitch << " Vel: " << midiVelocity << " Val: " << midiValue << " NVal: " << midiNormalizedValue << std::endl;
 	//CI_LOG_V("Midi: " + ss.str());
 
-	mSDASettings->mMidiMsg = ss.str();
+	mVDSettings->mMidiMsg = ss.str();
 }
 
-void SDARouter::updateParams(int iarg0, float farg1) {
+void VDRouter::updateParams(int iarg0, float farg1) {
 	if (farg1 > 0.1) {
 		//avoid to send twice
 		if (iarg0 == 58) {
 			// track left		
-			mSDASettings->iTrack--;
-			if (mSDASettings->iTrack < 0) mSDASettings->iTrack = 0;
+			mVDSettings->iTrack--;
+			if (mVDSettings->iTrack < 0) mVDSettings->iTrack = 0;
 		}
 		if (iarg0 == 59) {
 			// track right
-			mSDASettings->iTrack++;
-			if (mSDASettings->iTrack > 7) mSDASettings->iTrack = 7;
+			mVDSettings->iTrack++;
+			if (mVDSettings->iTrack > 7) mVDSettings->iTrack = 7;
 		}
 		if (iarg0 == 60) {
 			// set (reset blendmode)
-			mSDASettings->iBlendmode = 0;
+			mVDSettings->iBlendmode = 0;
 		}
 		if (iarg0 == 61) {
 			// right arrow
-			mSDASettings->iBlendmode--;
-			if (mSDASettings->iBlendmode < 0) mSDASettings->iBlendmode = mSDAAnimation->getBlendModesCount() - 1;
+			mVDSettings->iBlendmode--;
+			if (mVDSettings->iBlendmode < 0) mVDSettings->iBlendmode = mVDAnimation->getBlendModesCount() - 1;
 		}
 		if (iarg0 == 62) {
 			// left arrow
-			mSDASettings->iBlendmode++;
-			if (mSDASettings->iBlendmode > mSDAAnimation->getBlendModesCount() - 1) mSDASettings->iBlendmode = 0;
+			mVDSettings->iBlendmode++;
+			if (mVDSettings->iBlendmode > mVDAnimation->getBlendModesCount() - 1) mVDSettings->iBlendmode = 0;
 		}
 	}
 	if (iarg0 > 0 && iarg0 < 9) {
 		// sliders 
-		mSDAWebsocket->changeFloatValue(iarg0, farg1);
+		mVDWebsocket->changeFloatValue(iarg0, farg1);
 	}
 	if (iarg0 > 10 && iarg0 < 19) {
 		// rotary 
-		mSDAWebsocket->changeFloatValue(iarg0, farg1);
+		mVDWebsocket->changeFloatValue(iarg0, farg1);
 		// audio multfactor
-		if (iarg0 == 13) mSDAWebsocket->changeFloatValue(iarg0, (farg1 + 0.01) * 10);
+		if (iarg0 == 13) mVDWebsocket->changeFloatValue(iarg0, (farg1 + 0.01) * 10);
 		// exposure
-		if (iarg0 == 14) mSDAWebsocket->changeFloatValue(iarg0, (farg1 + 0.01) * mSDAAnimation->getMaxUniformValueByIndex(14));
+		if (iarg0 == 14) mVDWebsocket->changeFloatValue(iarg0, (farg1 + 0.01) * mVDAnimation->getMaxUniformValueByIndex(14));
 		// xfade
-		if (iarg0 == mSDASettings->IXFADE) {//18
-			mSDAWebsocket->changeFloatValue(iarg0, farg1);
-			//mSDASettings->xFade = farg1;
-			//mSDASettings->xFadeChanged = true;
+		if (iarg0 == mVDSettings->IXFADE) {//18
+			mVDWebsocket->changeFloatValue(iarg0, farg1);
+			//mVDSettings->xFade = farg1;
+			//mVDSettings->xFadeChanged = true;
 		}
 	}
 	// buttons
 	if (iarg0 > 20 && iarg0 < 29) {
 		// top row
-		mSDAWebsocket->changeFloatValue(iarg0, farg1);
+		mVDWebsocket->changeFloatValue(iarg0, farg1);
 	}
 	if (iarg0 > 30 && iarg0 < 39)
 	{
 		// middle row
-		mSDAWebsocket->changeFloatValue(iarg0, farg1);
-		//mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, iarg0 - 31);
+		mVDWebsocket->changeFloatValue(iarg0, farg1);
+		//mVDAnimation->setIntUniformValueByIndex(mVDSettings->IFBOA, iarg0 - 31);
 	}
 	if (iarg0 > 40 && iarg0 < 49) {
 		// low row 
-		mSDAWebsocket->changeFloatValue(iarg0, farg1);
-		//mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, iarg0 - 41);
+		mVDWebsocket->changeFloatValue(iarg0, farg1);
+		//mVDAnimation->setIntUniformValueByIndex(mVDSettings->IFBOB, iarg0 - 41);
 	}
 	//if (iarg0 > 0 && iarg0 < 49) {
 		// float values 
-		//mSDAWebsocket->wsWrite("{\"params\" :[{ \"name\":" + toString(iarg0) + ",\"value\":" + toString(mSDAAnimation->getFloatUniformValueByIndex(iarg0)) + "}]}");
+		//mVDWebsocket->wsWrite("{\"params\" :[{ \"name\":" + toString(iarg0) + ",\"value\":" + toString(mVDAnimation->getFloatUniformValueByIndex(iarg0)) + "}]}");
 	//}
 }
 
 
-void SDARouter::colorWrite()
+void VDRouter::colorWrite()
 {
 #if defined( CINDER_MSW )
 	// lights4events
 	char col[97];
-	int r = (int)(mSDAAnimation->getFloatUniformValueByIndex(1) * 255);
-	int g = (int)(mSDAAnimation->getFloatUniformValueByIndex(2) * 255);
-	int b = (int)(mSDAAnimation->getFloatUniformValueByIndex(3) * 255);
-	int a = (int)(mSDAAnimation->getFloatUniformValueByIndex(4) * 255);
+	int r = (int)(mVDAnimation->getFloatUniformValueByIndex(1) * 255);
+	int g = (int)(mVDAnimation->getFloatUniformValueByIndex(2) * 255);
+	int b = (int)(mVDAnimation->getFloatUniformValueByIndex(3) * 255);
+	int a = (int)(mVDAnimation->getFloatUniformValueByIndex(4) * 255);
 	//sprintf(col, "#%02X%02X%02X", r, g, b);
 	sprintf(col, "{\"type\":\"action\", \"parameters\":{\"name\":\"FC\",\"parameters\":{\"color\":\"#%02X%02X%02X%02X\",\"fading\":\"NONE\"}}}", a, r, g, b);
-	mSDAWebsocket->wsWrite(col);
+	mVDWebsocket->wsWrite(col);
 #endif
 }

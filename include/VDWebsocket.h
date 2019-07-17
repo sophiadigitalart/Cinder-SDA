@@ -4,9 +4,9 @@
 #include "cinder/Json.h"
 
 // Settings
-#include "SDASettings.h"
+#include "VDSettings.h"
 // Animation
-#include "SDAAnimation.h"
+#include "VDAnimation.h"
 
 // WebSockets
 #include "WebSocketClient.h"
@@ -19,16 +19,16 @@ using namespace std;
 using namespace asio;
 //using namespace asio::ip; 
 
-namespace SophiaDigitalArt
+namespace VideoDromm
 {
-	// stores the pointer to the SDAWebsocket instance
-	typedef std::shared_ptr<class SDAWebsocket> SDAWebsocketRef;
-	class SDAWebsocket {
+	// stores the pointer to the VDWebsocket instance
+	typedef std::shared_ptr<class VDWebsocket> VDWebsocketRef;
+	class VDWebsocket {
 	public:
-		SDAWebsocket(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation);
-		static SDAWebsocketRef	create(SDASettingsRef aSDASettings, SDAAnimationRef aSDAAnimation)
+		VDWebsocket(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation);
+		static VDWebsocketRef	create(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation)
 		{
-			return shared_ptr<SDAWebsocket>(new SDAWebsocket(aSDASettings, aSDAAnimation));
+			return shared_ptr<VDWebsocket>(new VDWebsocket(aVDSettings, aVDAnimation));
 		}
 		void						update();
         // messages
@@ -60,9 +60,9 @@ namespace SophiaDigitalArt
 		bool						hasReceivedStream() { return streamReceived; };
 	private:
 		// Settings
-		SDASettingsRef				mSDASettings;
+		VDSettingsRef				mVDSettings;
 		// Animation
-		SDAAnimationRef				mSDAAnimation;
+		VDAnimationRef				mVDAnimation;
 
 		// lights4events
 		void						colorWrite();

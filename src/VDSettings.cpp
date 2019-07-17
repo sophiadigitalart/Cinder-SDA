@@ -1,18 +1,18 @@
 //
-//  SDASettings.cpp
+//  VDSettings.cpp
 //
 
-#include "SDASettings.h"
+#include "VDSettings.h"
 
 using namespace ci;
 using namespace std;
-using namespace SophiaDigitalArt;
+using namespace VideoDromm;
 
-SDASettings::SDASettings(string filename)
+VDSettings::VDSettings(string filename)
 {
 	// reset no matter what, so we don't miss anything
 	reset();
-	settingsFileName = "SDA" + filename + ".xml";
+	settingsFileName = "VD" + filename + ".xml";
 	// check to see if Settings.xml file exists and restore if it does
 	fs::path params = getAppPath() / settingsFileName;
 	if (fs::exists(params))
@@ -25,12 +25,12 @@ SDASettings::SDASettings(string filename)
 	}
 }
 
-SDASettingsRef SDASettings::create(string filename)
+VDSettingsRef VDSettings::create(string filename)
 {
-	return shared_ptr<SDASettings>(new SDASettings(filename));
+	return shared_ptr<VDSettings>(new VDSettings(filename));
 }
 
-bool SDASettings::save()
+bool VDSettings::save()
 {
 	fs::path directory = getAppPath();
 	/*if (!fs::exists(directory)) {
@@ -201,7 +201,7 @@ bool SDASettings::save()
 	return true;
 }
 
-bool SDASettings::restore()
+bool VDSettings::restore()
 {
 	// check to see if Settings.xml file exists
 	fs::path params = getAppPath() / settingsFileName;
@@ -396,7 +396,7 @@ bool SDASettings::restore()
 	}
 }
 
-void SDASettings::resetSomeParams() {
+void VDSettings::resetSomeParams() {
 	mCamPosXY = vec2(0.0f);
 	mCount = 1;
 
@@ -448,7 +448,7 @@ void SDASettings::resetSomeParams() {
 	shaderEditIndex = 0;
 }
 
-void SDASettings::reset()
+void VDSettings::reset()
 {
 	// parameters exposed in XML
 	mMIDIOpenAllInputPorts = mAutoLayout = mShowUI = mCursorVisible = true;
