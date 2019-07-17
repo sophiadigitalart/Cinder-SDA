@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <cinder>
-<template name="SDA: Basic" parent="org.libcinder.apptemplates.basicopengl">
-	<requires>com.sophiadigitalart.sda</requires>
+<template name="VD: Basic" parent="org.libcinder.apptemplates.basicopengl">
+	<requires>com.sophiadigitalart.vd</requires>
 	<requires>com.wk.websocketpp</requires>
 	<platform os="msw">
 		<requires>fr.batchass.spout</requires>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <cinder>
 <block
-	name="Cinder-SDA"
-	id="com.sophiadigitalart.sda"
+	name="Cinder-VD"
+	id="com.sophiadigitalart.vd"
 	author="Bruce Lane"
 	license="MIT"
-	summary="SDA block for Cinder 0.9: utilities for Spout, WebSockets, Watchdog, Shaders"
-	url="https://github.com/sophiadigitalart/Cinder-SDA"
-	git="git://github.com/sophiadigitalart/Cinder-SDA.git"
+	summary="VD block for Cinder 0.9: utilities for Spout, WebSockets, Watchdog, Shaders"
+	url="https://github.com/sophiadigitalart/Cinder-VD"
+	git="git://github.com/sophiadigitalart/Cinder-VD.git"
 	>
 	<supports os="msw" />
 	<requires>com.wk.websocketpp</requires>
@@ -23,5 +23,5 @@
 		<requires>org.libcinder.OSC</requires>
 	</platform>
 </block>
-<template>templates/SDA/template.xml</template>
+<template>templates/VD/template.xml</template>
 </cinder>
