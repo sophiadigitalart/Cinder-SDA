@@ -125,6 +125,10 @@ namespace SophiaDigitalArt {
 			// done in router mSDAAnimation->changeFloatValue(aCtrl, aValue);
 			mSDAWebsocket->changeFloatValue(aCtrl, aValue);
 		};
+		void							setBoolUniformValueByIndex(unsigned int aCtrl, float aValue) {
+			// done in router mSDAAnimation->changeFloatValue(aCtrl, aValue);
+			mSDAWebsocket->changeBoolValue(aCtrl, aValue);
+		};
 
 		// tempo
 		float							getBpm() { return mSDAAnimation->getBpm(); };

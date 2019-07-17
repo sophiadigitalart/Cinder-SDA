@@ -101,7 +101,7 @@ SDAAnimation::SDAAnimation(SDASettingsRef aSDASettings) {
 		// iBpm 
 		createFloatUniform("iBpm", mSDASettings->IBPM, 165.0f, 0.000000001f, 400.0f); // 21
 		// Speed 
-		createFloatUniform("speed", mSDASettings->ISPEED, 12.0f, 0.01f, 12.0f); // 22
+		createFloatUniform("speed", mSDASettings->ISPEED, 0.01f, 0.01f, 1.0f); // 22
 		// slitscan (or other) Param1 
 		createFloatUniform("pixelX", mSDASettings->IPIXELX, 1.0f, 0.01f, 100.0f); // 23
 		// slitscan (or other) Param2 

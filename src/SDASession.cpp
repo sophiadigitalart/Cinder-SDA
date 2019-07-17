@@ -1404,8 +1404,14 @@ float SDASession::getSpeed(unsigned int aTextureIndex) {
 	return mTextureList[aTextureIndex]->getSpeed();
 }
 void SDASession::setSpeed(unsigned int aTextureIndex, float aSpeed) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	mTextureList[aTextureIndex]->setSpeed(aSpeed);
+	//if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	//mTextureList[aTextureIndex]->setSpeed(aSpeed);
+	for (int i = 0; i < mTextureList.size() - 1; i++)
+	{
+		if (mTextureList[i]->getType() == mTextureList[i]->SEQUENCE) {
+			mTextureList[i]->setSpeed(aSpeed);
+		}
+	}
 }
 int SDASession::getPosition(unsigned int aTextureIndex) {
 	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;

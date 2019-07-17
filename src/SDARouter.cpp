@@ -443,11 +443,11 @@ void SDARouter::midiListener(midi::Message msg) {
 				mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOB, mSelectedFboB);
 			}
 			*/
-			if (midiControl > 30 && midiControl < 39) {
+			//if (midiControl > 30 && midiControl < 39) {
 				mSDAWebsocket->changeFloatValue(midiControl, midiNormalizedValue);
 				//mSelectedFboA = midiControl - 31;
 				//mSDAAnimation->setIntUniformValueByIndex(mSDASettings->IFBOA, mSelectedFboA);
-			}
+			//}
 			
 		}
 		else {

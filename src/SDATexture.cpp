@@ -351,6 +351,7 @@ namespace SophiaDigitalArt {
 	}
 
 	ci::gl::Texture2dRef TextureImage::getTexture() {
+
 		Area area(mXLeft, mYTop, mXRight, mYBottom);
 		mProcessedSurface = mInputSurface.clone(area);
 		mTexture = gl::Texture2d::create(mProcessedSurface, ci::gl::Texture::Format().loadTopDown(mFlipV));
@@ -393,7 +394,7 @@ namespace SophiaDigitalArt {
 				bool firstIndexFound = false;
 				// loading 2000 files takes a while, I load only the first one
 				for (fs::directory_iterator it(fullPath); it != fs::directory_iterator(); ++it)
-				{ 
+				{
 					// if file(1).jpg filename, mNumberOfDigits is 2
 					if (mNumberOfDigits == 2) {
 						break;
@@ -513,14 +514,27 @@ namespace SophiaDigitalArt {
 				default:
 					break;
 				}
-				
+
 				string fileNameToLoad = mPrefix + restOfFileName + "." + mExt;
 				fs::path fileToLoad = getAssetPath("") / mPath / fileNameToLoad;
 				if (fs::exists(fileToLoad)) {
 					// start profiling
 					auto start = Clock::now();
 
-					mSequenceTextures.push_back(ci::gl::Texture::create(loadImage(fileToLoad), gl::Texture::Format().loadTopDown()));
+					mTexture = ci::gl::Texture::create(loadImage(fileToLoad));
+					mXLeft = 0;
+					mYTop = 0;
+					mXRight = mOriginalWidth = mTexture->getWidth();
+					mYBottom = mOriginalHeight = mTexture->getHeight();
+					mInputSurface = Surface(loadImage(fileToLoad));
+					//mInputSurface = Surface(mWidth, mHeight, true);
+					Area area(mXLeft, mYTop, mXRight, mYBottom);
+					mProcessedSurface = mInputSurface.clone(area);
+					mTexture = gl::Texture2d::create(mProcessedSurface, ci::gl::Texture::Format().loadTopDown(mFlipV));
+
+					mSequenceTextures.push_back(mTexture);
+
+					//mSequenceTextures.push_back(ci::gl::Texture::create(loadImage(fileToLoad), gl::Texture::Format().loadTopDown()));
 					mCurrentLoadedFrame = mFramesLoaded;
 					mFramesLoaded++;
 					auto end = Clock::now();
@@ -552,8 +566,11 @@ namespace SophiaDigitalArt {
 		if (mSequenceTextures.size() > 0) {
 			// Call on each frame to update the playhead
 			if (mPlaying) {
+				mSpeed = mSDAAnimation->getFloatUniformValueByName("speed");
 				playheadFrameInc += mSpeed;
+
 				newPosition = mPosition + (int)playheadFrameInc;
+				//CI_LOG_V("newPosition: " + toString( newPosition) + " playheadFrameInc" + toString(playheadFrameInc) +  " mSpeed " + toString(mSpeed));
 				if (playheadFrameInc > 1.0f) playheadFrameInc = 0.0f;
 				if (newPosition < 0) newPosition = mSequenceTextures.size() - 1;
 				if (newPosition > mSequenceTextures.size() - 1) newPosition = 0;
@@ -566,6 +583,7 @@ namespace SophiaDigitalArt {
 				}
 				else {
 					newPosition = mPosition;
+
 				}
 			}
 			mPosition = max(0, min(newPosition, (int)mSequenceTextures.size() - 1));
@@ -585,8 +603,10 @@ namespace SophiaDigitalArt {
 			if (mPlaying) {
 				updateSequence();
 			}
+			
 			mTexture = mSequenceTextures[mPosition];
 		}
+
 		return mTexture;
 	}
 	/*ci::gl::Texture2dRef TextureImageSequence::getNextTexture() {
@@ -741,7 +761,7 @@ namespace SophiaDigitalArt {
 		mTexture = mSpoutIn.receiveTexture();
 		// set name for UI
 		mName = mSpoutIn.getSenderName();
-		
+
 #endif
 #if defined( CINDER_MAC )
 		mClientSyphon.draw(vec2(0.f, 0.f));
@@ -919,7 +939,7 @@ namespace SophiaDigitalArt {
 				if (mSDAAnimation->isAudioBuffered() && mBufferPlayerNode) {
 					gl::ScopedFramebuffer fbScp(mFbo);
 					gl::clear(Color::black());
-					
+
 					mTexture->bind(0);
 
 					//mWaveformPlot.draw();
@@ -929,7 +949,7 @@ namespace SophiaDigitalArt {
 					gl::color(ColorA(0, 1, 0, 0.7f));
 					gl::drawSolidRect(Rectf(readPos - 2, 0, readPos + 2, (float)mHeight));
 					mRenderedTexture = mFbo->getColorTexture();
-					return mRenderedTexture;					
+					return mRenderedTexture;
 				}
 			}
 		}
@@ -1000,4 +1020,4 @@ namespace SophiaDigitalArt {
 	}
 	TextureStream::~TextureStream(void) {
 	}
-} // namespace SophiaDigitalArt
+	} // namespace SophiaDigitalArt
