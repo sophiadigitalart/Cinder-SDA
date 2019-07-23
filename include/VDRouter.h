@@ -19,12 +19,12 @@ using namespace ci::app;
 using namespace std;
 using namespace asio;
 using namespace asio::ip; 
-using namespace VideoDromm;
+using namespace videodromm;
 
 using Receiver = osc::ReceiverUdp;
 using protocol = asio::ip::udp;
 
-namespace VideoDromm
+namespace videodromm
 {
 	// stores the pointer to the VDRouter instance
 	typedef std::shared_ptr<class VDRouter> VDRouterRef;

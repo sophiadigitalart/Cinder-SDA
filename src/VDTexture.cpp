@@ -6,7 +6,7 @@
 using namespace ci;
 using namespace ci::app;
 
-namespace VideoDromm {
+namespace videodromm {
 	VDTexture::VDTexture(TextureType aType)
 		: mPath("")
 		, mName("")
@@ -1020,4 +1020,4 @@ namespace VideoDromm {
 	}
 	TextureStream::~TextureStream(void) {
 	}
-	} // namespace VideoDromm
+	} // namespace videodromm
