@@ -17,6 +17,8 @@ VDSession::VDSession(VDSettingsRef aVDSettings)
 	// Animation
 	mVDAnimation = VDAnimation::create(mVDSettings);
 	// TODO: needed? mVDAnimation->tapTempo();
+		// allow log to file
+	mVDLog = VDLog::create();
 	// init fbo format
 	//fmt.setWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
 	//fmt.setBorderColor(Color::black());		
@@ -712,6 +714,22 @@ bool VDSession::handleKeyDown(KeyEvent &event)
 			// crossfade left
 			if (mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IXFADE) > 0.0f) mVDWebsocket->changeFloatValue(mVDSettings->IXFADE, mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IXFADE) - 0.1f);
 			break;
+		case KeyEvent::KEY_h:
+			// ui visibility
+			toggleUI();
+			break;
+		case KeyEvent::KEY_s:
+			for (size_t s = 0; s < getInputTexturesCount(); s++)
+			{
+				float spd = getSpeed(s);
+				if (isAltDown) {
+					setSpeed(s, getSpeed(s) - 0.01f);
+				}
+				else {
+					setSpeed(s, getSpeed(s) + 0.01f);
+				}
+			}			
+			break;
 		default:
 			CI_LOG_V("session keydown: " + toString(event.getCode()));
 			handled = false;
@@ -1025,7 +1043,6 @@ string VDSession::getHydraFragmentShaderString() {
 
 unsigned int VDSession::createShaderFboFromString(string aFragmentShaderString, string aShaderFilename) {
 	unsigned int rtn = 0;
-	unsigned int texIndex = 0;
 	// create new shader
 	VDShaderRef s(new VDShader(mVDSettings, mVDAnimation, aShaderFilename, aFragmentShaderString));
 	if (s->isValid()) {
@@ -1040,14 +1057,12 @@ unsigned int VDSession::createShaderFboFromString(string aFragmentShaderString, 
 		fboXml.setAttribute("width", "1280");
 		fboXml.setAttribute("height", "720");
 		fboXml.setAttribute("shadername", mShaderList[rtn]->getName());
-		fboXml.setAttribute("inputtextureindex", texIndex);// 20190502 math<int>::min(rtn, mTextureList.size() - 1));
+		fboXml.setAttribute("inputtextureindex", math<int>::min(rtn, mTextureList.size() - 1));
 		f->fromXml(fboXml);
 		//f->setShaderIndex(rtn);
 		f->setFragmentShader(rtn, mShaderList[rtn]->getFragmentString(), mShaderList[rtn]->getName());
 		mFboList.push_back(f);
-		texIndex = mFboList.size();
-		if (texIndex > mTextureList.size() - 1) texIndex = 0;
-		setFboInputTexture(mFboList.size() - 1, texIndex);// math<int>::min(rtn, mTextureList.size() - 1));
+		setFboInputTexture(mFboList.size() - 1, math<int>::min(rtn, mTextureList.size() - 1));
 	}
 	return rtn;
 }
@@ -1138,7 +1153,7 @@ void VDSession::initShaderList() {
 		createShaderFbo("0.frag");
 		createShaderFboFromString("void main(void){vec2 uv = gl_FragCoord.xy / iResolution.xy;uv = abs(2.0*(uv - 0.5));vec4 t1 = texture2D(iChannel0, vec2(uv[0], 0.1));vec4 t2 = texture2D(iChannel0, vec2(uv[1], 0.1));float fft = t1[0] * t2[0];gl_FragColor = vec4(sin(fft*3.141*2.5), sin(fft*3.141*2.0), sin(fft*3.141*1.0), 1.0);}", "fftMatrixProduct.glsl");
 		createShaderFboFromString("void main(void) {vec2 uv = 2 * (gl_FragCoord.xy / iResolution.xy - vec2(0.5));float radius = length(uv);float angle = atan(uv.y, uv.x);float col = .0;col += 1.5*sin(iTime + 13.0 * angle + uv.y * 20);col += cos(.9 * uv.x * angle * 60.0 + radius * 5.0 - iTime * 2.);fragColor = (1.2 - radius) * vec4(vec3(col), 1.0);}", "hexler330.glsl");
-
+/*
 		createShaderFboFromString("void main(void){vec2 uv = 2 * (fragCoord.xy / iResolution.xy - vec2(0.5));float specx = texture2D( iChannel0, vec2(0.25,5.0/100.0) ).x;float specy = texture2D( iChannel0, vec2(0.5,5.0/100.0) ).x;float specz = 1.0*texture2D( iChannel0, vec2(0.7,5.0/100.0) ).x;float r = length(uv); float p = atan(uv.y/uv.x); uv = abs(uv);float col = 0.0;float amp = (specx+specy+specz)/3.0;uv.y += sin(uv.y*3.0*specx-iTime/5.0*specy+r*10.);uv.x += cos((iTime/5.0)+specx*30.0*uv.x);col += abs(1.0/uv.y/30.0) * (specx+specz)*15.0;col += abs(1.0/uv.x/60.0) * specx*8. ; fragColor=vec4(vec3( col ),1.0);}", "Hexler2.glsl");
 		createShaderFboFromString("void main(void){vec2 uv = 2 * (gl_FragCoord.xy / iResolution.xy - vec2(0.5));vec2 spec = 1.0*texture2D(iChannel0, vec2(0.25, 5.0 / 100.0)).xx;float col = 0.0;uv.x += sin(iTime * 6.0 + uv.y*1.5)*spec.y;col += abs(0.8 / uv.x) * spec.y;gl_FragColor = vec4(col, col, col, 1.0);}", "SoundVizVert.glsl");
 		createShaderFboFromString("void main(void){vec2 uv = 2 * (gl_FragCoord.xy / iResolution.xy - vec2(0.5));vec2 spec = 1.0*texture2D(iChannel0, vec2(0.25, 5.0 / 100.0)).yy;float col = 0.0;uv.y += sin(iTime * 6.0 + uv.x*1.5)*spec.x;col += abs(0.8/uv.y) * spec.x;gl_FragColor = vec4(col, col, col, 1.0);}", "SoundVizHoriz.glsl");
@@ -1148,9 +1163,9 @@ void VDSession::initShaderList() {
 		createShaderFboFromString("void main(void){float d = distance(fragCoord.xy, iResolution.xy * vec2(0.5,0.5).xy);float x = sin(5.0+0.1*d + iTime*-4.0) * 5.0;x = clamp( x, 0.0, 1.0 );fragColor = vec4(x, x, x, 1.0);}", "Circular.glsl");
 		createShaderFboFromString("void main(void){vec4 p = vec4(fragCoord.xy,0.,1.)/iResolution.y - vec4(.9,.5,0,0), c=p-p;float t=iTime,r=length(p.xy+=sin(t+sin(t*.8))*.4),a=atan(p.y,p.x);for (float i = 0.;i<60.;i++) c = c*.98 + (sin(i+vec4(5,3,2,1))*.5+.5)*smoothstep(.99, 1., sin(log(r+i*.05)-t-i+sin(a +=t*.01)));fragColor = c*r;}", "2TweetsChallenge.glsl");
 		createShaderFboFromString("void main(void){vec2 p = -1.0+2.0*fragCoord.xy/iResolution.xy;float w = sin(iTime+6.5*sqrt(dot(p,p))*cos(p.x));float x = cos(int(iRatio*10.0)*atan(p.y,p.x) + 1.8*w);vec3 col = iColor*15.0;fragColor = vec4(col*x,1.0);}", "gunstonSmoke.glsl");
-		createShaderFboFromString("void main(void) {vec2  px = 4.0*(-iResolution.xy + 2.0*fragCoord.xy)/iResolution.y;float id = 0.5 + 0.5*cos(iTime + sin(dot(floor(px+0.5),vec2(113.1,17.81)))*43758.545);vec3 co = 0.5 + 0.5*cos(iTime + 3.5*id + vec3(0.0,1.57,3.14) );vec2 pa = smoothstep( 0.0, 0.2, id*(0.5 + 0.5*cos(6.2831*px)) );fragColor = vec4( co*pa.x*pa.y, 1.0 );}", "ColorGrid.glsl");
-		/*createShaderFboFromString("void main(void){vec2 uv = gl_FragCoord.xy / iResolution.xy;fragColor = texture(iChannel0, uv);}", "tex0");
-		createShaderFboFromString("void main(void){vec2 uv = gl_FragCoord.xy / iResolution.xy;fragColor = texture(iChannel0, uv);}", "tex1");*/
+		createShaderFboFromString("void main(void) {vec2  px = 4.0*(-iResolution.xy + 2.0*fragCoord.xy)/iResolution.y;float id = 0.5 + 0.5*cos(iTime + sin(dot(floor(px+0.5),vec2(113.1,17.81)))*43758.545);vec3 co = 0.5 + 0.5*cos(iTime + 3.5*id + vec3(0.0,1.57,3.14) );vec2 pa = smoothstep( 0.0, 0.2, id*(0.5 + 0.5*cos(6.2831*px)) );fragColor = vec4( co*pa.x*pa.y, 1.0 );}", "ColorGrid.glsl");*/
+		createShaderFboFromString("void main(void){vec2 uv = gl_FragCoord.xy / iResolution.xy;fragColor = texture(iChannel0, uv);}", "tex0");
+		createShaderFboFromString("void main(void){vec2 uv = gl_FragCoord.xy / iResolution.xy;fragColor = texture(iChannel0, uv);}", "tex1");
 	}
 }
 bool VDSession::initTextureList() {
@@ -1399,19 +1414,16 @@ void VDSession::reverse(unsigned int aTextureIndex) {
 	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
 	mTextureList[aTextureIndex]->reverse();
 }
-float VDSession::getSpeed(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	return mTextureList[aTextureIndex]->getSpeed();
-}
+
 void VDSession::setSpeed(unsigned int aTextureIndex, float aSpeed) {
 	//if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
 	//mTextureList[aTextureIndex]->setSpeed(aSpeed);
 	for (int i = 0; i < mTextureList.size() - 1; i++)
 	{
-		if (mTextureList[i]->getType() == mTextureList[i]->SEQUENCE) {
+		//if (mTextureList[i]->getType() == mTextureList[i]->SEQUENCE) {
 			mTextureList[i]->setSpeed(aSpeed);
-		}
-	}
+		//}
+	} 
 }
 int VDSession::getPosition(unsigned int aTextureIndex) {
 	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
@@ -1459,14 +1471,16 @@ ci::gl::TextureRef VDSession::getMixetteTexture() {
 	gl::ScopedFramebuffer fbScp(mMixetteFbo);
 	// clear out the FBO with black
 	gl::clear(Color::black());
-	mMixFbos[0].fbo->getColorTexture()->bind(0);
+// 20190727 TODO CHECK
+
+	mTextureList[1]->getTexture()->bind(0);
 	mHydraFbo->getColorTexture()->bind(1);
-	mFboList[0]->getRenderedTexture()->bind(2);
-	mFboList[1]->getRenderedTexture()->bind(3);
-	mFboList[2]->getRenderedTexture()->bind(4);
-	mFboList[3]->getRenderedTexture()->bind(5);
-	mFboList[4]->getRenderedTexture()->bind(6);
-	mFboList[5]->getRenderedTexture()->bind(7);
+	mMixFbos[0].fbo->getColorTexture()->bind(2);
+	mFboList[0]->getRenderedTexture()->bind(3);
+	mFboList[1]->getRenderedTexture()->bind(4);
+	mFboList[2]->getRenderedTexture()->bind(5);
+	mFboList[3]->getRenderedTexture()->bind(6);
+	mFboList[4]->getRenderedTexture()->bind(7);
 
 	//mImage->bind(0);
 	gl::ScopedGlslProg prog(mGlslMixette);

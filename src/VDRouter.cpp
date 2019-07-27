@@ -243,7 +243,6 @@ void VDRouter::midiSetup() {
 	stringstream ss;
 	ss << "setupMidi: ";
 	CI_LOG_V("midiSetup: " + ss.str());
-
 	if (mMidiIn0.getNumPorts() > 0)
 	{
 		mMidiIn0.listPorts();
@@ -308,7 +307,7 @@ void VDRouter::midiSetup() {
 }
 
 void VDRouter::openMidiInPort(int i) {
-		CI_LOG_V("openMidiInPort: " + toString( i));
+	CI_LOG_V("openMidiInPort: " + toString(i));
 		stringstream ss;
 		if (i < mMidiIn0.getNumPorts()) {
 			if (i == 0) {
@@ -326,7 +325,7 @@ void VDRouter::openMidiInPort(int i) {
 		}
 		mMidiInputs[i].isConnected = true;
 		ss << "Opening MIDI in port " << i << " " << mMidiInputs[i].portName << std::endl;
-		mVDSettings->mMidiMsg = ss.str();
+		mVDSettings->mMsg = ss.str();
 		CI_LOG_V(ss.str());
 		mVDSettings->mNewMsg = true;
 }
@@ -399,7 +398,7 @@ void VDRouter::openMidiOutPort(int i) {
 			}
 		}
 	}
-	mVDSettings->mMidiMsg = ss.str();
+	mVDSettings->mMsg = ss.str();
 	mVDSettings->mNewMsg = true;
 	CI_LOG_V(ss.str());
 }

@@ -715,7 +715,6 @@ void VDSettings::reset()
 		"c *= iExposure;\n"
 		"gl_FragColor = c; \n"
 		"}\n";
-
 	mMixFragmentShaderString = "#version 150\n"
 		"uniform vec3 iResolution;\n"
 		"uniform sampler2D iChannel0;\n"

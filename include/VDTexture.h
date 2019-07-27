@@ -112,9 +112,9 @@ namespace videodromm
 		virtual void					toggleLoadingFromDisk();
 		virtual bool					isLoadingFromDisk();
 		void							syncToBeat();
-		virtual void					reverse();
-		virtual float					getSpeed();
-		virtual void					setSpeed(float speed);
+		void							reverse();
+		float							getSpeed();
+		void							setSpeed(float speed);
 		//virtual int					getPlayheadPosition();
 		int								getPosition() { return mPosition; };
 		virtual void					setPlayheadPosition(int position);
@@ -148,7 +148,7 @@ namespace videodromm
 		gl::Texture::Format				fmt;
 		gl::Fbo::Format					fboFmt;
 		ci::gl::Texture2dRef			mRenderedTexture;
-
+		float							mSpeed;
 	private:
 	};
 	/*
@@ -206,10 +206,6 @@ namespace videodromm
 		//int							getPlayheadPosition() override;
 		void							setPlayheadPosition(int position) override;
 
-		float							getSpeed() override;
-		void							setSpeed(float speed) override;
-		void							reverse() override;
-
 		bool							isValid(){ return mFramesLoaded > 0; };
 		int								getMaxFrame() override;
 		//ci::gl::Texture2dRef			getNextTexture() override;
@@ -235,7 +231,7 @@ namespace videodromm
 		//int							mPlayheadPosition;
 		bool						mLoadingPaused;
 		bool						mLoadingFilesComplete;
-		float						mSpeed;
+
 		vector<ci::gl::TextureRef>	mSequenceTextures;
 	};
 

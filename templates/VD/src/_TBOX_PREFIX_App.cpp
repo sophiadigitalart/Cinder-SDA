@@ -14,7 +14,7 @@
 using namespace ci;
 using namespace ci::app;
 using namespace std;
-using namespace VideoDromm;
+using namespace videodromm;
 
 class _TBOX_PREFIX_App : public App {
 
@@ -30,7 +30,8 @@ public:
 	void update() override;
 	void draw() override;
 	void cleanup() override;
-	void setUIVisibility(bool visible);
+	void toggleUIVisibility() { mVDSession->toggleUI(); };
+	void toggleCursorVisibility(bool visible);
 private:
 	// Settings
 	VDSettingsRef					mVDSettings;
@@ -64,11 +65,11 @@ _TBOX_PREFIX_App::_TBOX_PREFIX_App()
 	: mSpoutOut("VD", app::getWindowSize())
 {
 	// Settings
-	mVDSettings = VDSettings::create();
+	mVDSettings = VDSettings::create("_TBOX_PREFIX_App");
 	// Session
 	mVDSession = VDSession::create(mVDSettings);
 	//mVDSettings->mCursorVisible = true;
-	setUIVisibility(mVDSettings->mCursorVisible);
+	toggleCursorVisibility(mVDSettings->mCursorVisible);
 	mVDSession->getWindowsResolution();
 
 	mouseGlobal = false;
@@ -84,7 +85,7 @@ void _TBOX_PREFIX_App::positionRenderWindow() {
 	setWindowPos(mVDSettings->mRenderX, mVDSettings->mRenderY);
 	setWindowSize(mVDSettings->mRenderWidth, mVDSettings->mRenderHeight);
 }
-void _TBOX_PREFIX_App::setUIVisibility(bool visible)
+void _TBOX_PREFIX_App::toggleCursorVisibility(bool visible)
 {
 	if (visible)
 	{
@@ -151,10 +152,10 @@ void _TBOX_PREFIX_App::keyDown(KeyEvent event)
 			// quit the application
 			quit();
 			break;
-		case KeyEvent::KEY_h:
+		case KeyEvent::KEY_c:
 			// mouse cursor and ui visibility
 			mVDSettings->mCursorVisible = !mVDSettings->mCursorVisible;
-			setUIVisibility(mVDSettings->mCursorVisible);
+			toggleCursorVisibility(mVDSettings->mCursorVisible);
 			break;
 		}
 	}

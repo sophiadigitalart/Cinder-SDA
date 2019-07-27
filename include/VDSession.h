@@ -109,6 +109,9 @@ namespace videodromm {
 		int								getIntUniformValueByName(string aName) {
 			return mVDAnimation->getIntUniformValueByName(aName);
 		};
+		int								getIntUniformValueByIndex(unsigned int aCtrl) {
+			return mVDAnimation->getIntUniformValueByIndex(aCtrl);
+		};
 		bool							getBoolUniformValueByName(string aName) {
 			return mVDAnimation->getBoolUniformValueByName(aName);
 		};
@@ -125,11 +128,13 @@ namespace videodromm {
 			// done in router mVDAnimation->changeFloatValue(aCtrl, aValue);
 			mVDWebsocket->changeFloatValue(aCtrl, aValue);
 		};
-		void							setBoolUniformValueByIndex(unsigned int aCtrl, float aValue) {
+		void							setIntUniformValueByIndex(unsigned int aCtrl, int aValue) {
+			mVDWebsocket->changeIntValue(aCtrl, aValue);
+		};
+void							setBoolUniformValueByIndex(unsigned int aCtrl, float aValue) {
 			// done in router mVDAnimation->changeFloatValue(aCtrl, aValue);
 			mVDWebsocket->changeBoolValue(aCtrl, aValue);
 		};
-
 		// tempo
 		float							getBpm() { return mVDAnimation->getBpm(); };
 		void							setBpm(float aBpm) { mVDAnimation->setBpm(aBpm); };
@@ -273,7 +278,9 @@ namespace videodromm {
 		void							toggleLoadingFromDisk(unsigned int aTextureIndex);
 		void							syncToBeat(unsigned int aTextureIndex);
 		void							reverse(unsigned int aTextureIndex);
-		float							getSpeed(unsigned int aTextureIndex);
+		float							getSpeed(unsigned int aTextureIndex) {
+			return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->getSpeed();
+		};
 		void							setSpeed(unsigned int aTextureIndex, float aSpeed);
 		int								getPosition(unsigned int aTextureIndex);
 		void							setPlayheadPosition(unsigned int aTextureIndex, int aPosition);
@@ -315,6 +322,9 @@ namespace videodromm {
 		
 		int								getMode() { return mMode; };
 		void							setMode(int aMode) { mMode = aMode; };;
+		void							toggleUI() { mShowUI = !mShowUI; };
+		bool							showUI() { return mShowUI; };
+
 	private:
 		int								mMode;
 		// Settings
@@ -322,7 +332,7 @@ namespace videodromm {
 		// Utils
 		VDUtilsRef						mVDUtils;
 		// Message router
-		VDRouterRef					mVDRouter;
+		VDRouterRef						mVDRouter;
 		// VDWebsocket
 		VDWebsocketRef					mVDWebsocket;
 		// Animation
@@ -381,7 +391,7 @@ namespace videodromm {
 		void							updateStream(string * aStringPtr);
 		//! window management
 		int								cmd;
-
+		bool							mShowUI = false;
 		/* 
 			mix
 		*/

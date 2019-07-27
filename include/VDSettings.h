@@ -56,6 +56,16 @@ namespace videodromm {
 		static const int			IBG = 27;
 		static const int			IBB = 28;
 
+		/*
+		static const int			IFREQ1 = 26;
+		static const int			IFREQ2 = 27;
+		static const int			IFREQ3 = 28;
+
+		static const int			IBR = 36;
+		static const int			IBG = 37;
+		static const int			IBB = 38; */
+		// useless? 
+
 		static const int			IRESX = 29;
 		static const int			IRESY = 30;
 		static const int			IWEIGHT0 = 31;
@@ -66,7 +76,7 @@ namespace videodromm {
 		static const int			IWEIGHT5 = 36;
 		static const int			IWEIGHT6 = 37;
 		static const int			IWEIGHT7 = 38;
-	
+
 		static const int			ICONTOUR = 40;
 		static const int			IROTATIONSPEED = 41;
 		static const int			IMOUSEX = 42;
@@ -76,12 +86,16 @@ namespace videodromm {
 		static const int			IVFALLOFF = 46;
 		static const int			TIME = 47;
 
+		
+
 		static const int			IBLENDMODE = 50;
 
 		// int
 		static const int			IPHASE = 52;
 		static const int			IFBOA = 54;
 		static const int			IFBOB = 55;
+		static const int			IOUTW = 56;
+		static const int			IOUTH = 57;		
 		// booleans 80 to 110
 		static const int			IGLITCH = 81;
 		static const int			IVIGN = 82;

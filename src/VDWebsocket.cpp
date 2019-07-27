@@ -546,7 +546,9 @@ void VDWebsocket::changeBoolValue(unsigned int aControl, bool aValue) {
 	string strParams = sParams.str();
 	sendJSON(strParams);
 }
-
+void VDWebsocket::changeIntValue(unsigned int aControl, int aValue) {
+	mVDAnimation->setIntUniformValueByIndex(aControl, aValue);
+}
 void VDWebsocket::changeFloatValue(unsigned int aControl, float aValue, bool forceSend, bool toggle, bool increase, bool decrease) {
 	/*if (aControl == 31) {
 		CI_LOG_V("old value " + toString(mVDAnimation->getFloatUniformValueByIndex(aControl)) + " newvalue " + toString(aValue));

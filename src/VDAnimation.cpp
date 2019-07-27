@@ -101,7 +101,7 @@ VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
 		// iBpm 
 		createFloatUniform("iBpm", mVDSettings->IBPM, 165.0f, 0.000000001f, 400.0f); // 21
 		// Speed 
-		createFloatUniform("speed", mVDSettings->ISPEED, 0.01f, 0.01f, 1.0f); // 22
+		createFloatUniform("speed", mVDSettings->ISPEED, 0.01f, 0.01f, 12.0f); // 22
 		// slitscan (or other) Param1 
 		createFloatUniform("pixelX", mVDSettings->IPIXELX, 1.0f, 0.01f, 100.0f); // 23
 		// slitscan (or other) Param2 
@@ -140,7 +140,6 @@ VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
 		// weight texture 
 		createFloatUniform("iWeight7", mVDSettings->IWEIGHT7, 0.0f); // 38
 
-
 		// contour
 		createFloatUniform("iContour", mVDSettings->ICONTOUR, 0.0f, 0.0f, 0.5f); // 40
 		// RotationSpeed
@@ -158,6 +157,10 @@ VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
 		createFloatUniform("iVFallOff", mVDSettings->IVFALLOFF, 0.31f, 0.0f, 1.0f); // 46
 		// hydra time
 		createFloatUniform("time", mVDSettings->TIME, 0.0f); // 47
+		// iOutW
+		createIntUniform("iOutW", mVDSettings->IOUTW, mVDSettings->mRenderWidth); // 56
+		// iOutH  
+		createIntUniform("iOutH", mVDSettings->IOUTH, mVDSettings->mRenderHeight); // 57
 
 		// int
 		// blend mode 
@@ -206,13 +209,14 @@ VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
 		createFloatUniform("srcYLeft", mVDSettings->SRCYLEFT, 0.0f, 0.0f, 1024.0f); // 132
 		createFloatUniform("srcYRight", mVDSettings->SRCYRIGHT, mVDSettings->mRenderHeight, 0.0f, 1024.0f); // 133
 		// iFreq0  
-		createFloatUniform("iFreq0", mVDSettings->IFREQ0, 0.0f, 0.01f, 256.0f); //  140 was 25 	
+		createFloatUniform("iFreq0", mVDSettings->IFREQ0, 0.0f, 0.01f, 256.0f); // 140 was 25 	
 		// iFreq1  
-		createFloatUniform("iFreq1", mVDSettings->IFREQ1, 0.0f, 0.01f, 256.0f); // 141 was  39 was 26
+		createFloatUniform("iFreq1", mVDSettings->IFREQ1, 0.0f, 0.01f, 256.0f); // 141 was 39 was 26
 		// iFreq2  
-		createFloatUniform("iFreq2", mVDSettings->IFREQ2, 0.0f, 0.01f, 256.0f); // 142 was  48 was 27
+		createFloatUniform("iFreq2", mVDSettings->IFREQ2, 0.0f, 0.01f, 256.0f); // 142 was 48 was 27
 		// iFreq3  
-		createFloatUniform("iFreq3", mVDSettings->IFREQ3, 0.0f, 0.01f, 256.0f); // 143 was  49 was  28
+		createFloatUniform("iFreq3", mVDSettings->IFREQ3, 0.0f, 0.01f, 256.0f); // 143 was 49 was  28
+
 		// vec4 kinect2
 		createVec4Uniform("iSpineBase", 200, vec4(320.0f, 240.0f, 0.0f, 0.0f));
 		createVec4Uniform("SpineMid", 201, vec4(320.0f, 240.0f, 0.0f, 0.0f));

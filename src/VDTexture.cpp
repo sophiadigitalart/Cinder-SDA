@@ -19,6 +19,7 @@ namespace videodromm {
 		mXLeft = 0;
 		mYTop = 0;
 		mPosition = 1;
+		mSpeed = 0.01f;
 		mXRight = mOriginalWidth = mWidth;
 		mYBottom = mOriginalHeight = mHeight;
 		mAreaWidth = mWidth;
@@ -210,11 +211,13 @@ namespace videodromm {
 		mSyncToBeat = !mSyncToBeat;
 	}
 	void VDTexture::reverse() {
+		mSpeed *= -1.0f;
 	}
 	float VDTexture::getSpeed() {
-		return 1;
+		return mSpeed;	
 	}
 	void VDTexture::setSpeed(float speed) {
+		mSpeed = speed;
 	}
 
 	void VDTexture::setPlayheadPosition(int position) {
@@ -323,8 +326,8 @@ namespace videodromm {
 	{
 		VDTexture::fromXml(xml);
 		// retrieve attributes specific to this type of texture
-		mFlipV = xml.getAttributeValue<bool>("flipv", "true"); // default true
-		mFlipH = xml.getAttributeValue<bool>("fliph", "true"); // default true
+		mFlipV = xml.getAttributeValue<bool>("flipv", "false"); // default true
+		mFlipH = xml.getAttributeValue<bool>("fliph", "false"); // default true
 		mPath = xml.getAttributeValue<string>("path", "");
 		mFolder = xml.getAttributeValue<string>("folder", "");
 		mName = mPath;
@@ -351,7 +354,6 @@ namespace videodromm {
 	}
 
 	ci::gl::Texture2dRef TextureImage::getTexture() {
-
 		Area area(mXLeft, mYTop, mXRight, mYBottom);
 		mProcessedSurface = mInputSurface.clone(area);
 		mTexture = gl::Texture2d::create(mProcessedSurface, ci::gl::Texture::Format().loadTopDown(mFlipV));
@@ -375,7 +377,6 @@ namespace videodromm {
 		mCurrentLoadedFrame = 0;
 		mNextIndexFrameToTry = 0;
 		mPlaying = false;
-		mSpeed = 0.01f;
 		mExt = "png";
 		mPrefix = "none";
 		mNextIndexFrameToTry = 0;
@@ -394,7 +395,7 @@ namespace videodromm {
 				bool firstIndexFound = false;
 				// loading 2000 files takes a while, I load only the first one
 				for (fs::directory_iterator it(fullPath); it != fs::directory_iterator(); ++it)
-				{
+				{ 
 					// if file(1).jpg filename, mNumberOfDigits is 2
 					if (mNumberOfDigits == 2) {
 						break;
@@ -514,14 +515,15 @@ namespace videodromm {
 				default:
 					break;
 				}
-
+				
 				string fileNameToLoad = mPrefix + restOfFileName + "." + mExt;
 				fs::path fileToLoad = getAssetPath("") / mPath / fileNameToLoad;
 				if (fs::exists(fileToLoad)) {
 					// start profiling
 					auto start = Clock::now();
-
-					mTexture = ci::gl::Texture::create(loadImage(fileToLoad));
+// 20190727 TODO CHECK
+					mSequenceTextures.push_back(ci::gl::Texture::create(loadImage(fileToLoad), gl::Texture::Format().loadTopDown(mFlipV))); // 20190724
+/*mTexture = ci::gl::Texture::create(loadImage(fileToLoad));
 					mXLeft = 0;
 					mYTop = 0;
 					mXRight = mOriginalWidth = mTexture->getWidth();
@@ -532,9 +534,7 @@ namespace videodromm {
 					mProcessedSurface = mInputSurface.clone(area);
 					mTexture = gl::Texture2d::create(mProcessedSurface, ci::gl::Texture::Format().loadTopDown(mFlipV));
 
-					mSequenceTextures.push_back(mTexture);
-
-					//mSequenceTextures.push_back(ci::gl::Texture::create(loadImage(fileToLoad), gl::Texture::Format().loadTopDown()));
+					mSequenceTextures.push_back(mTexture); */
 					mCurrentLoadedFrame = mFramesLoaded;
 					mFramesLoaded++;
 					auto end = Clock::now();
@@ -566,11 +566,9 @@ namespace videodromm {
 		if (mSequenceTextures.size() > 0) {
 			// Call on each frame to update the playhead
 			if (mPlaying) {
-				mSpeed = mVDAnimation->getFloatUniformValueByName("speed");
+				//mSpeed = mVDAnimation->getFloatUniformValueByName("speed");
 				playheadFrameInc += mSpeed;
-
 				newPosition = mPosition + (int)playheadFrameInc;
-				//CI_LOG_V("newPosition: " + toString( newPosition) + " playheadFrameInc" + toString(playheadFrameInc) +  " mSpeed " + toString(mSpeed));
 				if (playheadFrameInc > 1.0f) playheadFrameInc = 0.0f;
 				if (newPosition < 0) newPosition = mSequenceTextures.size() - 1;
 				if (newPosition > mSequenceTextures.size() - 1) newPosition = 0;
@@ -583,7 +581,6 @@ namespace videodromm {
 				}
 				else {
 					newPosition = mPosition;
-
 				}
 			}
 			mPosition = max(0, min(newPosition, (int)mSequenceTextures.size() - 1));
@@ -603,10 +600,8 @@ namespace videodromm {
 			if (mPlaying) {
 				updateSequence();
 			}
-			
 			mTexture = mSequenceTextures[mPosition];
 		}
-
 		return mTexture;
 	}
 	/*ci::gl::Texture2dRef TextureImageSequence::getNextTexture() {
@@ -641,15 +636,7 @@ namespace videodromm {
 			loadNextImageFromDisk();
 		}
 	}
-	void TextureImageSequence::reverse() {
-		mSpeed *= -1.0f;
-	}
-	float TextureImageSequence::getSpeed() {
-		return mSpeed;
-	}
-	void TextureImageSequence::setSpeed(float speed) {
-		mSpeed = speed;
-	}
+	
 	bool TextureImageSequence::isLoadingFromDisk() {
 		return !mLoadingFilesComplete;
 	}
@@ -761,7 +748,7 @@ namespace videodromm {
 		mTexture = mSpoutIn.receiveTexture();
 		// set name for UI
 		mName = mSpoutIn.getSenderName();
-
+		
 #endif
 #if defined( CINDER_MAC )
 		mClientSyphon.draw(vec2(0.f, 0.f));
@@ -939,7 +926,7 @@ namespace videodromm {
 				if (mVDAnimation->isAudioBuffered() && mBufferPlayerNode) {
 					gl::ScopedFramebuffer fbScp(mFbo);
 					gl::clear(Color::black());
-
+					
 					mTexture->bind(0);
 
 					//mWaveformPlot.draw();
@@ -949,7 +936,7 @@ namespace videodromm {
 					gl::color(ColorA(0, 1, 0, 0.7f));
 					gl::drawSolidRect(Rectf(readPos - 2, 0, readPos + 2, (float)mHeight));
 					mRenderedTexture = mFbo->getColorTexture();
-					return mRenderedTexture;
+					return mRenderedTexture;					
 				}
 			}
 		}

@@ -8,7 +8,7 @@ VDShader::VDShader(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, strin
 	mValid = false;
 	mActive = true;
 	// shadertoy include
-	//shaderInclude = loadString(loadAsset("shadertoy.sda"));
+	//shaderInclude = loadString(loadAsset("shadertoy.vd"));
 	shaderInclude = "#version 150\n"
 		"// shadertoy specific\n"
 		"uniform vec3      	iResolution;\n"
@@ -185,7 +185,8 @@ bool VDShader::setFragmentString(string aFragmentShaderString, string aName) {
 		pattern = { "iAudio0" };
 		replacement = { "iChannel0" };
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
-		pattern = { "iFreq0" };
+// 20190727 TODO CHECK
+		/*pattern = { "iFreq0" };
 		replacement = { "iChannel0.x" };
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
 		pattern = { "iFreq1" };
@@ -193,7 +194,7 @@ bool VDShader::setFragmentString(string aFragmentShaderString, string aName) {
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
 		pattern = { "iFreq2" };
 		replacement = { "iChannel0.x" };
-		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
+		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement); */
 		pattern = { "iRenderXY.x" };
 		replacement = { "0.0" };
 		mOriginalFragmentString = std::regex_replace(mOriginalFragmentString, pattern, replacement);
