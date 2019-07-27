@@ -719,16 +719,14 @@ bool VDSession::handleKeyDown(KeyEvent &event)
 			toggleUI();
 			break;
 		case KeyEvent::KEY_s:
-			for (size_t s = 0; s < getInputTexturesCount(); s++)
-			{
-				float spd = getSpeed(s);
-				if (isAltDown) {
-					setSpeed(s, getSpeed(s) - 0.01f);
-				}
-				else {
-					setSpeed(s, getSpeed(s) + 0.01f);
-				}
-			}			
+			
+			if (isAltDown) {
+				setSpeed(0, getSpeed(0) - 0.01f);
+			}
+			else {
+				setSpeed(0, getSpeed(0) + 0.01f);
+			}
+						
 			break;
 		default:
 			CI_LOG_V("session keydown: " + toString(event.getCode()));
@@ -1420,9 +1418,7 @@ void VDSession::setSpeed(unsigned int aTextureIndex, float aSpeed) {
 	//mTextureList[aTextureIndex]->setSpeed(aSpeed);
 	for (int i = 0; i < mTextureList.size() - 1; i++)
 	{
-		//if (mTextureList[i]->getType() == mTextureList[i]->SEQUENCE) {
-			mTextureList[i]->setSpeed(aSpeed);
-		//}
+		mTextureList[i]->setSpeed(aSpeed);
 	} 
 }
 int VDSession::getPosition(unsigned int aTextureIndex) {

@@ -728,7 +728,7 @@ void VDAnimation::update() {
 	{
 		float f = getFloatUniformValueByName("iTime");
 		float g = shaderUniforms["iTime"].floatValue;
-		// shaderUniforms["iTime"].floatValue = shaderUniforms["iTempoTime"].floatValue*iTimeFactor;
+		//shaderUniforms["iTime"].floatValue = shaderUniforms["iTempoTime"].floatValue*iTimeFactor;
 		CI_LOG_W(" shaderUniforms[iTime].floatValue:" + toString(g));
 		CI_LOG_W(" getFloatUniformValueByName(iTime):" + toString(f));
 		//shaderUniforms["iTime"].floatValue = getFloatUniformValueByName("iTime");
