@@ -494,7 +494,7 @@ void VDSession::fileDrop(FileDropEvent event) {
 
 	unsigned int index = (int)(event.getX() / (mVDSettings->uiLargePreviewW + mVDSettings->uiMargin));
 	int y = (int)(event.getY());
-	if (index < 2 || y < mVDSettings->uiYPosRow3 || y > mVDSettings->uiYPosRow3 + mVDSettings->uiPreviewH) index = 0;
+	//if (index < 2 || y < mVDSettings->uiYPosRow3 || y > mVDSettings->uiYPosRow3 + mVDSettings->uiPreviewH) index = 0;
 	ci::fs::path mPath = event.getFile(event.getNumFiles() - 1);
 	string absolutePath = mPath.string();
 	// use the last of the dropped files
@@ -1380,9 +1380,25 @@ void VDSession::loadMovie(string aFile, unsigned int aTextureIndex) {
 
 }
 void VDSession::loadImageFile(string aFile, unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	CI_LOG_V("loadImageFile " + aFile + " at textureIndex " + toString(aTextureIndex));
-	mTextureList[aTextureIndex]->loadFromFullPath(aFile);
+	// create texture
+	if (mTextureList.size() < 8) {
+		XmlTree			imageXml;
+		imageXml.setTag("texture");
+		imageXml.setAttribute("id", to_string(mTextureList.size()));
+		imageXml.setAttribute("texturetype", "image");
+		imageXml.setAttribute("path", aFile);
+		imageXml.setAttribute("width", "1280");
+		imageXml.setAttribute("height", "720");
+		imageXml.setAttribute("flipv", "0");
+		TextureImageRef t(TextureImage::create());
+		t->fromXml(imageXml);
+		mTextureList.push_back(t);
+		mTextureList[mTextureList.size() - 1]->loadFromFullPath(aFile);
+	}
+	else {
+		CI_LOG_V("loadImageFile " + aFile + " at textureIndex " + toString(aTextureIndex));
+		mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->loadFromFullPath(aFile);
+	}
 }
 void VDSession::loadAudioFile(string aFile) {
 	mTextureList[0]->loadFromFullPath(aFile);
