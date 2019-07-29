@@ -39,20 +39,8 @@ private:
 	VDSessionRef					mVDSession;
 	// Log
 	VDLogRef						mVDLog;
-	// imgui
-	float							color[4];
-	float							backcolor[4];
-	int								playheadPositions[12];
-	int								speeds[12];
-
-	float							f = 0.0f;
-	char							buf[64];
-	unsigned int					i, j;
-
-	bool							mouseGlobal;
 
 	string							mError;
-	// fbo
 	bool							mIsShutDown;
 	Anim<float>						mRenderWindowTimer;
 	void							positionRenderWindow();
@@ -72,16 +60,16 @@ _TBOX_PREFIX_App::_TBOX_PREFIX_App()
 	toggleCursorVisibility(mVDSettings->mCursorVisible);
 	mVDSession->getWindowsResolution();
 
-	mouseGlobal = false;
 	mFadeInDelay = true;
 	// windows
 	mIsShutDown = false;
 	mRenderWindowTimer = 0.0f;
-	timeline().apply(&mRenderWindowTimer, 1.0f, 2.0f).finishFn([&] { positionRenderWindow(); });
+	//timeline().apply(&mRenderWindowTimer, 1.0f, 2.0f).finishFn([&] { positionRenderWindow(); });
 
 }
 void _TBOX_PREFIX_App::positionRenderWindow() {
-	mVDSettings->mRenderPosXY = ivec2(mVDSettings->mRenderX, mVDSettings->mRenderY);//20141214 was 0
+	mVDSession->getWindowsResolution();
+	mVDSettings->mRenderPosXY = ivec2(mVDSettings->mRenderX, mVDSettings->mRenderY);
 	setWindowPos(mVDSettings->mRenderX, mVDSettings->mRenderY);
 	setWindowSize(mVDSettings->mRenderWidth, mVDSettings->mRenderHeight);
 }
@@ -156,6 +144,10 @@ void _TBOX_PREFIX_App::keyDown(KeyEvent event)
 			// mouse cursor and ui visibility
 			mVDSettings->mCursorVisible = !mVDSettings->mCursorVisible;
 			toggleCursorVisibility(mVDSettings->mCursorVisible);
+			break;
+		case KeyEvent::KEY_F11:
+			// windows position
+			positionRenderWindow();
 			break;
 		}
 	}
