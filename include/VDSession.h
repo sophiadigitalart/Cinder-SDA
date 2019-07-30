@@ -173,7 +173,7 @@ void							setBoolUniformValueByIndex(unsigned int aCtrl, float aValue) {
 		void							setFboFragmentShaderIndex(unsigned int aFboIndex, unsigned int aFboShaderIndex);
 		unsigned int					getFboFragmentShaderIndex(unsigned int aFboIndex);
 		bool							loadShaderFolder(string aFolder);
-		int								loadFragmentShader(string aFilePath);
+		int								loadFragmentShader(string aFilePath, unsigned int aFboShaderIndex = 4);
 		unsigned int					getShadersCount() { return mShaderList.size(); };
 		string							getShaderName(unsigned int aShaderIndex);
 		ci::gl::TextureRef				getShaderThumb(unsigned int aShaderIndex);
@@ -203,7 +203,7 @@ void							setBoolUniformValueByIndex(unsigned int aCtrl, float aValue) {
 		ci::gl::TextureRef				getFboTexture(unsigned int aFboIndex = 0);
 		ci::gl::TextureRef				getFboRenderedTexture(unsigned int aFboIndex);
 		ci::gl::TextureRef				getFboThumb(unsigned int aBlendIndex) { return mBlendFbos[aBlendIndex]->getColorTexture(); };
-		unsigned int 					createShaderFbo(string aShaderFilename, unsigned int aInputTextureIndex = 0);
+		unsigned int 					createShaderFbo(string aShaderFilename, unsigned int aFboShaderIndex = 4);
 		unsigned int					createShaderFboFromString(string aFragmentShaderString, string aShaderFilename);
 		string							getFboName(unsigned int aFboIndex) { return mFboList[aFboIndex]->getName(); };
 		//int								getFboTextureWidth(unsigned int aFboIndex);
