@@ -282,6 +282,18 @@ void							setBoolUniformValueByIndex(unsigned int aCtrl, float aValue) {
 			return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->getSpeed();
 		};
 		void							setSpeed(unsigned int aTextureIndex, float aSpeed);
+		void							incrementSequencePosition() {
+			for (unsigned int i = 0; i < mTextureList.size() - 1; i++)
+			{
+				setPlayheadPosition(i, getPosition(i) + 1);
+			}
+		}
+		void							decrementSequencePosition() {
+			for (unsigned int i = 0; i < mTextureList.size() - 1; i++)
+			{
+				setPlayheadPosition(i, getPosition(i) - 1);
+			}
+		}
 		int								getPosition(unsigned int aTextureIndex);
 		void							setPlayheadPosition(unsigned int aTextureIndex, int aPosition);
 		int								getMaxFrame(unsigned int aTextureIndex);

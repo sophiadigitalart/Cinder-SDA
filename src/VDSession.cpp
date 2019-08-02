@@ -714,6 +714,14 @@ bool VDSession::handleKeyDown(KeyEvent &event)
 			// crossfade left
 			if (mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IXFADE) > 0.0f) mVDWebsocket->changeFloatValue(mVDSettings->IXFADE, mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IXFADE) - 0.1f);
 			break;
+		case KeyEvent::KEY_UP:
+			// imgseq next
+			incrementSequencePosition();
+			break;
+		case KeyEvent::KEY_DOWN:
+			// imgseq next
+			decrementSequencePosition();
+			break;
 		case KeyEvent::KEY_h:
 			// ui visibility
 			toggleUI();
@@ -726,7 +734,6 @@ bool VDSession::handleKeyDown(KeyEvent &event)
 			else {
 				setSpeed(0, getSpeed(0) + 0.01f);
 			}
-
 			break;
 		default:
 			CI_LOG_V("session keydown: " + toString(event.getCode()));
