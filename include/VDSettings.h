@@ -95,7 +95,9 @@ namespace videodromm {
 		static const int			IFBOA = 54;
 		static const int			IFBOB = 55;
 		static const int			IOUTW = 56;
-		static const int			IOUTH = 57;		
+		static const int			IOUTH = 57;	
+		static const int			IBEAT = 58;
+		static const int			IBAR = 59;
 		// booleans 80 to 110
 		static const int			IGLITCH = 81;
 		static const int			IVIGN = 82;

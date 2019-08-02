@@ -67,6 +67,7 @@ namespace videodromm
 		bool							mUseTimeWithTempo;
 		void							toggleUseTimeWithTempo() { mUseTimeWithTempo = !mUseTimeWithTempo; };
 		void							useTimeWithTempo() { mUseTimeWithTempo = true; };
+		bool							getUseTimeWithTempo() { return mUseTimeWithTempo; };
 		float							iTempoTimeBeatPerBar;
 		float							getBpm() {
 			return getFloatUniformValueByIndex(mVDSettings->IBPM);
@@ -83,8 +84,7 @@ namespace videodromm
 		void							setTimeFactor(const int &aTimeFactor);
 		int								getEndFrame() { return mEndFrame; };
 		void							setEndFrame(int frame) { mEndFrame = frame; };
-
-
+		int								mLastBeat = 0;
 		// animation
 		int								currentScene;
 		//int							getBadTV(int frame);
@@ -130,6 +130,12 @@ namespace videodromm
 			shaderUniforms[aName].intValue = aValue;
 		};
 		void							setIntUniformValueByIndex(unsigned int aIndex, int aValue) {
+			if (mVDSettings->IBEAT == aIndex) {
+				if (aValue != mLastBeat) {
+					mLastBeat = aValue;
+					if (aValue == 0) setIntUniformValueByIndex(mVDSettings->IBAR, getIntUniformValueByIndex(mVDSettings->IBAR) + 1);
+				}
+			}
 			shaderUniforms[getUniformNameForIndex(aIndex)].intValue = aValue;
 		}
 		void							setFloatUniformValueByName(string aName, float aValue) {

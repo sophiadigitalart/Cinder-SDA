@@ -20,6 +20,7 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 			int index = -1;
 			int i = 0;
 			float f = 1.0f;
+			
 			vec2 vv = vec2(0.0f);
 			string addr = msg.getAddress();
 			// handle all msg without page integer first
@@ -40,6 +41,20 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 					found = true;
 					mVDAnimation->setAutoBeatAnimation(false);
 					mVDAnimation->setBpm(msg[0].flt());
+				}
+			}
+			if (!found)
+			{
+				ctrl = "link";
+				index = addr.find(ctrl);
+				if (index != std::string::npos)
+				{
+					found = true;
+					double d0 = msg[0].dbl(); // tempo
+					mVDAnimation->setBpm(d0);
+					double d1 = msg[1].dbl();
+					int d2 = msg[2].int32();
+					mVDWebsocket->changeIntValue(mVDSettings->IBEAT, d2);
 				}
 			}
 			if (!found)
@@ -74,6 +89,7 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 								mVDAnimation->setFloatUniformValueByIndex(i, f);
 							}
 						}
+						
 						if (!found)
 						{
 							ctrl = "multifader";

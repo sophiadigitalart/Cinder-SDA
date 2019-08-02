@@ -157,10 +157,6 @@ VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
 		createFloatUniform("iVFallOff", mVDSettings->IVFALLOFF, 0.31f, 0.0f, 1.0f); // 46
 		// hydra time
 		createFloatUniform("time", mVDSettings->TIME, 0.0f); // 47
-		// iOutW
-		createIntUniform("iOutW", mVDSettings->IOUTW, mVDSettings->mRenderWidth); // 56
-		// iOutH  
-		createIntUniform("iOutH", mVDSettings->IOUTH, mVDSettings->mRenderHeight); // 57
 
 		// int
 		// blend mode 
@@ -175,6 +171,14 @@ VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
 		createIntUniform("iFboA", mVDSettings->IFBOA, 0); // 54
 		// fbo B
 		createIntUniform("iFboB", mVDSettings->IFBOB, 1); // 55
+		// iOutW
+		createIntUniform("iOutW", mVDSettings->IOUTW, mVDSettings->mRenderWidth); // 56
+		// iOutH  
+		createIntUniform("iOutH", mVDSettings->IOUTH, mVDSettings->mRenderHeight); // 57
+		// beat 
+		createIntUniform("iBeat", mVDSettings->IBEAT, 1); // 58
+		// bar 
+		createIntUniform("iBar", mVDSettings->IBAR, 0); // 59
 
 		// vec3
 		createVec3Uniform("iResolution", 60, vec3(getFloatUniformValueByName("iResolutionX"), getFloatUniformValueByName("iResolutionY"), 1.0));
@@ -728,7 +732,7 @@ void VDAnimation::update() {
 	{
 		float f = getFloatUniformValueByName("iTime");
 		float g = shaderUniforms["iTime"].floatValue;
-		//shaderUniforms["iTime"].floatValue = shaderUniforms["iTempoTime"].floatValue*iTimeFactor;
+		shaderUniforms["iTime"].floatValue = shaderUniforms["iTempoTime"].floatValue*iTimeFactor;
 		CI_LOG_W(" shaderUniforms[iTime].floatValue:" + toString(g));
 		CI_LOG_W(" getFloatUniformValueByName(iTime):" + toString(f));
 		//shaderUniforms["iTime"].floatValue = getFloatUniformValueByName("iTime");

@@ -199,18 +199,18 @@ void VDWebsocket::parseMessage(string msg) {
 							// change tempo
 							mVDAnimation->useTimeWithTempo();
 							mVDAnimation->setBpm(jsonElement->getChild("tempo").getValue<float>());
-							CI_LOG_E("tempo:" + toString(mVDAnimation->getBpm()));
+							CI_LOG_I("tempo:" + toString(mVDAnimation->getBpm()));
 							break;
 						case 3:
 							// change beat
 							mVDAnimation->setFloatUniformValueByIndex(mVDSettings->ITIME, jsonElement->getChild("beat").getValue<float>());
-							CI_LOG_E("beat:" + toString(mVDSettings->ITIME) + " " + toString(mVDAnimation->getFloatUniformValueByIndex(mVDSettings->ITIME)));
+							CI_LOG_I("time:" + toString(mVDSettings->ITIME) + " " + toString(mVDAnimation->getFloatUniformValueByIndex(mVDSettings->ITIME)));
 							break;
 						case 4:
 							// change phase
 							mVDAnimation->setFloatUniformValueByIndex(mVDSettings->ITEMPOTIME, jsonElement->getChild("phase").getValue<float>());
-							CI_LOG_E("phase:" + toString(mVDSettings->ITEMPOTIME) + " " + toString(mVDAnimation->getFloatUniformValueByIndex(mVDSettings->ITEMPOTIME)));
-							mVDAnimation->setIntUniformValueByName("iBeat", (int)jsonElement->getChild("phase").getValue<float>());
+							CI_LOG_I("beat:" + toString(mVDSettings->ITEMPOTIME) + " " + toString(mVDAnimation->getFloatUniformValueByIndex(mVDSettings->ITEMPOTIME)));
+							mVDAnimation->setIntUniformValueByIndex(mVDSettings->IBEAT, (int)jsonElement->getChild("phase").getValue<float>());
 							break;
 						default:
 							break;
