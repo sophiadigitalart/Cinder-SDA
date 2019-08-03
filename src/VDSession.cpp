@@ -277,7 +277,7 @@ void VDSession::updateBlendUniforms() {
 	mGlslBlend->uniform("iCrossfade", 0.5f);// blendmode only work if different than 0 or 1
 	mGlslBlend->uniform("iPixelate", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IPIXELATE));
 	mGlslBlend->uniform("iExposure", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IEXPOSURE));
-	mGlslBlend->uniform("iDeltaTime", mVDAnimation->iDeltaTime);
+	mGlslBlend->uniform("iDeltaTime", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IDELTATIME));
 	mGlslBlend->uniform("iFade", (int)mVDSettings->iFade);
 	mGlslBlend->uniform("iToggle", (int)mVDAnimation->getBoolUniformValueByIndex(mVDSettings->ITOGGLE));
 	mGlslBlend->uniform("iGreyScale", (int)mVDSettings->iGreyScale);
@@ -292,7 +292,6 @@ void VDSession::updateBlendUniforms() {
 	mGlslBlend->uniform("iTempoTime", mVDAnimation->getFloatUniformValueByName("iTempoTime"));
 	mGlslBlend->uniform("iGlitch", (int)mVDAnimation->getBoolUniformValueByIndex(mVDSettings->IGLITCH));
 	mGlslBlend->uniform("iTrixels", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->ITRIXELS));
-	//mGlslBlend->uniform("iPhase", mVDSettings->iPhase);
 	mGlslBlend->uniform("iSeed", mVDSettings->iSeed);
 	mGlslBlend->uniform("iRedMultiplier", mVDAnimation->getFloatUniformValueByName("iRedMultiplier"));
 	mGlslBlend->uniform("iGreenMultiplier", mVDAnimation->getFloatUniformValueByName("iGreenMultiplier"));

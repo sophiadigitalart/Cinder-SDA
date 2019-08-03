@@ -495,7 +495,6 @@ void VDSettings::reset()
 	mPreviewEnabled = true;
 	//audio
 	mIsPlaying = false;
-	//iPhase = 0;
 	iSeed = 0.1;
 	mFftSize = 512;
 	mWindowSize = 1024;
@@ -729,7 +728,6 @@ void VDSettings::reset()
 		"uniform int       iBlendmode;\n"
 		"uniform int       iGreyScale;\n"
 		"uniform int       iGlitch;\n"
-		"uniform int       iPhase;\n"
 		"uniform int       iTransition;\n"
 		"uniform int       iRepeat;\n"
 		"uniform int       iVignette;\n"

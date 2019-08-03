@@ -62,7 +62,6 @@ namespace videodromm
 		const int						mBlendModes = 28;
 		void							blendRenderEnable(bool render) { mBlendRender = render; };
 		// tap tempo
-		float							iDeltaTime;
 		float							iTimeFactor;
 		bool							mUseTimeWithTempo;
 		void							toggleUseTimeWithTempo() { mUseTimeWithTempo = !mUseTimeWithTempo; };
@@ -77,7 +76,7 @@ namespace videodromm
 
 			if (aBpm > 0.0f) {
 				setFloatUniformValueByIndex(mVDSettings->IBPM, aBpm);
-				iDeltaTime = 60 / aBpm;
+				setFloatUniformValueByIndex(mVDSettings->IDELTATIME, 60 / aBpm);
 			}
 		};
 		void							tapTempo();
@@ -233,9 +232,6 @@ namespace videodromm
 
 		// timed animation
 		int								mEndFrame;
-		//int							iBar;
-		//int							iPhaseIndex; //1 to beatsperbar
-		//int							iBeatsPerBar;
 		int								getFreqIndexSize() { return freqIndexes.size(); };
 		int								getFreqIndex(unsigned int aFreqIndex) { return freqIndexes[aFreqIndex]; };
 		void							setFreqIndex(unsigned int aFreqIndex, unsigned int aFreq) { freqIndexes[aFreqIndex] = aFreq; };

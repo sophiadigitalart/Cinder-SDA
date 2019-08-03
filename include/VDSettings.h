@@ -51,7 +51,7 @@ namespace videodromm {
 		static const int			ISPEED = 22;
 		static const int			IPIXELX = 23;
 		static const int			IPIXELY = 24;
-
+		static const int			IDELTATIME = 25;
 		static const int			IBR = 26;
 		static const int			IBG = 27;
 		static const int			IBB = 28;
@@ -76,6 +76,7 @@ namespace videodromm {
 		static const int			IWEIGHT5 = 36;
 		static const int			IWEIGHT6 = 37;
 		static const int			IWEIGHT7 = 38;
+		static const int			IELAPSED = 39;
 
 		static const int			ICONTOUR = 40;
 		static const int			IROTATIONSPEED = 41;
@@ -85,13 +86,10 @@ namespace videodromm {
 		static const int			IVAMOUNT = 45;
 		static const int			IVFALLOFF = 46;
 		static const int			TIME = 47;
-
+		static const int			IPHASE = 48;
 		
-
-		static const int			IBLENDMODE = 50;
-
 		// int
-		static const int			IPHASE = 52;
+		static const int			IBLENDMODE = 50;
 		static const int			IFBOA = 54;
 		static const int			IFBOB = 55;
 		static const int			IOUTW = 56;
@@ -256,7 +254,6 @@ namespace videodromm {
 		bool						mIsPlaying;
 		bool						mUseAudio;
 		bool						mUseLineIn;
-		//int							iPhase;
 		int							mFftSize;
 		int							mWindowSize;
 		float						iSeed;
