@@ -142,6 +142,7 @@ void							setBoolUniformValueByIndex(unsigned int aCtrl, float aValue) {
 		void							toggleUseTimeWithTempo() { mVDAnimation->toggleUseTimeWithTempo(); };
 		void							useTimeWithTempo() { mVDAnimation->useTimeWithTempo(); };
 		bool							getUseTimeWithTempo() { return mVDAnimation->getUseTimeWithTempo(); };
+		void							setTimeFactor(const int &aTimeFactor) { mVDAnimation->setTimeFactor(aTimeFactor); };
 		// audio
 		float							getMaxVolume() { return mVDAnimation->maxVolume; };
 		float *							getFreqs() { return mVDAnimation->iFreqs; };

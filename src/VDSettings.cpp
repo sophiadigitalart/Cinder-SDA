@@ -409,6 +409,7 @@ void VDSettings::resetSomeParams() {
 	//iBadTv = 0.0f;
 	iAlpha = 1.0f;
 	iSpeedMultiplier = 1.0f;
+	iTimeFactor = 1.0f;
 
 	iGreyScale = false;
 	iFade = mSendToOutput = iRepeat = iXorY = false;

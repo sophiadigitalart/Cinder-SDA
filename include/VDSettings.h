@@ -190,6 +190,7 @@ namespace videodromm {
 
 		// shader uniforms	
 		float						iSpeedMultiplier;        // speed multiplier
+		float						iTimeFactor;
 		float						iChannelTime[4];
 		bool						iFade;
 		bool						iRepeat;
