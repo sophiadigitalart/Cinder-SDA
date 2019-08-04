@@ -429,20 +429,20 @@ void VDSettings::resetSomeParams() {
 	// mPreviewFboWidth 80 mPreviewFboHeight 60 margin 10 inBetween 15 mPreviewWidth = 160;mPreviewHeight = 120;
 	uiPreviewH = mPreviewHeight + uiMargin;
 	uiLargeW = (mPreviewFboWidth + uiMargin) * 3;
-	uiLargeH = (mPreviewFboHeight + uiMargin) * 7 + 10;
-	uiLargePreviewW = mPreviewFboWidth * 1.6;
-	uiLargePreviewH = mPreviewHeight * 2.2;
+	uiLargeH = (mPreviewFboHeight + uiMargin) * 6;
+	uiLargePreviewW = mPreviewFboWidth * 1.7;
+	uiLargePreviewH = mPreviewHeight * 2.8;
 
 	uiXPosCol1 = uiLargeW + uiMargin * 2;
 	uiXPosCol2 = uiXPosCol1 + uiMargin + uiElementWidth;
 	uiXPosCol3 = uiXPosCol2 + uiMargin;
 	//uiYPos;
 	uiYPosRow1 = 18;
-	uiYPosRow2 = 260;
-	uiYPosRow3 = uiYPosRow2 + uiLargePreviewH + uiMargin * 1.5;
-	uiYPosRow4 = uiYPosRow3 + uiLargePreviewH + uiMargin * 1.5;
-	uiYPosRow5 = uiYPosRow4 + uiLargePreviewH + uiMargin * 1.5;
-	uiYPosRow6 = uiYPosRow5 + uiLargePreviewH + uiMargin * 1.5;
+	uiYPosRow2 = uiYPosRow1 + uiLargeH + uiMargin;
+	uiYPosRow3 = uiYPosRow2 + uiLargePreviewH + uiMargin;
+	uiYPosRow4 = uiYPosRow3 + uiLargePreviewH + uiMargin;
+	uiYPosRow5 = uiYPosRow4 + uiLargePreviewH + uiMargin;
+	uiYPosRow6 = uiYPosRow5 + uiLargePreviewH + uiMargin;
 	
 	uiSmallH = uiYPosRow2 -uiYPosRow1 - uiMargin;
 

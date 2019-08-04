@@ -131,7 +131,7 @@ namespace videodromm {
 		void							setIntUniformValueByIndex(unsigned int aCtrl, int aValue) {
 			mVDWebsocket->changeIntValue(aCtrl, aValue);
 		};
-void							setBoolUniformValueByIndex(unsigned int aCtrl, float aValue) {
+		void							setBoolUniformValueByIndex(unsigned int aCtrl, float aValue) {
 			// done in router mVDAnimation->changeFloatValue(aCtrl, aValue);
 			mVDWebsocket->changeBoolValue(aCtrl, aValue);
 		};
