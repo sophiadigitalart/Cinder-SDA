@@ -40,12 +40,8 @@ VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
 	mTimer.start();
 	startTime = currentTime = mTimer.getSeconds();
 	//mBpm = 166;
-	//iDeltaTime = 60 / mBpm;//mTempo;
 	//setFloatUniformValueByIndex(mVDSettings->IBPM, 166.0f);
 	setFloatUniformValueByIndex(mVDSettings->IDELTATIME, 60.0f / 166.0f);
-	//iBar = 0;
-	//iBadTvRunning = false;
-	//int ctrl;
 
 	mUniformsJson = getAssetPath("") / mVDSettings->mAssetsPath / "uniforms.json";
 	if (fs::exists(mUniformsJson)) {
@@ -78,6 +74,7 @@ VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
 
 		// rotary
 		// ratio
+		//createFloatUniform("iRatio", mVDSettings->IRATIO, 1.0f, 0.01f, 1.0f); // 11
 		createFloatUniform("iRatio", mVDSettings->IRATIO, 20.0f, 0.00000000001f, 20.0f); // 11
 		// zoom
 		createFloatUniform("iZoom", mVDSettings->IZOOM, 1.0f, 0.95f, 1.1f); // 12
@@ -114,16 +111,12 @@ VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
 		createFloatUniform("iBG", mVDSettings->IBG, 0.5f); // 27
 		// background blue
 		createFloatUniform("iBB", mVDSettings->IBB, 0.1f); // 28
-		// background alpha
-		//createFloatUniform("iBA", mVDSettings->IBA, 0.2f); // 39
 
-
-		// iResolutionX (should be fbowidth) 
+		// iResolutionX (should be fbowidth?) 
 		createFloatUniform("iResolutionX", mVDSettings->IRESX, mVDSettings->mRenderWidth, 320.01f, 4280.0f); // 29
-		// iResolutionY (should be fboheight)  
+		// iResolutionY (should be fboheight?)  
 		createFloatUniform("iResolutionY", mVDSettings->IRESY, mVDSettings->mRenderHeight, 240.01f, 2160.0f); // 30
 
-		// TODO: double 
 		// weight mix fbo texture 0
 		createFloatUniform("iWeight0", mVDSettings->IWEIGHT0, 1.0f); // 31
 		// weight texture 1
@@ -205,9 +198,9 @@ VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
 		createBoolUniform("iToggle", mVDSettings->ITOGGLE); // 83
 		// invert
 		createBoolUniform("iInvert", mVDSettings->IINVERT); // 86
-		createBoolUniform("iXorY", mVDSettings->IXORY); // was 87
-		createBoolUniform("iFlipH", mVDSettings->IFLIPH); // 100 toggle was 90
-		createBoolUniform("iFlipV", mVDSettings->IFLIPV); // 103 toggle was 92
+		createBoolUniform("iXorY", mVDSettings->IXORY); // 101
+		createBoolUniform("iFlipH", mVDSettings->IFLIPH); // 100
+		createBoolUniform("iFlipV", mVDSettings->IFLIPV); // 103
 
 		// vec2
 		createVec2Uniform("resolution", mVDSettings->RESOLUTION, vec2(1280.0f, 720.0f)); // 120
@@ -218,13 +211,13 @@ VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
 		createFloatUniform("srcYLeft", mVDSettings->SRCYLEFT, 0.0f, 0.0f, 1024.0f); // 132
 		createFloatUniform("srcYRight", mVDSettings->SRCYRIGHT, mVDSettings->mRenderHeight, 0.0f, 1024.0f); // 133
 		// iFreq0  
-		createFloatUniform("iFreq0", mVDSettings->IFREQ0, 0.0f, 0.01f, 256.0f); // 140 was 25 	
+		createFloatUniform("iFreq0", mVDSettings->IFREQ0, 0.0f, 0.01f, 256.0f); // 140	
 		// iFreq1  
-		createFloatUniform("iFreq1", mVDSettings->IFREQ1, 0.0f, 0.01f, 256.0f); // 141 was 39 was 26
+		createFloatUniform("iFreq1", mVDSettings->IFREQ1, 0.0f, 0.01f, 256.0f); // 141
 		// iFreq2  
-		createFloatUniform("iFreq2", mVDSettings->IFREQ2, 0.0f, 0.01f, 256.0f); // 142 was 48 was 27
+		createFloatUniform("iFreq2", mVDSettings->IFREQ2, 0.0f, 0.01f, 256.0f); // 142
 		// iFreq3  
-		createFloatUniform("iFreq3", mVDSettings->IFREQ3, 0.0f, 0.01f, 256.0f); // 143 was 49 was  28
+		createFloatUniform("iFreq3", mVDSettings->IFREQ3, 0.0f, 0.01f, 256.0f); // 143
 
 		// vec4 kinect2
 		createVec4Uniform("iSpineBase", 200, vec4(320.0f, 240.0f, 0.0f, 0.0f));
@@ -271,12 +264,8 @@ VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
 
 	load();
 	loadAnimation();
-	CI_LOG_V("VDAnimation, iResX:" + toString(getFloatUniformValueByIndex(29)));
-	CI_LOG_V("VDAnimation, iResY:" + toString(getFloatUniformValueByIndex(30)));
 
-	setVec3UniformValueByIndex(60, vec3(getFloatUniformValueByIndex(29), getFloatUniformValueByIndex(30), 1.0));
-	CI_LOG_V("VDAnimation, iResolution:" + toString(shaderUniforms[getUniformNameForIndex(60)].vec3Value));
-
+	setVec3UniformValueByIndex(60, vec3(getFloatUniformValueByIndex(mVDSettings->IRESX), getFloatUniformValueByIndex(mVDSettings->IRESY), 1.0));
 }
 void VDAnimation::loadUniforms(const ci::DataSourceRef &source) {
 
@@ -481,6 +470,9 @@ void VDAnimation::createFloatUniform(string aName, int aCtrlIndex, float aValue,
 	shaderUniforms[aName].boolValue = false;
 	shaderUniforms[aName].autotime = false;
 	shaderUniforms[aName].automatic = false;
+	shaderUniforms[aName].autobass = false;
+	shaderUniforms[aName].automid = false;
+	shaderUniforms[aName].autotreble = false;
 	shaderUniforms[aName].index = aCtrlIndex;
 	shaderUniforms[aName].floatValue = aValue;
 	shaderUniforms[aName].uniformType = 0;
@@ -528,6 +520,9 @@ void VDAnimation::createBoolUniform(string aName, int aCtrlIndex, bool aValue) {
 	shaderUniforms[aName].boolValue = aValue;
 	shaderUniforms[aName].autotime = false;
 	shaderUniforms[aName].automatic = false;
+	shaderUniforms[aName].autobass = false;
+	shaderUniforms[aName].automid = false;
+	shaderUniforms[aName].autotreble = false;
 	shaderUniforms[aName].index = aCtrlIndex;
 	shaderUniforms[aName].floatValue = aValue;
 	shaderUniforms[aName].uniformType = 6;
@@ -557,9 +552,24 @@ bool VDAnimation::toggleTempo(unsigned int aIndex) {
 	shaderUniforms[getUniformNameForIndex(aIndex)].autotime = !shaderUniforms[getUniformNameForIndex(aIndex)].autotime;
 	return shaderUniforms[getUniformNameForIndex(aIndex)].autotime;
 }
+bool VDAnimation::toggleBass(unsigned int aIndex) {
+	shaderUniforms[getUniformNameForIndex(aIndex)].autobass = !shaderUniforms[getUniformNameForIndex(aIndex)].autobass;
+	return shaderUniforms[getUniformNameForIndex(aIndex)].autobass;
+}
+bool VDAnimation::toggleMid(unsigned int aIndex) {
+	shaderUniforms[getUniformNameForIndex(aIndex)].automid = !shaderUniforms[getUniformNameForIndex(aIndex)].automid;
+	return shaderUniforms[getUniformNameForIndex(aIndex)].automid;
+}
+bool VDAnimation::toggleTreble(unsigned int aIndex) {
+	shaderUniforms[getUniformNameForIndex(aIndex)].autotreble = !shaderUniforms[getUniformNameForIndex(aIndex)].autotreble;
+	return shaderUniforms[getUniformNameForIndex(aIndex)].autotreble;
+}
 void VDAnimation::resetAutoAnimation(unsigned int aIndex) {
 	shaderUniforms[getUniformNameForIndex(aIndex)].automatic = false;
 	shaderUniforms[getUniformNameForIndex(aIndex)].autotime = false;
+	shaderUniforms[getUniformNameForIndex(aIndex)].autobass = false;
+	shaderUniforms[getUniformNameForIndex(aIndex)].automid = false;
+	shaderUniforms[getUniformNameForIndex(aIndex)].autotreble = false;
 	shaderUniforms[getUniformNameForIndex(aIndex)].floatValue = shaderUniforms[getUniformNameForIndex(aIndex)].defaultValue;
 }
 
@@ -570,9 +580,10 @@ bool VDAnimation::setFloatUniformValueByIndex(unsigned int aIndex, float aValue)
 		/*if (aIndex == 31) {
 			CI_LOG_V("old value " + toString(shaderUniforms[getUniformNameForIndex(aIndex)].floatValue) + " newvalue " + toString(aValue));
 		}*/
-		if (shaderUniforms[getUniformNameForIndex(aIndex)].floatValue != aValue) {
-			if (aValue >= shaderUniforms[getUniformNameForIndex(aIndex)].minValue && aValue <= shaderUniforms[getUniformNameForIndex(aIndex)].maxValue) {
-				shaderUniforms[getUniformNameForIndex(aIndex)].floatValue = aValue;
+		string uniformName = getUniformNameForIndex(aIndex);
+		if (shaderUniforms[uniformName].floatValue != aValue) {
+			if ((aValue >= shaderUniforms[uniformName].minValue && aValue <= shaderUniforms[uniformName].maxValue) || shaderUniforms[uniformName].autobass || shaderUniforms[uniformName].automid || shaderUniforms[uniformName].autotreble) {
+				shaderUniforms[uniformName].floatValue = aValue;
 				rtn = true;
 			}
 		}
@@ -764,8 +775,8 @@ void VDAnimation::update() {
 
 	int time = (currentTime - startTime)*1000000.0;
 	
-	int elapsed = getFloatUniformValueByIndex(mVDSettings->IDELTATIME)*1000000.0;
-	int elapsedBeatPerBar = getFloatUniformValueByIndex(mVDSettings->IDELTATIME) / (shaderUniforms["iBeatsPerBar"].intValue + 1)*1000000.0;
+	int elapsed = shaderUniforms["iDeltaTime"].floatValue * 1000000.0;
+	int elapsedBeatPerBar = shaderUniforms["iDeltaTime"].floatValue / (shaderUniforms["iBeatsPerBar"].intValue + 1)*1000000.0;
 	/*if (elapsedBeatPerBar > 0)
 	{
 		double moduloBeatPerBar = (time % elapsedBeatPerBar) / 1000000.0;
@@ -802,6 +813,24 @@ void VDAnimation::update() {
 				if (shaderUniforms[getUniformNameForIndex(anim)].automatic) {
 					setFloatUniformValueByIndex(anim, lmap<float>(shaderUniforms["iTempoTime"].floatValue, 0.00001, getFloatUniformValueByIndex(mVDSettings->IDELTATIME), shaderUniforms[getUniformNameForIndex(anim)].minValue, shaderUniforms[getUniformNameForIndex(anim)].maxValue));
 				}
+				else
+				{
+					if (shaderUniforms[getUniformNameForIndex(anim)].autobass) {
+						setFloatUniformValueByIndex(anim, (getFloatUniformDefaultValueByIndex(anim) + 0.01f) * getFloatUniformValueByIndex(mVDSettings->IFREQ0) / 25.0f);
+					}
+					else
+					{
+						if (shaderUniforms[getUniformNameForIndex(anim)].automid) {
+							setFloatUniformValueByIndex(anim, (getFloatUniformDefaultValueByIndex(anim) + 0.01f) * getFloatUniformValueByIndex(mVDSettings->IFREQ1) / 5.0f);
+						}
+						else
+						{
+							if (shaderUniforms[getUniformNameForIndex(anim)].autotreble) {
+								setFloatUniformValueByIndex(anim, (getFloatUniformDefaultValueByIndex(anim) + 0.01f) * getFloatUniformValueByIndex(mVDSettings->IFREQ2) / 2.0f);
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -814,7 +843,7 @@ void VDAnimation::update() {
 		// TODO migrate:
 		if (mVDSettings->autoInvert)
 		{
-			setBoolUniformValueByIndex(48, (modulo < 0.1) ? 1.0 : 0.0);
+			setBoolUniformValueByIndex(mVDSettings->IINVERT, (modulo < 0.1) ? 1.0 : 0.0);
 		}
 
 		if (mVDSettings->tEyePointZ)

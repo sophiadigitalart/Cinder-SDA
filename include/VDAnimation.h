@@ -37,6 +37,9 @@ namespace videodromm
 		float							maxValue;
 		bool							autotime;
 		bool							automatic;
+		bool							autobass;
+		bool							automid;
+		bool							autotreble;
 		int								textureIndex;
 		bool							isValid;
 	};
@@ -117,6 +120,9 @@ namespace videodromm
 		bool							toggleAuto(unsigned int aIndex);
 		bool							toggleValue(unsigned int aIndex);
 		bool							toggleTempo(unsigned int aIndex);
+		bool							toggleBass(unsigned int aIndex);
+		bool							toggleMid(unsigned int aIndex);
+		bool							toggleTreble(unsigned int aIndex);
 		void							resetAutoAnimation(unsigned int aIndex);
 		bool							setFloatUniformValueByIndex(unsigned int aIndex, float aValue);
 
@@ -187,11 +193,10 @@ namespace videodromm
 			return shaderUniforms[getUniformNameForIndex(aIndex)].vec4Value;
 		};
 		float							getFloatUniformValueByIndex(unsigned int aIndex) {
-			if (aIndex == mVDSettings->IBPM) {
-				string s = getUniformNameForIndex(aIndex);
-				float f = shaderUniforms[getUniformNameForIndex(aIndex)].floatValue;
-			}
 			return shaderUniforms[getUniformNameForIndex(aIndex)].floatValue;
+		}
+		float							getFloatUniformDefaultValueByIndex(unsigned int aIndex) {
+			return shaderUniforms[getUniformNameForIndex(aIndex)].defaultValue;
 		}
 		int								getIntUniformValueByIndex(unsigned int aIndex) {
 			return shaderUniforms[getUniformNameForIndex(aIndex)].intValue;
@@ -225,7 +230,12 @@ namespace videodromm
 		/* bool							isFlipH() { return mFlipH; };
 		bool							isFlipV() { return mFlipV; };
 		void							flipH() { mFlipH = !mFlipH; };
-		void							flipV() { mFlipV = !mFlipV; }; */
+		void							flipV() { mFlipV = !mFlipV; };*/
+		bool							isFlipH() { return getBoolUniformValueByIndex(mVDSettings->IFLIPH); };
+		bool							isFlipV() { return getBoolUniformValueByIndex(mVDSettings->IFLIPV); };
+		void							flipH() { setBoolUniformValueByIndex(mVDSettings->IFLIPH, !getBoolUniformValueByIndex(mVDSettings->IFLIPH)); };
+		void							flipV() { setBoolUniformValueByIndex(mVDSettings->IFLIPV, !getBoolUniformValueByIndex(mVDSettings->IFLIPV)); };
+		
 		unsigned int					getBlendModesCount() { return mBlendModes; };
 		bool							renderBlend() { return mBlendRender; };
 
