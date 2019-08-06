@@ -74,7 +74,7 @@ namespace videodromm
 			return getFloatUniformValueByIndex(mVDSettings->IBPM);
 		};
 		void							setBpm(float aBpm) {
-			CI_LOG_W("setBpm " + toString(aBpm));
+			//CI_LOG_W("setBpm " + toString(aBpm));
 
 			if (aBpm > 0.0f) {
 				setFloatUniformValueByIndex(mVDSettings->IBPM, aBpm);

@@ -751,9 +751,11 @@ void VDAnimation::update() {
 		float f = getFloatUniformValueByName("iTime");
 		float g = shaderUniforms["iTime"].floatValue;
 		shaderUniforms["iTime"].floatValue = shaderUniforms["iTempoTime"].floatValue*iTimeFactor;
-		CI_LOG_W(" shaderUniforms[iTime].floatValue:" + toString(g));
-		CI_LOG_W(" getFloatUniformValueByName(iTime):" + toString(f)); */
-		shaderUniforms["iTime"].floatValue = shaderUniforms["iTempoTime"].floatValue * mVDSettings->iSpeedMultiplier * mVDSettings->iTimeFactor;
+		 */
+		//shaderUniforms["iTime"].floatValue = shaderUniforms["iTempoTime"].floatValue * mVDSettings->iSpeedMultiplier * mVDSettings->iTimeFactor;
+		shaderUniforms["iTime"].floatValue = shaderUniforms["iTime"].floatValue * mVDSettings->iSpeedMultiplier * mVDSettings->iTimeFactor;
+		//CI_LOG_W(" shaderUniforms[iTime].floatValue:" + toString(shaderUniforms["iTime"].floatValue));
+		//CI_LOG_W(" getFloatUniformValueByName(iTime):" + toString(getFloatUniformValueByIndex(mVDSettings->ITIME)));
 		shaderUniforms["iElapsed"].floatValue = shaderUniforms["iPhase"].floatValue * mVDSettings->iSpeedMultiplier * mVDSettings->iTimeFactor;
 	}
 	else
@@ -898,30 +900,33 @@ void VDAnimation::setTimeFactor(const int &aTimeFactor)
 	switch (aTimeFactor)
 	{
 	case 0:
-		mVDSettings->iTimeFactor = 0.0001;
+		mVDSettings->iTimeFactor = 0.03125;
 		break;
 	case 1:
-		mVDSettings->iTimeFactor = 0.125;
+		mVDSettings->iTimeFactor = 0.0625;
 		break;
 	case 2:
-		mVDSettings->iTimeFactor = 0.25;
+		mVDSettings->iTimeFactor = 0.125;
 		break;
 	case 3:
-		mVDSettings->iTimeFactor = 0.5;
+		mVDSettings->iTimeFactor = 0.25;
 		break;
 	case 4:
-		mVDSettings->iTimeFactor = 0.75;
+		mVDSettings->iTimeFactor = 0.5;
 		break;
 	case 5:
-		mVDSettings->iTimeFactor = 1.0;
+		mVDSettings->iTimeFactor = 0.75;
 		break;
 	case 6:
-		mVDSettings->iTimeFactor = 2.0;
+		mVDSettings->iTimeFactor = 1.0;
 		break;
 	case 7:
-		mVDSettings->iTimeFactor = 4.0;
+		mVDSettings->iTimeFactor = 2.0;
 		break;
 	case 8:
+		mVDSettings->iTimeFactor = 4.0;
+		break;
+	case 9:
 		mVDSettings->iTimeFactor = 16.0;
 		break;
 	default:

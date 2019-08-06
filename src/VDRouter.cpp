@@ -45,6 +45,73 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 			}
 			if (!found)
 			{
+				// int32 0 or 1 play from Transthor
+				ctrl = "/play";
+				index = addr.find(ctrl);
+				if (index != std::string::npos)
+				{
+					found = true;
+				}
+			}
+			if (!found)
+			{
+				// float ticks from Transthor
+				ctrl = "/ticks";
+				index = addr.find(ctrl);
+				if (index != std::string::npos)
+				{
+					found = true;
+					f = msg[0].flt();
+					mVDAnimation->useTimeWithTempo();
+					mVDAnimation->setFloatUniformValueByIndex(mVDSettings->ITIME, f);
+					stringstream ss;
+					ss << addr << " " << f;
+					//CI_LOG_I("OSC: " << ctrl << " addr: " << addr);
+					mVDSettings->mOSCMsg = ss.str();
+					//mVDAnimation->setFloatUniformValueByIndex(mVDSettings->IELAPSED, msg[0].flt());
+				}
+			}
+			if (!found)
+			{
+				// float tempo from Transthor
+				ctrl = "/tempo";
+				index = addr.find(ctrl);
+				if (index != std::string::npos)
+				{
+					found = true;
+					mVDAnimation->useTimeWithTempo();
+					f = msg[0].flt();
+					mVDAnimation->setBpm(f);
+					//CI_LOG_I("tempo:" + toString(mVDAnimation->getBpm()));
+				}
+			}
+			if (!found)
+			{
+				// int32 1 to 4 beat from Transthor
+				ctrl = "/beat";
+				index = addr.find(ctrl);
+				if (index != std::string::npos)
+				{
+					found = true;			
+					mVDAnimation->setIntUniformValueByIndex(mVDSettings->IBEAT, msg[0].int32() - 1);
+					//CI_LOG_I("beat:" + toString(mVDSettings->IBEAT) + " " + toString(mVDAnimation->getIntUniformValueByIndex(mVDSettings->IBEAT)));
+	
+				}
+			}
+			if (!found)
+			{
+				// int32 bar from Transthor
+				ctrl = "/bar";
+				index = addr.find(ctrl);
+				if (index != std::string::npos)
+				{
+					found = true;
+					mVDAnimation->setIntUniformValueByIndex(mVDSettings->IBAR, msg[0].int32());
+				}
+			}
+
+			if (!found)
+			{
 				ctrl = "link";
 				index = addr.find(ctrl);
 				if (index != std::string::npos)
@@ -59,10 +126,11 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 			}
 			if (!found)
 			{
+				// touchosc
 				int page = 0;
 				try {
+					// CHECK exception if not integer
 					page = std::stoi(addr.substr(1, 1)); // 1 to 4
-
 
 					int lastSlashIndex = addr.find_last_of("/"); // 0 2
 					// if not a page selection
@@ -135,7 +203,6 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 							{
 								found = true;
 								// /2/multitoggle/5/3
-
 							}
 						}
 						if (!found)
@@ -173,7 +240,6 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 							{
 								found = true;
 								vv = vec2(msg[0].flt(), msg[1].flt());
-
 							}
 						}
 						if (!found)
@@ -201,14 +267,16 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 					}
 				}
 				catch (const std::exception& e) {
+					stringstream ss;
+					ss << addr << " not integer";
+					mVDSettings->mOSCMsg = ss.str();
 					CI_LOG_E("not integer: " << addr);
 				}
 			}
 			if (found) {
-				stringstream ss;
-				ss << addr << " " << f;
-				CI_LOG_I("OSC: " << ctrl << " addr: " << addr);
-				mVDSettings->mOSCMsg = ss.str();
+				//ss << addr << " " << f;
+				//CI_LOG_I("OSC: " << ctrl << " addr: " << addr);
+				//mVDSettings->mOSCMsg = ss.str();
 			}
 			else {
 				CI_LOG_E("not handled: " << msg.getNumArgs() << " addr: " << addr);
