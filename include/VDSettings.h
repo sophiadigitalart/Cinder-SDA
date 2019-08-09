@@ -190,7 +190,7 @@ namespace videodromm {
 
 		// shader uniforms	
 		float						iSpeedMultiplier;   // speed multiplier
-		float						iStart = 0.0f;		// start adjustment
+		float						iStart = 1.0f;		// start adjustment
 		float						iTimeFactor;
 		float						iChannelTime[4];
 		bool						iFade;
