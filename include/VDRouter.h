@@ -117,6 +117,7 @@ namespace videodromm
 		int							mSelectedFboB;
 
 		static const int			MAX = 16;
+		float						mBarStart = 0.0f;
 		// osc
 		shared_ptr<osc::ReceiverUdp>			mOscReceiver;
 		std::map<uint64_t, protocol::endpoint>	mConnections;

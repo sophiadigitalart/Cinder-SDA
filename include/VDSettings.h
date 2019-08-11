@@ -105,8 +105,8 @@ namespace videodromm {
 		static const int			IXORY = 101;
 		static const int			IFLIPV = 103;
 		// global flip
-		//bool						mFlipV;
-		//bool						mFlipH;
+		bool						mFlipV;
+		bool						mFlipH;
 		/*static const int			IRHANDX = 110;
 		static const int			IRHANDY = 111;
 		static const int			IRHANDZ = 112;
@@ -191,6 +191,7 @@ namespace videodromm {
 		// shader uniforms	
 		float						iSpeedMultiplier;   // speed multiplier
 		float						iStart = 1.0f;		// start adjustment
+		float						iBarDuration = 1.0f;// between 2 bars (seeconds)
 		float						iTimeFactor;
 		float						iChannelTime[4];
 		bool						iFade;

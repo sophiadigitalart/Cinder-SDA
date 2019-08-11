@@ -106,6 +106,12 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 				if (index != std::string::npos)
 				{
 					found = true;
+					int previousBar = mVDAnimation->getIntUniformValueByIndex(mVDSettings->IBAR);
+
+					if (previousBar != msg[0].int32()) {
+						mVDSettings->iBarDuration = mVDAnimation->getFloatUniformValueByIndex(mVDSettings->ITIME) - mBarStart;
+						mBarStart = mVDAnimation->getFloatUniformValueByIndex(mVDSettings->ITIME);
+					}
 					mVDAnimation->setIntUniformValueByIndex(mVDSettings->IBAR, msg[0].int32());
 				}
 			}

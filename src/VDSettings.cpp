@@ -412,7 +412,7 @@ void VDSettings::resetSomeParams() {
 	iTimeFactor = 1.0f;
 
 	iGreyScale = false;
-	iFade = mSendToOutput = iRepeat = iXorY = false;
+	iFade = mSendToOutput = iRepeat = iXorY = mFlipV = mFlipH = false;
 
 	// transition
 	iTransition = 0;
