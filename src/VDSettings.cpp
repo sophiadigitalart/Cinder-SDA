@@ -408,7 +408,7 @@ void VDSettings::resetSomeParams() {
 	// unicorns
 	//iBadTv = 0.0f;
 	iAlpha = 1.0f;
-	iSpeedMultiplier = 0.0985f;// nearly ok for 160 = 0.0985f;
+	iSpeedMultiplier = 1.0f;// = 0.0985f;// nearly ok for 160 = 0.0985f;
 	iTimeFactor = 1.0f;
 
 	iGreyScale = false;
