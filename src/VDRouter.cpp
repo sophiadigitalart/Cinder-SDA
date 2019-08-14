@@ -20,7 +20,7 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 			int index = -1;
 			int i = 0;
 			float f = 1.0f;
-			
+			stringstream ss;	
 			vec2 vv = vec2(0.0f);
 			string addr = msg.getAddress();
 			// handle all msg without page integer first
@@ -64,10 +64,10 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 					f = msg[0].flt();
 					mVDAnimation->useTimeWithTempo();
 					mVDAnimation->setFloatUniformValueByIndex(mVDSettings->ITIME, f);
-					stringstream ss;
+					//stringstream ss;
 					ss << addr << " " << f;
 					//CI_LOG_I("OSC: " << ctrl << " addr: " << addr);
-					mVDSettings->mOSCMsg = ss.str();
+					mVDSettings->mMsg = ss.str();
 					//mVDAnimation->setFloatUniformValueByIndex(mVDSettings->IELAPSED, msg[0].flt());
 				}
 			}
@@ -283,17 +283,14 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 					}
 				}
 				catch (const std::exception& e) {
-					stringstream ss;
 					ss << addr << " not integer";
 					mVDSettings->mOSCMsg = ss.str();
 					CI_LOG_E("not integer: " << addr);
 				}
 			}
 			if (found) {
-				stringstream ss;
-				ss << addr << " " << f;
-				CI_LOG_I("OSC: " << ctrl << " addr: " << addr);
-				mVDSettings->mOSCMsg = ss.str();
+				mVDSettings->mOSCMsg = addr;
+				// nope too much disk io CI_LOG_I("OSC: " << ctrl << " addr: " << addr);
 			}
 			else {
 				CI_LOG_E("not handled: " << msg.getNumArgs() << " addr: " << addr);
