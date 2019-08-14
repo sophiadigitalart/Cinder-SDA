@@ -94,6 +94,10 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 				{
 					found = true;			
 					mVDAnimation->setIntUniformValueByIndex(mVDSettings->IBEAT, msg[0].int32() - 1);
+					mVDAnimation->setIntUniformValueByIndex(
+						mVDSettings->IBARBEAT,
+						mVDAnimation->getIntUniformValueByIndex(mVDSettings->IBAR) * 4 + mVDAnimation->getIntUniformValueByIndex(mVDSettings->IBEAT));
+
 					//CI_LOG_I("beat:" + toString(mVDSettings->IBEAT) + " " + toString(mVDAnimation->getIntUniformValueByIndex(mVDSettings->IBEAT)));
 	
 				}
@@ -106,13 +110,19 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 				if (index != std::string::npos)
 				{
 					found = true;
+					// TODO test if useless:
 					int previousBar = mVDAnimation->getIntUniformValueByIndex(mVDSettings->IBAR);
 
 					if (previousBar != msg[0].int32()) {
 						mVDSettings->iBarDuration = mVDAnimation->getFloatUniformValueByIndex(mVDSettings->ITIME) - mBarStart;
 						mBarStart = mVDAnimation->getFloatUniformValueByIndex(mVDSettings->ITIME);
 					}
+					// TODO END
 					mVDAnimation->setIntUniformValueByIndex(mVDSettings->IBAR, msg[0].int32());
+					mVDAnimation->setIntUniformValueByIndex(
+						mVDSettings->IBARBEAT,
+						mVDAnimation->getIntUniformValueByIndex(mVDSettings->IBAR) * 4 + mVDAnimation->getIntUniformValueByIndex(mVDSettings->IBEAT));
+
 				}
 			}
 
@@ -280,9 +290,10 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 				}
 			}
 			if (found) {
-				//ss << addr << " " << f;
-				//CI_LOG_I("OSC: " << ctrl << " addr: " << addr);
-				//mVDSettings->mOSCMsg = ss.str();
+				stringstream ss;
+				ss << addr << " " << f;
+				CI_LOG_I("OSC: " << ctrl << " addr: " << addr);
+				mVDSettings->mOSCMsg = ss.str();
 			}
 			else {
 				CI_LOG_E("not handled: " << msg.getNumArgs() << " addr: " << addr);

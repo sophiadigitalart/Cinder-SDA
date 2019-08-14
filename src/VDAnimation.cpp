@@ -159,12 +159,12 @@ VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
 		// int
 		// blend mode 
 		createIntUniform("iBlendmode", mVDSettings->IBLENDMODE, 0); // 50
-		// greyscale 
-		createIntUniform("iGreyScale", 51, 0);
-		
-
-		// beats per bar 
-		createIntUniform("iBeatsPerBar", 53, 4);
+		// beat 
+		createIntUniform("iBeat", mVDSettings->IBEAT, 0); // 51
+		// bar 
+		createIntUniform("iBar", mVDSettings->IBAR, 0); // 52
+		// bar 
+		createIntUniform("iBarBeat", mVDSettings->IBARBEAT, 0); // 53		
 		// fbo A
 		createIntUniform("iFboA", mVDSettings->IFBOA, 0); // 54
 		// fbo B
@@ -173,10 +173,11 @@ VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
 		createIntUniform("iOutW", mVDSettings->IOUTW, mVDSettings->mRenderWidth); // 56
 		// iOutH  
 		createIntUniform("iOutH", mVDSettings->IOUTH, mVDSettings->mRenderHeight); // 57
-		// beat 
-		createIntUniform("iBeat", mVDSettings->IBEAT, 1); // 58
-		// bar 
-		createIntUniform("iBar", mVDSettings->IBAR, 0); // 59
+		// greyscale 
+		createIntUniform("iGreyScale", mVDSettings->IGREYSCALE, 0); //58
+		// beats per bar 
+		createIntUniform("iBeatsPerBar", mVDSettings->IBEATSPERBAR, 4); // 59
+
 
 		// vec3
 		createVec3Uniform("iResolution", 60, vec3(getFloatUniformValueByName("iResolutionX"), getFloatUniformValueByName("iResolutionY"), 1.0));
