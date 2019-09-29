@@ -469,7 +469,8 @@ void VDSettings::reset()
 	mRenderWidth = 1280;
 	mRenderHeight = 720;
 	// parameters not exposed in XML
-	mRenderXY = mLeftRenderXY = mRightRenderXY = mPreviewRenderXY = mWarp1RenderXY = mWarp2RenderXY = vec2(0.0f);
+	mRenderXY = mTexMult = vec2(1.0f);
+	mLeftRenderXY = mRightRenderXY = mPreviewRenderXY = mWarp1RenderXY = mWarp2RenderXY = vec2(0.0f);
 	mRenderPosXY = vec2(0.0, 320.0);
 	//mRenderResoXY = vec2(mRenderWidth, mRenderHeight);
 	//mRenderResolution = ivec2(mRenderWidth, mRenderHeight);
