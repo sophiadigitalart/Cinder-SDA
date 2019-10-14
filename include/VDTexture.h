@@ -57,6 +57,8 @@ namespace videodromm
 	// stores the pointer to the VDTexture instance
 	typedef std::shared_ptr<class VDTexture> 	VDTextureRef;
 	typedef std::vector<VDTextureRef>			VDTextureList;
+	//typedef map<string, ci::gl::TextureRef>		VDCachedTextures;
+
 	// for profiling
 	typedef std::chrono::high_resolution_clock Clock;
 
@@ -68,6 +70,7 @@ namespace videodromm
 		virtual ~VDTexture(void);
 
 		virtual ci::gl::Texture2dRef	getTexture();
+		virtual ci::gl::Texture2dRef	getCachedTexture(string aFilename); 
 		//! returns a shared pointer to this input texture
 		VDTextureRef					getPtr() { return shared_from_this(); }
 		ci::ivec2						getSize();
@@ -148,6 +151,7 @@ namespace videodromm
 		gl::Texture::Format				fmt;
 		gl::Fbo::Format					fboFmt;
 		ci::gl::Texture2dRef			mRenderedTexture;
+		
 		float							mSpeed;
 	private:
 	};
@@ -176,6 +180,7 @@ namespace videodromm
 	protected:
 		//! 
 		virtual ci::gl::Texture2dRef	getTexture() override;
+		virtual ci::gl::Texture2dRef	getCachedTexture(string aFilename) override;
 	};
 
 	/*
@@ -212,6 +217,7 @@ namespace videodromm
 	protected:
 		//! 
 		virtual ci::gl::Texture2dRef	getTexture() override;
+		virtual ci::gl::Texture2dRef	getCachedTexture(string aFilename) override;
 
 	private:
 		// Animation
@@ -233,6 +239,7 @@ namespace videodromm
 		bool						mLoadingFilesComplete;
 
 		vector<ci::gl::TextureRef>	mSequenceTextures;
+		map<string, ci::gl::TextureRef>	mCachedTextures;
 	};
 
 	/*
@@ -260,6 +267,7 @@ namespace videodromm
 	protected:
 		//! 
 		virtual ci::gl::Texture2dRef	getTexture() override;
+		virtual ci::gl::Texture2dRef	getCachedTexture(string aFilename) override;
 	private:
 		void printDevices();
 		string					mFirstCameraDeviceName;
@@ -291,6 +299,7 @@ namespace videodromm
 	protected:
 		//! 
 		virtual ci::gl::Texture2dRef	getTexture() override;
+		virtual ci::gl::Texture2dRef	getCachedTexture(string aFilename) override;
 	private:
 #if defined( CINDER_MSW )
 		// -------- SPOUT -------------
@@ -329,6 +338,7 @@ namespace videodromm
 	protected:
 		//! 
 		virtual ci::gl::Texture2dRef	getTexture() override;
+		virtual ci::gl::Texture2dRef	getCachedTexture(string aFilename) override;
 		//float							getIntensity() override;
 	private:
 		// Animation
@@ -383,6 +393,7 @@ namespace videodromm
 	protected:
 		//! 
 		virtual ci::gl::Texture2dRef	getTexture() override;
+		virtual ci::gl::Texture2dRef	getCachedTexture(string aFilename) override;
 	private:
 		// Animation
 		VDAnimationRef					mVDAnimation;

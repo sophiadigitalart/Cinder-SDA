@@ -303,6 +303,9 @@ namespace videodromm {
 	ci::gl::TextureRef VDTexture::getTexture() {
 		return mTexture;
 	}
+	ci::gl::Texture2dRef VDTexture::getCachedTexture(string aFilename) {
+		return mTexture;
+	}
 	/*
 	**   Child classes
 	*/
@@ -359,7 +362,9 @@ namespace videodromm {
 		mTexture = gl::Texture2d::create(mProcessedSurface, ci::gl::Texture::Format().loadTopDown(mFlipV));
 		return mTexture;
 	}
-
+	ci::gl::Texture2dRef TextureImage::getCachedTexture(string aFilename) {
+		return TextureImage::getTexture();
+	}
 	TextureImage::~TextureImage(void) {
 	}
 
@@ -457,6 +462,7 @@ namespace videodromm {
 				// might want to remove default file as we are now using a boolean to notify the caller
 				if (anyImagefileName.length() > 0) {
 					mTexture = ci::gl::Texture::create(loadImage(loadAsset(anyImagefileName)), ci::gl::Texture::Format().loadTopDown(mFlipV));
+					//mSequenceTextures[anyImagefileName] = mTexture;
 					mSequenceTextures.push_back(ci::gl::Texture::create(loadImage(loadAsset(anyImagefileName)), gl::Texture::Format().loadTopDown(mFlipV)));
 					mLoadingFilesComplete = true;
 					mFramesLoaded = 1;
@@ -496,7 +502,7 @@ namespace videodromm {
 		return xml;
 	}
 	void TextureImageSequence::loadNextImageFromDisk() {
-		if (!mLoadingPaused) {
+		// can't pause if UI not ready anyways if (!mLoadingPaused) {
 
 			if (!mLoadingFilesComplete) {
 				// thank you Omar!
@@ -521,9 +527,17 @@ namespace videodromm {
 				if (fs::exists(fileToLoad)) {
 					// start profiling
 					auto start = Clock::now();
-// 20190727 TODO CHECK
-					mSequenceTextures.push_back(ci::gl::Texture::create(loadImage(fileToLoad), gl::Texture::Format().loadTopDown(mFlipV))); // 20190724
-/*mTexture = ci::gl::Texture::create(loadImage(fileToLoad));
+					if (mCachedTextures[fileNameToLoad]) {
+						mSequenceTextures.push_back(mCachedTextures[fileNameToLoad]);
+					}
+					else {
+						// 20190727 TODO CHECK
+						mSequenceTextures.push_back(ci::gl::Texture::create(loadImage(fileToLoad), gl::Texture::Format().loadTopDown(mFlipV))); // 20190724
+						// 20191014
+						mCachedTextures[fileNameToLoad] = ci::gl::Texture::create(loadImage(fileToLoad), gl::Texture::Format().loadTopDown(mFlipV));
+					}
+					
+					/*mTexture = ci::gl::Texture::create(loadImage(fileToLoad));
 					mXLeft = 0;
 					mYTop = 0;
 					mXRight = mOriginalWidth = mTexture->getWidth();
@@ -533,7 +547,6 @@ namespace videodromm {
 					Area area(mXLeft, mYTop, mXRight, mYBottom);
 					mProcessedSurface = mInputSurface.clone(area);
 					mTexture = gl::Texture2d::create(mProcessedSurface, ci::gl::Texture::Format().loadTopDown(mFlipV));
-
 					mSequenceTextures.push_back(mTexture); */
 					mCurrentLoadedFrame = mFramesLoaded;
 					mFramesLoaded++;
@@ -558,7 +571,7 @@ namespace videodromm {
 				if (mNextIndexFrameToTry > 9999 && mNumberOfDigits == 4) mLoadingFilesComplete = true;
 				if (mNextIndexFrameToTry > 999 && mNumberOfDigits == 3) mLoadingFilesComplete = true;
 			}
-		}
+		//}
 	}
 	void TextureImageSequence::updateSequence() {
 		int newPosition;
@@ -602,6 +615,33 @@ namespace videodromm {
 				updateSequence();
 			}
 			mTexture = mSequenceTextures[mPosition];
+		}
+		return mTexture;
+	}
+	ci::gl::Texture2dRef TextureImageSequence::getCachedTexture(string aFilename) {
+		
+		if (mCachedTextures[aFilename]) {
+			CI_LOG_V(aFilename + " in cache");
+			mTexture = mCachedTextures[aFilename];
+		}
+		else {	
+			// 20191014
+			fs::path fullPath = getAssetPath("") / aFilename;			
+			if (fs::exists(fullPath)) {
+				// start profiling
+				auto start = Clock::now();
+				mCachedTextures[aFilename] = ci::gl::Texture::create(loadImage(loadAsset(aFilename)), gl::Texture::Format().loadTopDown(mFlipV));
+				auto end = Clock::now();
+				auto msdur = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+				int milli = msdur.count();				
+				mTexture = mCachedTextures[aFilename];
+				mStatus = aFilename + " cached in ms " + toString(milli);	
+				CI_LOG_V(mStatus);
+			}
+			else {
+				mTexture = mSequenceTextures[mPosition];
+				CI_LOG_V(aFilename + " does not exist");
+			}
 		}
 		return mTexture;
 	}
@@ -695,6 +735,9 @@ namespace videodromm {
 		}
 		return mTexture;
 	}
+	ci::gl::Texture2dRef TextureCamera::getCachedTexture(string aFilename) {
+		return TextureCamera::getTexture();
+	}
 	void TextureCamera::printDevices() {
 		for (const auto &device : Capture::getDevices()) {
 			console() << "Device: " << device->getName() << " "
@@ -742,7 +785,7 @@ namespace videodromm {
 		xml.setAttribute("fliph", mFlipH);
 		return xml;
 	}
-
+	
 	ci::gl::Texture2dRef TextureShared::getTexture() {
 #if defined( CINDER_MSW )
 
@@ -755,6 +798,9 @@ namespace videodromm {
 		mClientSyphon.draw(vec2(0.f, 0.f));
 #endif
 		return mTexture;
+	}
+	ci::gl::Texture2dRef TextureShared::getCachedTexture(string aFilename) {
+		return TextureShared::getTexture();
 	}
 	TextureShared::~TextureShared(void) {
 #if defined( CINDER_MSW )
@@ -949,6 +995,9 @@ namespace videodromm {
 
 		return mTexture;
 	}
+	ci::gl::Texture2dRef TextureAudio::getCachedTexture(string aFilename) {
+		return TextureAudio::getTexture();
+	}
 	TextureAudio::~TextureAudio(void) {
 	}
 	/*
@@ -1005,6 +1054,9 @@ namespace videodromm {
 
 	ci::gl::Texture2dRef TextureStream::getTexture() {
 		return mTexture;
+	}
+	ci::gl::Texture2dRef TextureStream::getCachedTexture(string aFilename) {
+		return TextureStream::getTexture();
 	}
 	TextureStream::~TextureStream(void) {
 	}

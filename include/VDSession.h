@@ -242,6 +242,7 @@ namespace videodromm {
 
 		// textures
 		ci::gl::TextureRef				getInputTexture(unsigned int aTextureIndex);
+		ci::gl::TextureRef				getCachedTexture(unsigned int aTextureIndex, string aFilename);
 		//ci::gl::TextureRef				getNextInputTexture(unsigned int aTextureIndex);
 		string							getInputTextureName(unsigned int aTextureIndex);
 		unsigned int					getInputTexturesCount();

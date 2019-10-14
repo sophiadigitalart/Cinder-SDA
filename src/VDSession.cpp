@@ -1287,6 +1287,11 @@ ci::gl::TextureRef VDSession::getInputTexture(unsigned int aTextureIndex) {
 	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
 	return mTextureList[aTextureIndex]->getTexture();
 }
+ci::gl::TextureRef VDSession::getCachedTexture(unsigned int aTextureIndex, string aFilename) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	return mTextureList[aTextureIndex]->getCachedTexture(aFilename);
+}
+
 /*ci::gl::TextureRef VDSession::getNextInputTexture(unsigned int aTextureIndex) {
 	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
 	if (mTextureList[aTextureIndex]->getType() == mTextureList[aTextureIndex]->SEQUENCE) {

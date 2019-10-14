@@ -289,7 +289,7 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 				}
 			}
 			if (found) {
-				mVDSettings->mOSCMsg = addr;
+				if (addr != "/play") mVDSettings->mOSCMsg = addr;
 				// nope too much disk io CI_LOG_I("OSC: " << ctrl << " addr: " << addr);
 			}
 			else {
