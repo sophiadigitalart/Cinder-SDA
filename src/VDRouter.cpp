@@ -9,6 +9,8 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 	CI_LOG_V("VDRouter constructor");
 	mFBOAChanged = false;
 	mFBOBChanged = false;
+	// midi
+	if (mVDSettings->mMIDIOpenAllInputPorts) midiSetup();
 	// Osc
 	if (mVDSettings->mOSCEnabled) {
 		mOscReceiver = std::make_shared<osc::ReceiverUdp>(mVDSettings->mOSCReceiverPort);
@@ -319,8 +321,7 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 				return true;
 		});
 	}
-	// midi
-	if (mVDSettings->mMIDIOpenAllInputPorts) midiSetup();
+	
 	mSelectedWarp = 0;
 	mSelectedFboA = 1;
 	mSelectedFboB = 2;

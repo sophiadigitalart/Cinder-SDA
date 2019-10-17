@@ -234,9 +234,11 @@ namespace videodromm
 		int							mNextIndexFrameToTry;
 		int							mCurrentLoadedFrame;
 		int							mFramesLoaded;
+		int							currentSecond;
 		//int							mPlayheadPosition;
 		bool						mLoadingPaused;
 		bool						mLoadingFilesComplete;
+		string						mLastCachedFilename;
 
 		vector<ci::gl::TextureRef>	mSequenceTextures;
 		map<string, ci::gl::TextureRef>	mCachedTextures;

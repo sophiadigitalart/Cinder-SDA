@@ -214,7 +214,7 @@ namespace videodromm {
 		mSpeed *= -1.0f;
 	}
 	float VDTexture::getSpeed() {
-		return mSpeed;	
+		return mSpeed;
 	}
 	void VDTexture::setSpeed(float speed) {
 		mSpeed = speed;
@@ -387,6 +387,7 @@ namespace videodromm {
 		mNextIndexFrameToTry = 0;
 		mPosition = 0;
 		mNumberOfDigits = 4;
+		mLastCachedFilename = "a (1).jpg";
 	}
 	bool TextureImageSequence::loadFromFullPath(string aPath)
 	{
@@ -400,7 +401,7 @@ namespace videodromm {
 				bool firstIndexFound = false;
 				// loading 2000 files takes a while, I load only the first one
 				for (fs::directory_iterator it(fullPath); it != fs::directory_iterator(); ++it)
-				{ 
+				{
 					// if file(1).jpg filename, mNumberOfDigits is 2
 					if (mNumberOfDigits == 2) {
 						break;
@@ -504,73 +505,73 @@ namespace videodromm {
 	void TextureImageSequence::loadNextImageFromDisk() {
 		// can't pause if UI not ready anyways if (!mLoadingPaused) {
 
-			if (!mLoadingFilesComplete) {
-				// thank you Omar!
-				char restOfFileName[32];
-				switch (mNumberOfDigits)
-				{
-				case 2:
-					sprintf(restOfFileName, "%d)", mNextIndexFrameToTry);
-					break;
-				case 3:
-					sprintf(restOfFileName, "%03d", mNextIndexFrameToTry);
-					break;
-				case 4:
-					sprintf(restOfFileName, "%04d", mNextIndexFrameToTry);
-					break;
-				default:
-					break;
-				}
-				
-				string fileNameToLoad = mPrefix + restOfFileName + "." + mExt;
-				fs::path fileToLoad = getAssetPath("") / mPath / fileNameToLoad;
-				if (fs::exists(fileToLoad)) {
-					// start profiling
-					auto start = Clock::now();
-					if (mCachedTextures[fileNameToLoad]) {
-						mSequenceTextures.push_back(mCachedTextures[fileNameToLoad]);
-					}
-					else {
-						// 20190727 TODO CHECK
-						mSequenceTextures.push_back(ci::gl::Texture::create(loadImage(fileToLoad), gl::Texture::Format().loadTopDown(mFlipV))); // 20190724
-						// 20191014
-						mCachedTextures[fileNameToLoad] = ci::gl::Texture::create(loadImage(fileToLoad), gl::Texture::Format().loadTopDown(mFlipV));
-					}
-					
-					/*mTexture = ci::gl::Texture::create(loadImage(fileToLoad));
-					mXLeft = 0;
-					mYTop = 0;
-					mXRight = mOriginalWidth = mTexture->getWidth();
-					mYBottom = mOriginalHeight = mTexture->getHeight();
-					mInputSurface = Surface(loadImage(fileToLoad));
-					//mInputSurface = Surface(mWidth, mHeight, true);
-					Area area(mXLeft, mYTop, mXRight, mYBottom);
-					mProcessedSurface = mInputSurface.clone(area);
-					mTexture = gl::Texture2d::create(mProcessedSurface, ci::gl::Texture::Format().loadTopDown(mFlipV));
-					mSequenceTextures.push_back(mTexture); */
-					mCurrentLoadedFrame = mFramesLoaded;
-					mFramesLoaded++;
-					auto end = Clock::now();
-					auto msdur = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-					int milli = msdur.count();
+		if (!mLoadingFilesComplete) {
+			// thank you Omar!
+			char restOfFileName[32];
+			switch (mNumberOfDigits)
+			{
+			case 2:
+				sprintf(restOfFileName, "%d)", mNextIndexFrameToTry);
+				break;
+			case 3:
+				sprintf(restOfFileName, "%03d", mNextIndexFrameToTry);
+				break;
+			case 4:
+				sprintf(restOfFileName, "%04d", mNextIndexFrameToTry);
+				break;
+			default:
+				break;
+			}
 
-					mStatus = fileToLoad.string() + " loaded in ms " + toString(milli);
+			string fileNameToLoad = mPrefix + restOfFileName + "." + mExt;
+			fs::path fileToLoad = getAssetPath("") / mPath / fileNameToLoad;
+			if (fs::exists(fileToLoad)) {
+				// start profiling
+				auto start = Clock::now();
+				if (mCachedTextures[fileNameToLoad]) {
+					mSequenceTextures.push_back(mCachedTextures[fileNameToLoad]);
 				}
 				else {
-
-					mStatus = fileToLoad.string() + " does not exist";
-					if (mFramesLoaded > 0) {
-						// if frames have been loaded we hit the last file of the image sequence at this point
-						mStatus = "last image loaded";
-						mLoadingFilesComplete = true;
-					}
+					// 20190727 TODO CHECK
+					mSequenceTextures.push_back(ci::gl::Texture::create(loadImage(fileToLoad), gl::Texture::Format().loadTopDown(mFlipV))); // 20190724
+					// 20191014
+					mCachedTextures[fileNameToLoad] = ci::gl::Texture::create(loadImage(fileToLoad), gl::Texture::Format().loadTopDown(mFlipV));
 				}
-				CI_LOG_V(mStatus);
-				// increment counter for next filename
-				mNextIndexFrameToTry++;
-				if (mNextIndexFrameToTry > 9999 && mNumberOfDigits == 4) mLoadingFilesComplete = true;
-				if (mNextIndexFrameToTry > 999 && mNumberOfDigits == 3) mLoadingFilesComplete = true;
+
+				/*mTexture = ci::gl::Texture::create(loadImage(fileToLoad));
+				mXLeft = 0;
+				mYTop = 0;
+				mXRight = mOriginalWidth = mTexture->getWidth();
+				mYBottom = mOriginalHeight = mTexture->getHeight();
+				mInputSurface = Surface(loadImage(fileToLoad));
+				//mInputSurface = Surface(mWidth, mHeight, true);
+				Area area(mXLeft, mYTop, mXRight, mYBottom);
+				mProcessedSurface = mInputSurface.clone(area);
+				mTexture = gl::Texture2d::create(mProcessedSurface, ci::gl::Texture::Format().loadTopDown(mFlipV));
+				mSequenceTextures.push_back(mTexture); */
+				mCurrentLoadedFrame = mFramesLoaded;
+				mFramesLoaded++;
+				auto end = Clock::now();
+				auto msdur = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+				int milli = msdur.count();
+
+				mStatus = fileToLoad.string() + " loaded in ms " + toString(milli);
 			}
+			else {
+
+				mStatus = fileToLoad.string() + " does not exist";
+				if (mFramesLoaded > 0) {
+					// if frames have been loaded we hit the last file of the image sequence at this point
+					mStatus = "last image loaded";
+					mLoadingFilesComplete = true;
+				}
+			}
+			CI_LOG_V(mStatus);
+			// increment counter for next filename
+			mNextIndexFrameToTry++;
+			if (mNextIndexFrameToTry > 9999 && mNumberOfDigits == 4) mLoadingFilesComplete = true;
+			if (mNextIndexFrameToTry > 999 && mNumberOfDigits == 3) mLoadingFilesComplete = true;
+		}
 		//}
 	}
 	void TextureImageSequence::updateSequence() {
@@ -609,7 +610,12 @@ namespace videodromm {
 				//error
 				mPosition = 0;
 			}
-			if (!mLoadingFilesComplete) loadNextImageFromDisk();
+			//20191017 slowdown loading not to freeze ui
+			if (!mLoadingFilesComplete) {
+				// too slow if (currentSecond != (int)getElapsedSeconds()) { currentSecond = (int)getElapsedSeconds();
+				loadNextImageFromDisk();
+				//}
+			}
 
 			if (mPlaying) {
 				updateSequence();
@@ -619,28 +625,29 @@ namespace videodromm {
 		return mTexture;
 	}
 	ci::gl::Texture2dRef TextureImageSequence::getCachedTexture(string aFilename) {
-		
+
 		if (mCachedTextures[aFilename]) {
 			CI_LOG_V(aFilename + " in cache");
 			mTexture = mCachedTextures[aFilename];
 		}
-		else {	
-			// 20191014
-			fs::path fullPath = getAssetPath("") / aFilename;			
+		else {
+			fs::path fullPath = getAssetPath("") / mPath / aFilename;
 			if (fs::exists(fullPath)) {
 				// start profiling
 				auto start = Clock::now();
-				mCachedTextures[aFilename] = ci::gl::Texture::create(loadImage(loadAsset(aFilename)), gl::Texture::Format().loadTopDown(mFlipV));
+				mCachedTextures[aFilename] = ci::gl::Texture::create(loadImage(fullPath), gl::Texture::Format().loadTopDown(mFlipV));
 				auto end = Clock::now();
 				auto msdur = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-				int milli = msdur.count();				
+				int milli = msdur.count();
+				mLastCachedFilename = aFilename;
 				mTexture = mCachedTextures[aFilename];
-				mStatus = aFilename + " cached in ms " + toString(milli);	
+				mStatus = aFilename + " cached in ms " + toString(milli);
 				CI_LOG_V(mStatus);
 			}
 			else {
-				mTexture = mSequenceTextures[mPosition];
+				// we want the last texture repeating mTexture = mSequenceTextures[mPosition];
 				CI_LOG_V(aFilename + " does not exist");
+				mTexture = mCachedTextures[mLastCachedFilename];
 			}
 		}
 		return mTexture;
@@ -677,7 +684,7 @@ namespace videodromm {
 			loadNextImageFromDisk();
 		}
 	}
-	
+
 	bool TextureImageSequence::isLoadingFromDisk() {
 		return !mLoadingFilesComplete;
 	}
@@ -746,8 +753,8 @@ namespace videodromm {
 #endif
 				<< endl;
 			mFirstCameraDeviceName = device->getName();
-		}
 	}
+}
 	TextureCamera::~TextureCamera(void) {
 
 	}
@@ -764,7 +771,7 @@ namespace videodromm {
 		mClientSyphon.setServerName("Reymenta client");
 		mClientSyphon.bind();
 #endif
-	}
+}
 	bool TextureShared::fromXml(const XmlTree &xml)
 	{
 		// init		
@@ -785,14 +792,14 @@ namespace videodromm {
 		xml.setAttribute("fliph", mFlipH);
 		return xml;
 	}
-	
+
 	ci::gl::Texture2dRef TextureShared::getTexture() {
 #if defined( CINDER_MSW )
 
 		mTexture = mSpoutIn.receiveTexture();
 		// set name for UI
 		mName = mSpoutIn.getSenderName();
-		
+
 #endif
 #if defined( CINDER_MAC )
 		mClientSyphon.draw(vec2(0.f, 0.f));
@@ -973,7 +980,7 @@ namespace videodromm {
 				if (mVDAnimation->isAudioBuffered() && mBufferPlayerNode) {
 					gl::ScopedFramebuffer fbScp(mFbo);
 					gl::clear(Color::black());
-					
+
 					mTexture->bind(0);
 
 					//mWaveformPlot.draw();
@@ -983,7 +990,7 @@ namespace videodromm {
 					gl::color(ColorA(0, 1, 0, 0.7f));
 					gl::drawSolidRect(Rectf(readPos - 2, 0, readPos + 2, (float)mHeight));
 					mRenderedTexture = mFbo->getColorTexture();
-					return mRenderedTexture;					
+					return mRenderedTexture;
 				}
 			}
 		}
