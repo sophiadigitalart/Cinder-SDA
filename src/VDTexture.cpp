@@ -628,6 +628,7 @@ namespace videodromm {
 
 		if (mCachedTextures[aFilename]) {
 			CI_LOG_V(aFilename + " in cache");
+			mLastCachedFilename = aFilename;
 			mTexture = mCachedTextures[aFilename];
 		}
 		else {
