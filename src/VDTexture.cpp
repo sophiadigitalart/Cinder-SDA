@@ -558,19 +558,24 @@ namespace videodromm {
 				mStatus = fileToLoad.string() + " loaded in ms " + toString(milli);
 			}
 			else {
-
 				mStatus = fileToLoad.string() + " does not exist";
+				/* 20191018
 				if (mFramesLoaded > 0) {
 					// if frames have been loaded we hit the last file of the image sequence at this point
 					mStatus = "last image loaded";
 					mLoadingFilesComplete = true;
-				}
+				} */
 			}
-			CI_LOG_V(mStatus);
 			// increment counter for next filename
 			mNextIndexFrameToTry++;
+			if (mNextIndexFrameToTry > 999) {
+				mLoadingFilesComplete = true;
+				mStatus = "stop at 999";
+			}
+			/* 20191018 obsolete
 			if (mNextIndexFrameToTry > 9999 && mNumberOfDigits == 4) mLoadingFilesComplete = true;
-			if (mNextIndexFrameToTry > 999 && mNumberOfDigits == 3) mLoadingFilesComplete = true;
+			if (mNextIndexFrameToTry > 999 && mNumberOfDigits == 3) mLoadingFilesComplete = true; */
+			CI_LOG_V(mStatus);
 		}
 		//}
 	}
@@ -646,7 +651,7 @@ namespace videodromm {
 				CI_LOG_V(mStatus);
 			}
 			else {
-				// we want the last texture repeating mTexture = mSequenceTextures[mPosition];
+				// we want the last texture repeating
 				CI_LOG_V(aFilename + " does not exist");
 				mTexture = mCachedTextures[mLastCachedFilename];
 			}
@@ -754,8 +759,8 @@ namespace videodromm {
 #endif
 				<< endl;
 			mFirstCameraDeviceName = device->getName();
+		}
 	}
-}
 	TextureCamera::~TextureCamera(void) {
 
 	}
@@ -772,7 +777,7 @@ namespace videodromm {
 		mClientSyphon.setServerName("Reymenta client");
 		mClientSyphon.bind();
 #endif
-}
+	}
 	bool TextureShared::fromXml(const XmlTree &xml)
 	{
 		// init		
@@ -1068,4 +1073,4 @@ namespace videodromm {
 	}
 	TextureStream::~TextureStream(void) {
 	}
-	} // namespace videodromm
+} // namespace videodromm
