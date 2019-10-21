@@ -26,12 +26,27 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 			vec2 vv = vec2(0.0f);
 			string addr = msg.getAddress();
 			// handle all msg without page integer first
-			// accxyz
-			ctrl = "accxyz";
+			// midi cc in osc
+			ctrl = "/cc";
 			index = addr.find(ctrl);
 			if (index != std::string::npos)
 			{
 				found = true;
+				i = msg[0].flt();
+				f = msg[1].flt() / 128;
+				mVDAnimation->setFloatUniformValueByIndex(i, f);
+				ss << "midi from OSC " << addr << " " << i << " value " << f;
+				mVDSettings->mMidiMsg = ss.str();
+			}
+			if (!found)
+			{
+				// accxyz
+				ctrl = "accxyz";
+				index = addr.find(ctrl);
+				if (index != std::string::npos)
+				{
+					found = true;
+				}
 			}
 			if (!found)
 			{
