@@ -568,9 +568,9 @@ namespace videodromm {
 			}
 			// increment counter for next filename
 			mNextIndexFrameToTry++;
-			if (mNextIndexFrameToTry > 999) {
+			if (mNextIndexFrameToTry > 530) {
 				mLoadingFilesComplete = true;
-				mStatus = "stop at 999";
+				mStatus = "stop at 530";
 			}
 			/* 20191018 obsolete
 			if (mNextIndexFrameToTry > 9999 && mNumberOfDigits == 4) mLoadingFilesComplete = true;
