@@ -134,21 +134,22 @@ void _TBOX_PREFIX_App::mouseUp(MouseEvent event)
 
 void _TBOX_PREFIX_App::keyDown(KeyEvent event)
 {
-	if (!mVDSession->handleKeyDown(event)) {
-		switch (event.getCode()) {
-		case KeyEvent::KEY_ESCAPE:
-			// quit the application
-			quit();
-			break;
-		case KeyEvent::KEY_c:
-			// mouse cursor and ui visibility
-			mVDSettings->mCursorVisible = !mVDSettings->mCursorVisible;
-			toggleCursorVisibility(mVDSettings->mCursorVisible);
-			break;
-		case KeyEvent::KEY_F11:
-			// windows position
-			positionRenderWindow();
-			break;
+	if (event.getCode() == KeyEvent::KEY_F12) {
+		quit();
+	}
+	else {
+		if (!mVDSession->handleKeyDown(event)) {
+			switch (event.getCode()) {
+			case KeyEvent::KEY_c:
+				// mouse cursor and ui visibility
+				mVDSettings->mCursorVisible = !mVDSettings->mCursorVisible;
+				toggleCursorVisibility(mVDSettings->mCursorVisible);
+				break;
+			case KeyEvent::KEY_F11:
+				// windows position
+				positionRenderWindow();
+				break;
+			}
 		}
 	}
 }
