@@ -55,7 +55,9 @@ namespace videodromm
 		void							update();
 		void							load();
 		void							save();
-
+		string							getAssetsPath() {
+			return mVDSettings->mAssetsPath;
+		}
 		Color							getBackgroundColor() { return mBackgroundColor; };
 		float							getExposure() { return mExposure; };
 		void							setExposure(float aExposure);

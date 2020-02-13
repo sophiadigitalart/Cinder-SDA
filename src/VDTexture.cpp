@@ -487,7 +487,7 @@ namespace videodromm {
 				rtn = loadFromFullPath(mPath);
 			}
 			else {
-				fs::path fullPath = getAssetPath("") / mPath;// TODO / mVDSettings->mAssetsPath
+				fs::path fullPath = getAssetPath("") / mVDAnimation->getAssetsPath() / mPath;// TODO
 				rtn = loadFromFullPath(fullPath.string());
 			}
 		}
