@@ -232,6 +232,7 @@ namespace videodromm
 		string						mExt;
 		int							mNumberOfDigits;
 		int							mNextIndexFrameToTry;
+		std::chrono::steady_clock::time_point	startGlobal;
 		int							mCurrentLoadedFrame;
 		int							mFramesLoaded;
 		int							currentSecond;

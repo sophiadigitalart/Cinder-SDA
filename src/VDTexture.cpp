@@ -388,6 +388,7 @@ namespace videodromm {
 		mPosition = 0;
 		mNumberOfDigits = 4;
 		mLastCachedFilename = "a (1).jpg";
+		startGlobal = Clock::now();
 	}
 	bool TextureImageSequence::loadFromFullPath(string aPath)
 	{
@@ -528,6 +529,7 @@ namespace videodromm {
 			if (fs::exists(fileToLoad)) {
 				// start profiling
 				auto start = Clock::now();
+				
 				if (mCachedTextures[fileNameToLoad]) {
 					mSequenceTextures.push_back(mCachedTextures[fileNameToLoad]);
 				}
@@ -571,6 +573,10 @@ namespace videodromm {
 			if (mNextIndexFrameToTry > 530) {
 				mLoadingFilesComplete = true;
 				mStatus = "stop at 530";
+				auto endGlobal = Clock::now();
+				auto msdurGlobal = std::chrono::duration_cast<std::chrono::milliseconds>(endGlobal - startGlobal);
+				int milliGlobal = msdurGlobal.count();
+				mStatus = "All files loaded in ms " + toString(milliGlobal);
 			}
 			/* 20191018 obsolete
 			if (mNextIndexFrameToTry > 9999 && mNumberOfDigits == 4) mLoadingFilesComplete = true;
