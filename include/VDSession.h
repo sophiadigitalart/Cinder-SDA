@@ -273,6 +273,7 @@ namespace videodromm {
 		unsigned int					getInputTextureOriginalWidth(unsigned int aTextureIndex);
 		unsigned int					getInputTextureOriginalHeight(unsigned int aTextureIndex);
 		void							togglePlayPause(unsigned int aTextureIndex);
+		string							getStatus(unsigned int aTextureIndex);
 		// movie
 		bool							isMovie(unsigned int aTextureIndex);
 		// sequence

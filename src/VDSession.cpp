@@ -1346,6 +1346,7 @@ void VDSession::setInputTextureYBottom(unsigned int aTextureIndex, int aYBottom)
 	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
 	mTextureList[aTextureIndex]->setYBottom(aYBottom);
 }
+
 bool VDSession::isFlipVInputTexture(unsigned int aTextureIndex) {
 	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
 	return mTextureList[aTextureIndex]->isFlipV();
@@ -1374,6 +1375,10 @@ void VDSession::toggleInputTextureLockBounds(unsigned int aTextureIndex) {
 void VDSession::togglePlayPause(unsigned int aTextureIndex) {
 	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
 	mTextureList[aTextureIndex]->togglePlayPause();
+}
+string VDSession::getStatus(unsigned int aTextureIndex) {
+	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	return mTextureList[aTextureIndex]->getStatus();
 }
 bool VDSession::loadImageSequence(string aFolder, unsigned int aTextureIndex) {
 	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;

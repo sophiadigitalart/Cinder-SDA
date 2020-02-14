@@ -389,6 +389,7 @@ namespace videodromm {
 		mNumberOfDigits = 4;
 		mLastCachedFilename = "a (1).jpg";
 		startGlobal = Clock::now();
+		mStatus = "...";
 	}
 	bool TextureImageSequence::loadFromFullPath(string aPath)
 	{
@@ -557,10 +558,10 @@ namespace videodromm {
 				auto msdur = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 				int milli = msdur.count();
 
-				mStatus = fileToLoad.string() + " loaded in ms " + toString(milli);
+				mStatus = toString(milli) + "ms " + fileNameToLoad;
 			}
 			else {
-				mStatus = fileToLoad.string() + " does not exist";
+				//mStatus = fileToLoad.string() + " does not exist";
 				/* 20191018
 				if (mFramesLoaded > 0) {
 					// if frames have been loaded we hit the last file of the image sequence at this point
@@ -572,11 +573,11 @@ namespace videodromm {
 			mNextIndexFrameToTry++;
 			if (mNextIndexFrameToTry > 530) {
 				mLoadingFilesComplete = true;
-				mStatus = "stop at 530";
+				//mStatus = "stop at 530";
 				auto endGlobal = Clock::now();
 				auto msdurGlobal = std::chrono::duration_cast<std::chrono::milliseconds>(endGlobal - startGlobal);
 				int milliGlobal = msdurGlobal.count();
-				mStatus = "All files loaded in ms " + toString(milliGlobal);
+				mStatus = toString(milliGlobal) + "ms total";
 			}
 			/* 20191018 obsolete
 			if (mNextIndexFrameToTry > 9999 && mNumberOfDigits == 4) mLoadingFilesComplete = true;
@@ -653,12 +654,12 @@ namespace videodromm {
 				int milli = msdur.count();
 				mLastCachedFilename = aFilename;
 				mTexture = mCachedTextures[aFilename];
-				mStatus = aFilename + " cached in ms " + toString(milli);
-				CI_LOG_V(mStatus);
+				//mStatus = aFilename + " cached in ms " + toString(milli);
+				//CI_LOG_V(mStatus);
 			}
 			else {
 				// we want the last texture repeating
-				CI_LOG_V(aFilename + " does not exist");
+				//CI_LOG_V(aFilename + " does not exist");
 				mTexture = mCachedTextures[mLastCachedFilename];
 			}
 		}
