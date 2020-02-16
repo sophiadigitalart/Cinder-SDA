@@ -55,17 +55,6 @@ namespace videodromm {
 		static const int			IBR = 26;
 		static const int			IBG = 27;
 		static const int			IBB = 28;
-
-		/*
-		static const int			IFREQ1 = 26;
-		static const int			IFREQ2 = 27;
-		static const int			IFREQ3 = 28;
-
-		static const int			IBR = 36;
-		static const int			IBG = 37;
-		static const int			IBB = 38; */
-		// useless? 
-
 		static const int			IRESX = 29;
 		static const int			IRESY = 30;
 		static const int			IWEIGHT0 = 31;

@@ -911,8 +911,7 @@ unsigned int VDSession::getFboFragmentShaderIndex(unsigned int aFboIndex) {
 	return rtn;
 }
 string VDSession::getShaderName(unsigned int aShaderIndex) {
-	if (aShaderIndex > mShaderList.size() - 1) aShaderIndex = mShaderList.size() - 1;
-	return mShaderList[aShaderIndex]->getName();
+	return mShaderList[math<int>::min(aShaderIndex, mShaderList.size() - 1)]->getFileNameWithExtension(); // 20200216 was getName()
 }
 
 ci::gl::TextureRef VDSession::getShaderThumb(unsigned int aShaderIndex) {
@@ -1087,7 +1086,7 @@ unsigned int VDSession::createShaderFboFromString(string aFragmentShaderString, 
 		//f->setShaderIndex(rtn);
 		f->setFragmentShader(rtn, mShaderList[rtn]->getFragmentString(), mShaderList[rtn]->getName());
 		mFboList.push_back(f);
-		setFboInputTexture(mFboList.size() - 1, math<int>::min(rtn, mTextureList.size() - 1));
+		setFboInputTexture(mFboList.size() - 1, math<int>::min(rtn, mTextureList.size() - 1));// TODO load tex idx from file 20200216 
 	}
 	return rtn;
 }

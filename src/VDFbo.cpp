@@ -67,7 +67,7 @@ namespace videodromm {
 		string mGlslPath = xml.getAttributeValue<string>("shadername", "0.frag");
 		mWidth = xml.getAttributeValue<int>("width", mVDSettings->mFboWidth);
 		mHeight = xml.getAttributeValue<int>("height", mVDSettings->mFboHeight);
-		mInputTextureIndex = xml.getAttributeValue<int>("inputtextureindex", 0);
+		// 20200216 bug fix? mInputTextureIndex = xml.getAttributeValue<int>("inputtextureindex", 0);
 		CI_LOG_V("fbo id " + mId + "fbo shadername " + mGlslPath);
 		mFboName = mGlslPath;
 		// 20161209 problem on Mac mFboTextureShader->setLabel(mShaderName);
@@ -83,12 +83,14 @@ namespace videodromm {
 		}
 		catch (gl::GlslProgCompileExc &exc) {
 			mError = string(exc.what());
-			CI_LOG_V("unable to load/compile fragment shader:" + string(exc.what()));
+			CI_LOG_V("fbo, unable to load/compile fragment shader:" + string(exc.what()));
 		}
 		catch (const std::exception &e) {
 			mError = string(e.what());
-			CI_LOG_V("unable to load fragment shader:" + string(e.what()));
+			CI_LOG_V("fbo, unable to load fragment shader:" + string(e.what()));
 		}
+		mVDSettings->mNewMsg = true;
+		mVDSettings->mMsg = mError;
 	}
 	void VDFbo::setShaderIndex(unsigned int aShaderIndex) {
 		mShaderIndex = aShaderIndex;
