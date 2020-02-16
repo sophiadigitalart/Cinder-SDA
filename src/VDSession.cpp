@@ -28,7 +28,15 @@ VDSession::VDSession(VDSettingsRef aVDSettings)
 	mPosX = mPosY = 0.0f;
 	mZoom = 1.0f;
 	mSelectedWarp = 0;
-
+	// Modes
+	mModesList[0] = "F1 Mixette";
+	mModesList[1] = "F2 Mix";
+	mModesList[2] = "F3 Hydra";
+	mModesList[3] = "F4 Fbo0";
+	mModesList[4] = "F5 Fbo1";
+	mModesList[5] = "F6 Fbo2";
+	mModesList[6] = "F7 Fbo3";
+	mModesList[7] = "F8 Mixette";
 	// Websocket
 	mVDWebsocket = VDWebsocket::create(mVDSettings, mVDAnimation);
 	// Message router
@@ -422,10 +430,11 @@ void VDSession::restore()
 	try {
 		JsonTree doc(loadFile(sessionPath));
 		if (doc.hasChild("shaders")) {
-			JsonTree shaders(doc.getChild("shaders"));			
+			JsonTree shaders(doc.getChild("shaders"));
 			if (shaders.hasChild("0")) createShaderFbo(shaders.getValueForKey<string>("0"));
 			if (shaders.hasChild("1")) createShaderFbo(shaders.getValueForKey<string>("1"));
 			if (shaders.hasChild("2")) createShaderFbo(shaders.getValueForKey<string>("2"));
+			if (shaders.hasChild("3")) createShaderFbo(shaders.getValueForKey<string>("3"));
 		}
 		if (doc.hasChild("settings")) {
 			JsonTree settings(doc.getChild("settings"));
@@ -456,7 +465,7 @@ void VDSession::restore()
 			if (assets.hasChild("textplaybackdelay")) mTextPlaybackDelay = assets.getValueForKey<int>("textplaybackdelay");
 			if (assets.hasChild("textplaybackend")) mTextPlaybackEnd = assets.getValueForKey<int>("textplaybackend");
 		}
-		
+
 	}
 	catch (const JsonTree::ExcJsonParserError& exc) {
 		CI_LOG_W(exc.what());
@@ -525,6 +534,9 @@ void VDSession::fileDrop(FileDropEvent event) {
 			loadFragmentShader(absolutePath, index);
 		}
 		else if (ext == "xml") {
+		}
+		else if (ext == "json") {
+			// TODO load track with textures, shaders
 		}
 		else if (ext == "mov") {
 			loadMovie(absolutePath, index);
@@ -902,6 +914,7 @@ string VDSession::getShaderName(unsigned int aShaderIndex) {
 	if (aShaderIndex > mShaderList.size() - 1) aShaderIndex = mShaderList.size() - 1;
 	return mShaderList[aShaderIndex]->getName();
 }
+
 ci::gl::TextureRef VDSession::getShaderThumb(unsigned int aShaderIndex) {
 	unsigned int found = 0;
 	for (int i = 0; i < mFboList.size(); i++)
@@ -1089,7 +1102,8 @@ unsigned int VDSession::createShaderFbo(string aShaderFilename, unsigned int aFb
 	// initialize rtn to 0 to force creation
 	unsigned int rtn = 0;
 	string fName = aShaderFilename;
-	string ext = "";
+	string currentShaderListFileName = "";
+	//string ext = "";
 	int dotIndex = fName.find_last_of(".");
 	int slashIndex = fName.find_last_of("\\");
 	if (aShaderFilename.length() > 0) {
@@ -1104,19 +1118,30 @@ unsigned int VDSession::createShaderFbo(string aShaderFilename, unsigned int aFb
 				fName = mFragFile.filename().string();
 				dotIndex = fName.find_last_of(".");
 				slashIndex = fName.find_last_of("\\");
-
+				/* useless
 				if (dotIndex != std::string::npos && dotIndex > slashIndex) {
 					ext = fName.substr(dotIndex + 1);
-				}
+				} */
+				// init with drag drop position
 				if (aFboShaderIndex > 4 && aFboShaderIndex < mShaderList.size() - 1) {
 					rtn = aFboShaderIndex;
 				}
-				else {
+				// find a shader with same file name
+				for (int i = mShaderList.size() - 1; i > 0; i--)
+				{
+					currentShaderListFileName = mShaderList[i]->getFileNameWithExtension();
+					if (fName == currentShaderListFileName) {
+						rtn = i;
+					}
+				}
 
+				if (rtn == 0) {
 					// find a removed shader
 					for (int i = mShaderList.size() - 1; i > 0; i--)
 					{
-						if (!mShaderList[i]->isValid() || fName == mShaderList[i]->getName()) { rtn = i; }
+						if (!mShaderList[i]->isValid()) {
+							rtn = i;
+						}
 					}
 					// find a not used shader if no removed shader
 					if (rtn == 0) {
@@ -1171,7 +1196,7 @@ void VDSession::initShaderList() {
 		createShaderFbo("0.frag");
 		createShaderFboFromString("void main(void){vec2 uv = gl_FragCoord.xy / iResolution.xy;uv = abs(2.0*(uv - 0.5));vec4 t1 = texture2D(iChannel0, vec2(uv[0], 0.1));vec4 t2 = texture2D(iChannel0, vec2(uv[1], 0.1));float fft = t1[0] * t2[0];gl_FragColor = vec4(sin(fft*3.141*2.5), sin(fft*3.141*2.0), sin(fft*3.141*1.0), 1.0);}", "fftMatrixProduct.glsl");
 		createShaderFboFromString("void main(void) {vec2 uv = 2 * (gl_FragCoord.xy / iResolution.xy - vec2(0.5));float radius = length(uv);float angle = atan(uv.y, uv.x);float col = .0;col += 1.5*sin(iTime + 13.0 * angle + uv.y * 20);col += cos(.9 * uv.x * angle * 60.0 + radius * 5.0 - iTime * 2.);fragColor = (1.2 - radius) * vec4(vec3(col), 1.0);}", "hexler330.glsl");
-		
+
 				createShaderFboFromString("void main(void){vec2 uv = 2 * (fragCoord.xy / iResolution.xy - vec2(0.5));float specx = texture2D( iChannel0, vec2(0.25,5.0/100.0) ).x;float specy = texture2D( iChannel0, vec2(0.5,5.0/100.0) ).x;float specz = 1.0*texture2D( iChannel0, vec2(0.7,5.0/100.0) ).x;float r = length(uv); float p = atan(uv.y/uv.x); uv = abs(uv);float col = 0.0;float amp = (specx+specy+specz)/3.0;uv.y += sin(uv.y*3.0*specx-iTime/5.0*specy+r*10.);uv.x += cos((iTime/5.0)+specx*30.0*uv.x);col += abs(1.0/uv.y/30.0) * (specx+specz)*15.0;col += abs(1.0/uv.x/60.0) * specx*8. ; fragColor=vec4(vec3( col ),1.0);}", "Hexler2.glsl");
 				createShaderFboFromString("void main(void){vec2 uv = 2 * (gl_FragCoord.xy / iResolution.xy - vec2(0.5));vec2 spec = 1.0*texture2D(iChannel0, vec2(0.25, 5.0 / 100.0)).xx;float col = 0.0;uv.x += sin(iTime * 6.0 + uv.y*1.5)*spec.y;col += abs(0.8 / uv.x) * spec.y;gl_FragColor = vec4(col, col, col, 1.0);}", "SoundVizVert.glsl");
 				createShaderFboFromString("void main(void){vec2 uv = 2 * (gl_FragCoord.xy / iResolution.xy - vec2(0.5));vec2 spec = 1.0*texture2D(iChannel0, vec2(0.25, 5.0 / 100.0)).yy;float col = 0.0;uv.y += sin(iTime * 6.0 + uv.x*1.5)*spec.x;col += abs(0.8/uv.y) * spec.x;gl_FragColor = vec4(col, col, col, 1.0);}", "SoundVizHoriz.glsl");
@@ -1292,14 +1317,6 @@ bool VDSession::isFboFlipV(unsigned int aFboIndex) {
 #pragma endregion mix
 
 #pragma region textures
-ci::gl::TextureRef VDSession::getInputTexture(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	return mTextureList[aTextureIndex]->getTexture();
-}
-ci::gl::TextureRef VDSession::getCachedTexture(unsigned int aTextureIndex, string aFilename) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	return mTextureList[aTextureIndex]->getCachedTexture(aFilename);
-}
 
 /*ci::gl::TextureRef VDSession::getNextInputTexture(unsigned int aTextureIndex) {
 	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
@@ -1311,86 +1328,76 @@ ci::gl::TextureRef VDSession::getCachedTexture(unsigned int aTextureIndex, strin
 	}
 
 }*/
+ci::gl::TextureRef VDSession::getInputTexture(unsigned int aTextureIndex) {
+	return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->getTexture();
+}
+ci::gl::TextureRef VDSession::getCachedTexture(unsigned int aTextureIndex, string aFilename) {
+	return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->getCachedTexture(aFilename);
+}
 string VDSession::getInputTextureName(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	return mTextureList[aTextureIndex]->getName();
+	return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->getName();
 }
 unsigned int VDSession::getInputTexturesCount() {
 	return mTextureList.size();
 }
 unsigned int VDSession::getInputTextureOriginalWidth(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	return mTextureList[aTextureIndex]->getOriginalWidth();
+	return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->getOriginalWidth();
 }
 unsigned int VDSession::getInputTextureOriginalHeight(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	return mTextureList[aTextureIndex]->getOriginalHeight();
+	return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->getOriginalHeight();
 }
 int VDSession::getInputTextureXLeft(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	return mTextureList[aTextureIndex]->getXLeft();
+	return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->getXLeft();
 }
 void VDSession::setInputTextureXLeft(unsigned int aTextureIndex, int aXLeft) {
 	mTextureList[aTextureIndex]->setXLeft(aXLeft);
 }
 int VDSession::getInputTextureYTop(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	return mTextureList[aTextureIndex]->getYTop();
+	return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->getYTop();
 }
 void VDSession::setInputTextureYTop(unsigned int aTextureIndex, int aYTop) {
-	mTextureList[aTextureIndex]->setYTop(aYTop);
+	mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->setYTop(aYTop);
 }
 int VDSession::getInputTextureXRight(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	return mTextureList[aTextureIndex]->getXRight();
+	return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->getXRight();
 }
 void VDSession::setInputTextureXRight(unsigned int aTextureIndex, int aXRight) {
-	mTextureList[aTextureIndex]->setXRight(aXRight);
+	mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->setXRight(aXRight);
 }
 int VDSession::getInputTextureYBottom(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	return mTextureList[aTextureIndex]->getYBottom();
+	return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->getYBottom();
 }
 void VDSession::setInputTextureYBottom(unsigned int aTextureIndex, int aYBottom) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	mTextureList[aTextureIndex]->setYBottom(aYBottom);
+	mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->setYBottom(aYBottom);
 }
 
 bool VDSession::isFlipVInputTexture(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	return mTextureList[aTextureIndex]->isFlipV();
+	return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->isFlipV();
 }
 void VDSession::inputTextureFlipV(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	mTextureList[aTextureIndex]->flipV();
+	mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->flipV();
 }
 bool VDSession::isFlipHInputTexture(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	return mTextureList[aTextureIndex]->isFlipH();
+	return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->isFlipH();
 }
 void VDSession::inputTextureFlipH(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	mTextureList[aTextureIndex]->flipH();
+	mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->flipH();
 }
 
 bool VDSession::getInputTextureLockBounds(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	return mTextureList[aTextureIndex]->getLockBounds();
+	return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->getLockBounds();
 }
 void VDSession::toggleInputTextureLockBounds(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	mTextureList[aTextureIndex]->toggleLockBounds();
+	mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->toggleLockBounds();
 }
 void VDSession::togglePlayPause(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	mTextureList[aTextureIndex]->togglePlayPause();
+	mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->togglePlayPause();
 }
 string VDSession::getStatus(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	return mTextureList[aTextureIndex]->getStatus();
+	return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->getStatus();
 }
 bool VDSession::loadImageSequence(string aFolder, unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	//if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
 	CI_LOG_V("loadImageSequence " + aFolder + " at textureIndex " + toString(aTextureIndex));
 	// add texture xml
 	XmlTree			textureXml;
@@ -1440,24 +1447,20 @@ bool VDSession::isMovie(unsigned int aTextureIndex) {
 
 // sequence
 bool VDSession::isSequence(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	aTextureIndex = math<int>::min(aTextureIndex, mTextureList.size() - 1);
 	return (mTextureList[aTextureIndex]->getType() == mTextureList[aTextureIndex]->SEQUENCE);
 }
 bool VDSession::isLoadingFromDisk(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	return (mTextureList[aTextureIndex]->isLoadingFromDisk());
+	return (mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->isLoadingFromDisk());
 }
 void VDSession::toggleLoadingFromDisk(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	mTextureList[aTextureIndex]->toggleLoadingFromDisk();
+	mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->toggleLoadingFromDisk();
 }
 void VDSession::syncToBeat(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	mTextureList[aTextureIndex]->syncToBeat();
+	mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->syncToBeat();
 }
 void VDSession::reverse(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	mTextureList[aTextureIndex]->reverse();
+	mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->reverse();
 }
 
 void VDSession::setSpeed(unsigned int aTextureIndex, float aSpeed) {
@@ -1469,16 +1472,13 @@ void VDSession::setSpeed(unsigned int aTextureIndex, float aSpeed) {
 	}
 }
 int VDSession::getPosition(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	return mTextureList[aTextureIndex]->getPosition();
+	return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->getPosition();
 }
 void VDSession::setPlayheadPosition(unsigned int aTextureIndex, int aPosition) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	mTextureList[aTextureIndex]->setPlayheadPosition(aPosition);
+	mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->setPlayheadPosition(aPosition);
 }
 int VDSession::getMaxFrame(unsigned int aTextureIndex) {
-	if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
-	return mTextureList[aTextureIndex]->getMaxFrame();
+	return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->getMaxFrame();
 }
 #pragma endregion textures
 void VDSession::load()
@@ -1514,9 +1514,9 @@ ci::gl::TextureRef VDSession::getMixetteTexture() {
 	gl::ScopedFramebuffer fbScp(mMixetteFbo);
 	// clear out the FBO with black
 	gl::clear(Color::black());
-	// 20190727 TODO CHECK
 
-	mTextureList[mTextureList.size()>0 ? 1 : 0]->getTexture()->bind(0);
+	// 20200216 TODO CHECK
+	mTextureList[mTextureList.size() > 1 ? 1 : 0]->getTexture()->bind(0);
 	mHydraFbo->getColorTexture()->bind(1);
 	mMixFbos[0].fbo->getColorTexture()->bind(2);
 	mFboList[0]->getRenderedTexture()->bind(3);

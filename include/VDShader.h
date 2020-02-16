@@ -34,15 +34,16 @@ namespace videodromm
 
 	class VDShader {
 	public:
-		VDShader(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, string aFragmentShaderFilePath, string aFragmentShaderString = "");
+		VDShader(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, string aFileNameWithExtension, string aFragmentShaderString = "");
 		//void update();
-		static VDShaderRef	create(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, string aFragmentShaderFilePath, string aFragmentShaderString = "")
+		static VDShaderRef	create(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, string aFileNameWithExtension, string aFragmentShaderString = "")
 		{
-			return shared_ptr<VDShader>(new VDShader(aVDSettings, aVDAnimation, aFragmentShaderFilePath, aFragmentShaderString));
+			return shared_ptr<VDShader>(new VDShader(aVDSettings, aVDAnimation, aFileNameWithExtension, aFragmentShaderString));
 		}
 		//void fromXml(const XmlTree &xml);
 		gl::GlslProgRef					getShader();
 		string							getName();
+		string							getFileNameWithExtension() {return mFileNameWithExtension;};
 		bool							loadFragmentStringFromFile(string aFileName);
 		string							getFragmentString() {
 			if (mFragmentShaderString.empty()) mFragmentShaderString = "void main(void){vec2 uv = gl_FragCoord.xy / iResolution.xy;fragColor = texture(iChannel0, uv);}";
@@ -72,7 +73,7 @@ namespace videodromm
         bool							mValid;
 		//! fragment shader
 		std::string						mFragmentShaderString;
-		std::string						mFragmentShaderFilePath;
+		std::string						mFileNameWithExtension;
 		fs::path						mFragFile;
 		// include shader lines
 		std::string						shaderInclude;

@@ -338,9 +338,13 @@ namespace videodromm {
 		
 		int								getMode() { return mMode; };
 		void							setMode(int aMode) { mMode = aMode; };;
+		int								getModesCount() { return mModesList.size() - 1; };
 		void							toggleUI() { mShowUI = !mShowUI; };
 		bool							showUI() { return mShowUI; };
-
+		string							getModeName(unsigned int aMode) {
+			if (aMode > mModesList.size() - 1) aMode = mModesList.size() - 1;
+			return mModesList[aMode];
+		}
 	private:
 		int								mMode;
 		// Settings
@@ -434,6 +438,8 @@ namespace videodromm {
 		VDTextureList					mTextureList;
 		fs::path						mTexturesFilepath;
 		bool							initTextureList();
+		//! Modes
+		map<int, string>				mModesList;
 		// blendmodes fbos
 		map<int, ci::gl::FboRef>		mBlendFbos;
 		int								mCurrentBlend;

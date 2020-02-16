@@ -2,8 +2,15 @@
 
 using namespace videodromm;
 
-VDShader::VDShader(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, string aFragmentShaderFilePath, string aFragmentShaderString) {
-	mFragmentShaderFilePath = aFragmentShaderFilePath;
+VDShader::VDShader(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, string aFileNameWithExtension, string aFragmentShaderString) {
+	fs::path mFragFilePath = aFileNameWithExtension;
+	if (fs::exists(mFragFilePath)) {
+		mFileNameWithExtension = mFragFilePath.string();
+	}
+	else {
+		mFileNameWithExtension = aFileNameWithExtension;
+	}
+	
 	mFragmentShaderString = aFragmentShaderString;
 	mValid = false;
 	mActive = true;
@@ -45,10 +52,10 @@ VDShader::VDShader(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, strin
 	mError = "";
 	// priority to loading from string 
 	if (mFragmentShaderString.length() > 0) {
-		mValid = setFragmentString(mFragmentShaderString, mFragmentShaderFilePath);
+		mValid = setFragmentString(mFragmentShaderString, mFileNameWithExtension);
 	}
 	else {
-		loadFragmentStringFromFile(mFragmentShaderFilePath);
+		loadFragmentStringFromFile(mFileNameWithExtension);
 	}
 	if (mValid) {
 		CI_LOG_V("VDShaders constructor success");
@@ -86,7 +93,7 @@ bool VDShader::loadFragmentStringFromFile(string aFileName) {
 		mName = fileName;
 	}*/
 
-	mFragmentShaderFilePath = mFragFile.string();
+	mFileNameWithExtension = mFragFile.string();
 	mFragmentShaderString = loadString(loadFile(mFragFile));
 	mValid = setFragmentString(mFragmentShaderString, mFragFile.filename().string());
 
