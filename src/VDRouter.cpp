@@ -386,7 +386,7 @@ void VDRouter::shutdown() {
 
 void VDRouter::midiSetup() {
 	stringstream ss;
-	ss << "setupMidi: ";
+	ss << "setupMidi ";
 	CI_LOG_V("midiSetup: " + ss.str());
 	if (mMidiIn0.getNumPorts() > 0)
 	{
@@ -415,10 +415,8 @@ void VDRouter::midiSetup() {
 		}
 	}
 	else {
-		ss << "no midi in ports found!";
+		ss << "no midi in ports found";
 	}
-	ss << std::endl;
-	CI_LOG_V(ss.str());
 
 	// midi out
 	//mMidiOut0.getPortList();
@@ -442,7 +440,7 @@ void VDRouter::midiSetup() {
 		}
 	}
 	else {
-		ss << "no midi out Ports found!!!!";
+		ss << "no midi out Ports found";
 	}
 	midiControlType = "none";
 	midiControl = midiPitch = midiVelocity = midiNormalizedValue = midiValue = midiChannel = 0;

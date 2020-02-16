@@ -899,13 +899,20 @@ void VDSession::setFboFragmentShaderIndex(unsigned int aFboIndex, unsigned int a
 	if (aFboIndex > mFboList.size() - 1) aFboIndex = mFboList.size() - 1;
 	if (aFboShaderIndex > mShaderList.size() - 1) aFboShaderIndex = mShaderList.size() - 1;
 	CI_LOG_V("setFboFragmentShaderIndex, after, fboIndex: " + toString(aFboIndex) + " shaderIndex " + toString(aFboShaderIndex));
-	mFboList[aFboIndex]->setFragmentShader(aFboShaderIndex, mShaderList[aFboShaderIndex]->getFragmentString(), mShaderList[aFboShaderIndex]->getName());
+	// 20200216 bug fix mFboList[aFboIndex]->setFragmentShader(aFboShaderIndex, mShaderList[aFboShaderIndex]->getFragmentString(), mShaderList[aFboShaderIndex]->getName());
+	mFboList[aFboShaderIndex]->setFragmentShader(aFboShaderIndex, mShaderList[aFboShaderIndex]->getFragmentString(), mShaderList[aFboShaderIndex]->getName());
+	if (aFboIndex == 0) {
+		setFboAIndex(0, aFboShaderIndex); // TODO 20200216 check 0 useless for now
+	}
+	else {
+		setFboBIndex(1, aFboShaderIndex); // TODO 20200216 check 1 useless for now
+	}
 	// route message
 	// LOOP! mVDWebsocket->changeFragmentShader(mShaderList[aFboShaderIndex]->getFragmentString());
 }
 
 unsigned int VDSession::getFboFragmentShaderIndex(unsigned int aFboIndex) {
-	unsigned int rtn = mFboList[aFboIndex]->getShaderIndex();
+	unsigned int rtn = mFboList[aFboIndex==0 ? mVDAnimation->getIntUniformValueByIndex(mVDSettings->IFBOA) : mVDAnimation->getIntUniformValueByIndex(mVDSettings->IFBOB)]->getShaderIndex();
 	//CI_LOG_V("getFboFragmentShaderIndex, fboIndex: " + toString(aFboIndex)+" shaderIndex: " + toString(rtn));
 	if (rtn > mShaderList.size() - 1) rtn = mShaderList.size() - 1;
 	return rtn;
