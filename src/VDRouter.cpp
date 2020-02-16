@@ -108,6 +108,32 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 			}
 			if (!found)
 			{
+				//32 floats from Speckthor
+				ctrl = "/Spectrum";
+				index = addr.find(ctrl);
+				if (index != std::string::npos)
+				{
+					found = true;
+					mVDAnimation->maxVolume = 0.0f;
+					for (int i = 0; i < msg.getNumArgs(); i++) {
+						// get the argument type 'f'
+						if (msg.getArgType(i) == ArgType::FLOAT) {
+							float f = msg[i].flt() * 200.0f;
+							if (f > mVDAnimation->maxVolume)
+							{
+								mVDAnimation->maxVolume = f;
+							}
+							mVDAnimation->iFreqs[i] = f;
+							if (i == mVDAnimation->getFreqIndex(0)) mVDAnimation->setFloatUniformValueByName("iFreq0", f);
+							if (i == mVDAnimation->getFreqIndex(1)) mVDAnimation->setFloatUniformValueByName("iFreq1", f);
+							if (i == mVDAnimation->getFreqIndex(2)) mVDAnimation->setFloatUniformValueByName("iFreq2", f);
+							if (i == mVDAnimation->getFreqIndex(3)) mVDAnimation->setFloatUniformValueByName("iFreq3", f);
+						}
+					}				
+				}
+			}
+			if (!found)
+			{
 				// int32 1 to 4 beat from Transthor
 				ctrl = "/beat";
 				index = addr.find(ctrl);
@@ -316,6 +342,7 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 			else {
 				CI_LOG_E("not handled: " << msg.getNumArgs() << " addr: " << addr);
 				mVDSettings->mOSCMsg = "not handled: " + addr;
+				mVDSettings->mMsg = "osc not handled: " + addr;
 			}
 		});
 
@@ -388,7 +415,7 @@ void VDRouter::midiSetup() {
 		}
 	}
 	else {
-		ss << "No MIDI in ports found!" << std::endl;
+		ss << "no midi in ports found!";
 	}
 	ss << std::endl;
 	CI_LOG_V(ss.str());
@@ -415,10 +442,11 @@ void VDRouter::midiSetup() {
 		}
 	}
 	else {
-		ss << "No MIDI Out Ports found!!!!" << std::endl;
+		ss << "no midi out Ports found!!!!";
 	}
 	midiControlType = "none";
 	midiControl = midiPitch = midiVelocity = midiNormalizedValue = midiValue = midiChannel = 0;
+	ss << std::endl;
 	mVDSettings->mNewMsg = true;
 	mVDSettings->mMidiMsg = ss.str();
 	CI_LOG_V(ss.str());
@@ -483,39 +511,40 @@ void VDRouter::midiOutSendNoteOn(int i, int channel, int pitch, int velocity) {
 void VDRouter::openMidiOutPort(int i) {
 
 	stringstream ss;
-	ss << "Port " << i << " ";
+	ss << "Port " << i;
 	if (i < mMidiOutputs.size()) {
 		if (i == 0) {
 			if (mMidiOut0.openPort(i)) {
 				mMidiOutputs[i].isConnected = true;
-				ss << "Opened MIDI out port " << i << " " << mMidiOutputs[i].portName << std::endl;
+				ss << " Opened MIDI out port " << i << " " << mMidiOutputs[i].portName;
 				mMidiOut0.sendNoteOn(1, 40, 64);
 			}
 			else {
-				ss << "Can't open MIDI out port " << i << " " << mMidiOutputs[i].portName << std::endl;
+				ss << " Can't open MIDI out port " << i << " " << mMidiOutputs[i].portName;
 			}
 		}
 		if (i == 1) {
 			if (mMidiOut1.openPort(i)) {
 				mMidiOutputs[i].isConnected = true;
-				ss << "Opened MIDI out port " << i << " " << mMidiOutputs[i].portName << std::endl;
+				ss << " Opened MIDI out port " << i << " " << mMidiOutputs[i].portName;
 				mMidiOut1.sendNoteOn(1, 40, 64);
 			}
 			else {
-				ss << "Can't open MIDI out port " << i << " " << mMidiOutputs[i].portName << std::endl;
+				ss << " Can't open MIDI out port " << i << " " << mMidiOutputs[i].portName;
 			}
 		}
 		if (i == 2) {
 			if (mMidiOut2.openPort(i)) {
 				mMidiOutputs[i].isConnected = true;
-				ss << "Opened MIDI out port " << i << " " << mMidiOutputs[i].portName << std::endl;
+				ss << " Opened MIDI out port " << i << " " << mMidiOutputs[i].portName;
 				mMidiOut2.sendNoteOn(1, 40, 64);
 			}
 			else {
-				ss << "Can't open MIDI out port " << i << " " << mMidiOutputs[i].portName << std::endl;
+				ss << " Can't open MIDI out port " << i << " " << mMidiOutputs[i].portName;
 			}
 		}
 	}
+	ss << std::endl;
 	mVDSettings->mMsg = ss.str();
 	mVDSettings->mNewMsg = true;
 	CI_LOG_V(ss.str());
@@ -548,7 +577,7 @@ void VDRouter::midiListener(midi::Message msg) {
 		midiControl = msg.control;
 		midiValue = msg.value;
 		midiNormalizedValue = lmap<float>(midiValue, 0.0, 127.0, 0.0, 1.0);
-		ss << "MIDI cc Chn: " << midiChannel << " CC: " << midiControl  << " Val: " << midiValue << " NVal: " << midiNormalizedValue << std::endl;
+		ss << "MIDI cc Chn: " << midiChannel << " CC: " << midiControl  << " Val: " << midiValue << " NVal: " << midiNormalizedValue;
 		CI_LOG_V("Midi: " + ss.str());
 
 		if (midiControl > 20 && midiControl < 49) {
@@ -614,7 +643,7 @@ void VDRouter::midiListener(midi::Message msg) {
 		if (midiPitch > 17 && midiPitch < 24) {
 			mVDAnimation->setBoolUniformValueByIndex(midiPitch + 80-17, true);
 		}
-		ss << "MIDI noteon Chn: " << midiChannel << " Pitch: " << midiPitch << std::endl;
+		ss << "MIDI noteon Chn: " << midiChannel << " Pitch: " << midiPitch;
 		CI_LOG_V("Midi: " + ss.str());
 		break;
 	case MIDI_NOTE_OFF:
@@ -635,7 +664,7 @@ void VDRouter::midiListener(midi::Message msg) {
 				mVDAnimation->setBoolUniformValueByIndex(midiPitch + 80, !midiStickyPrevValue);
 			}
 		}*/
-		ss << "MIDI noteoff Chn: " << midiChannel << " Pitch: " << midiPitch << std::endl;
+		ss << "MIDI noteoff Chn: " << midiChannel << " Pitch: " << midiPitch;
 		CI_LOG_V("Midi: " + ss.str());
 		/*midiControlType = "/off";
 		midiPitch = msg.pitch;
@@ -647,7 +676,7 @@ void VDRouter::midiListener(midi::Message msg) {
 	}
 	//ss << "MIDI Chn: " << midiChannel << " type: " << midiControlType << " CC: " << midiControl << " Pitch: " << midiPitch << " Vel: " << midiVelocity << " Val: " << midiValue << " NVal: " << midiNormalizedValue << std::endl;
 	//CI_LOG_V("Midi: " + ss.str());
-
+	ss << std::endl;
 	mVDSettings->mMidiMsg = ss.str();
 }
 

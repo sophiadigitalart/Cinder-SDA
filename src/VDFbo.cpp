@@ -175,7 +175,7 @@ namespace videodromm {
 					break;
 				case 1:
 					// sampler2D
-					mFboTextureShader->uniform(name, mInputTextureIndex);
+					mFboTextureShader->uniform(name,  mInputTextureIndex);// cinder::gl::GlslProg::logUniformWrongType[1021] Uniform type mismatch for "iChannel0", expected SAMPLER_2D and received uint32_t
 					break;
 				case 2:
 					// vec2

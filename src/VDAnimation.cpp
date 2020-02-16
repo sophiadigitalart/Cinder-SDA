@@ -16,7 +16,7 @@ VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
 	}
 	for (int i = 0; i < mWindowSize; i++)
 	{
-		iFreqs[i] = i;
+		iFreqs[i] = 0.0f;
 	}
 	// live json params
 	mJsonFilePath = app::getAssetPath("") / mVDSettings->mAssetsPath / "live_params.json";

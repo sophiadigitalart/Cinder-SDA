@@ -101,7 +101,8 @@ namespace videodromm
 		//! Input textures
 		//map<int, ci::gl::Texture2dRef>	mInputTextures;
 		VDTextureList					mTextureList;
-		unsigned int					mInputTextureIndex;
+		// 20200216 unsigned int					mInputTextureIndex;
+		int					mInputTextureIndex;
 		//! Shaders
 		//string							mShaderName;
 		unsigned int					mShaderIndex;
