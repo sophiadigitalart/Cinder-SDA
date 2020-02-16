@@ -90,7 +90,11 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 			}
 			if (!found)
 			{
-				// float tempo from Transthor
+				/*	float tempo from Transthor
+					SOS 160.0
+					HumanET	150
+					Hoover	135
+				*/
 				ctrl = "/tempo";
 				index = addr.find(ctrl);
 				if (index != std::string::npos)

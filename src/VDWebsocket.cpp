@@ -14,7 +14,7 @@ VDWebsocket::VDWebsocket(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation)
 	streamReceived = false;
 	// WebSockets
 	clientConnected = false;
-
+	
 	if (mVDSettings->mAreWebSocketsEnabledAtStartup) wsConnect();
 	mPingTime = getElapsedSeconds();
 
@@ -360,7 +360,7 @@ void VDWebsocket::wsConnect() {
 	if (mVDSettings->mIsWebSocketsServer) {
 		mServer.connectOpenEventHandler([&]() {
 			clientConnected = true;
-			mVDSettings->mWebSocketsMsg = "Connected";
+			mVDSettings->mWebSocketsMsg += " connected to server";
 			mVDSettings->mWebSocketsNewMsg = true;
 		});
 		mServer.connectCloseEventHandler([&]() {
@@ -389,6 +389,29 @@ void VDWebsocket::wsConnect() {
 		});
 		mServer.connectMessageEventHandler([&](string msg) {
 			parseMessage(msg);
+		});
+		mServer.connectSocketInitEventHandler([&]()
+		{
+			// This routine reads the address of the incoming connection
+			mVDSettings->mWebSocketsMsg = "WS Server new connection";
+			mVDSettings->mWebSocketsNewMsg = true;
+			asio::ip::tcp::socket* socket = mServer.getSocket();
+			if (socket != nullptr) {
+				asio::ip::address address = socket->remote_endpoint().address();
+				string host = "";
+				if (address.is_v4()) {
+					host += address.to_v4().to_string();
+				}
+				else if (address.is_v6()) {
+					host += address.to_v6().to_string();
+				}
+				else {
+					host += address.to_string();
+				}
+				host += ":" + toString(socket->remote_endpoint().port());
+				CI_LOG_V(host);
+				mVDSettings->mWebSocketsMsg += ": " + host;
+			}
 		});
 		mServer.listen(mVDSettings->mWebSocketsPort);
 	}
