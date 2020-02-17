@@ -1377,19 +1377,6 @@ void VDSession::setInputTextureYBottom(unsigned int aTextureIndex, int aYBottom)
 	mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->setYBottom(aYBottom);
 }
 
-bool VDSession::isFlipVInputTexture(unsigned int aTextureIndex) {
-	return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->isFlipV();
-}
-void VDSession::inputTextureFlipV(unsigned int aTextureIndex) {
-	mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->flipV();
-}
-bool VDSession::isFlipHInputTexture(unsigned int aTextureIndex) {
-	return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->isFlipH();
-}
-void VDSession::inputTextureFlipH(unsigned int aTextureIndex) {
-	mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->flipH();
-}
-
 bool VDSession::getInputTextureLockBounds(unsigned int aTextureIndex) {
 	return mTextureList[math<int>::min(aTextureIndex, mTextureList.size() - 1)]->getLockBounds();
 }

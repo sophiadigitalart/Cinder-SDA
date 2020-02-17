@@ -103,10 +103,6 @@ namespace videodromm
 		int								getYTop() { return mYTop; };
 		int								getXRight() { return mXRight; };
 		int								getYBottom() { return mYBottom; };
-		bool							isFlipH() { return mFlipH; };
-		bool							isFlipV() { return mFlipV; };
-		void							flipV();
-		void							flipH();
 		bool							getLockBounds();
 		void							toggleLockBounds();
 		// sequence and movie
@@ -126,8 +122,6 @@ namespace videodromm
 
 	protected:
 		std::string						mName;
-		bool							mFlipV;
-		bool							mFlipH;
 		TextureType						mType;
 		std::string						mPath;
 		std::string						mFolder;
