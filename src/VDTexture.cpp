@@ -1009,7 +1009,7 @@ namespace videodromm {
 		}
 		else {
 			// generate random values
-			for (int i = 0; i < 128; ++i) dTexture[i] = (unsigned char)(Rand::randUint() & 0xFF);
+			for (int i = 0; i < 128; ++i) dTexture[i] = (unsigned char)(i);
 			mTexture = gl::Texture::create(dTexture, GL_RED, 64, 2, fmt);
 		}
 
