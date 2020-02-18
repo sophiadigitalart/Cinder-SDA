@@ -434,7 +434,7 @@ namespace videodromm {
 		//! Shaders
 		VDShaderList					mShaderList;
 		void							initShaderList();
-		//! Textures
+		//! Textures TODO VDTextureList mTextureList in VBFbo AND VDSession
 		VDTextureList					mTextureList;
 		fs::path						mTexturesFilepath;
 		bool							initTextureList();

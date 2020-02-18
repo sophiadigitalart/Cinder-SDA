@@ -63,7 +63,7 @@ namespace videodromm
 		void							setShaderIndex(unsigned int aShaderIndex);
 		unsigned int					getShaderIndex() { return mShaderIndex; };
 		void							setFragmentShader(unsigned int aShaderIndex, string aFragmentShaderString, string aName);
-		// textures
+		// textures TODO VDTextureList mTextureList in VBFbo AND VDSession
 		void							setInputTexture(VDTextureList aTextureList, unsigned int aTextureIndex = 0);
 		unsigned int					getInputTextureIndex() { return mInputTextureIndex; };
 		ci::gl::Texture2dRef			getFboTexture();
@@ -99,8 +99,8 @@ namespace videodromm
 		gl::Texture::Format				fmt;
 		gl::Fbo::Format					fboFmt;
 		//! Input textures
-		//map<int, ci::gl::Texture2dRef>	mInputTextures;
-		VDTextureList					mTextureList;
+		//map<int, ci::gl::Texture2dRef>	mInputTextures; TODO VDTextureList mTextureList in VBFbo AND VDSession
+		//VDTextureList					mTextureList;
 		// 20200216 unsigned int					mInputTextureIndex;
 		int					mInputTextureIndex;
 		//! Shaders

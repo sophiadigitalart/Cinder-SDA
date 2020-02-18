@@ -17,8 +17,6 @@ VDSession::VDSession(VDSettingsRef aVDSettings)
 	// Animation
 	mVDAnimation = VDAnimation::create(mVDSettings);
 	// TODO: needed? mVDAnimation->tapTempo();
-		// allow log to file
-	mVDLog = VDLog::create();
 	// init fbo format
 	//fmt.setWrap(GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER);
 	//fmt.setBorderColor(Color::black());		
