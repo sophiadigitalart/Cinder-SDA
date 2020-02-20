@@ -101,11 +101,9 @@ namespace videodromm
 		gl::Texture::Format				fmt;
 		gl::Fbo::Format					fboFmt;
 		//! Input textures
-		//map<int, ci::gl::Texture2dRef>mInputTextures;
-		//VDTextureList					mTextureList;
-		// 20200216 unsigned int		mInputTextureIndex;
+		//map<int, ci::gl::Texture2dRef>mInputTextures; TODO VDTextureList mTextureList in VBFbo AND VDSession
+		VDTextureList					mTextureList;
 		int								mInputTextureIndex;
-		gl::TextureRef					mInputTextureRef;
 		//! Shaders
 		//string						mShaderName;
 		unsigned int					mShaderIndex;

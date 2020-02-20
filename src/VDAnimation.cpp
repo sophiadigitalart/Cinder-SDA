@@ -529,9 +529,7 @@ void VDAnimation::createBoolUniform(string aName, int aCtrlIndex, bool aValue) {
 	shaderUniforms[aName].uniformType = 6;
 	shaderUniforms[aName].isValid = true;
 }
-string VDAnimation::getUniformNameForIndex(int aIndex) {
-	return controlIndexes[aIndex];
-}
+
 /*bool VDAnimation::hasFloatChanged(int aIndex) {
 	if (shaderUniforms[getUniformNameForIndex(aIndex)].floatValue != controlValues[aIndex]) {
 	//CI_LOG_V("hasFloatChanged, aIndex:" + toString(aIndex));
