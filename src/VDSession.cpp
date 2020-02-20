@@ -1181,9 +1181,7 @@ unsigned int VDSession::createShaderFbo(string aShaderFilename, unsigned int aFb
 	return rtn;
 }
 void VDSession::setFboInputTexture(unsigned int aFboIndex, unsigned int aInputTextureIndex) {
-	if (aFboIndex > mFboList.size() - 1) aFboIndex = mFboList.size() - 1;
-	if (aInputTextureIndex > mTextureList.size() - 1) aInputTextureIndex = mTextureList.size() - 1;
-	mFboList[aFboIndex]->setInputTexture(mTextureList, aInputTextureIndex);
+	mFboList[math<int>::min(aFboIndex, mFboList.size() - 1)]->setInputTextureRef(mTextureList[aInputTextureIndex]->getTexture());
 }
 unsigned int VDSession::getFboInputTextureIndex(unsigned int aFboIndex) {
 	if (aFboIndex > mFboList.size() - 1) aFboIndex = mFboList.size() - 1;

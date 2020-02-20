@@ -70,8 +70,10 @@ void JsonBag::save(ci::fs::path aJsonFilePath)// const
 
 void JsonBag::removeTarget(void *target)
 {
-	if (!target)
+	if (!target) {
+		CI_LOG_E("Target not found.");
 		return;
+	}
 
 	for (auto it = mItems.cbegin(); it != mItems.cend(); ++it) {
 		if (it->second->getTarget() == target) {
@@ -79,7 +81,7 @@ void JsonBag::removeTarget(void *target)
 			return;
 		}
 	}
-	CI_LOG_E("Target not found.");
+	
 }
 
 JsonBag* live::bag()

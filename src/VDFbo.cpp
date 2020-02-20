@@ -17,7 +17,7 @@ namespace videodromm {
 		mType = UNKNOWN;
 
 		mInputTextureIndex = 0; 
-
+		mInputTextureRef = ci::gl::Texture::create(mVDSettings->mFboWidth, mVDSettings->mFboHeight, ci::gl::Texture::Format().loadTopDown());
 
 		mPosX = mPosY = 0.0f;
 		mZoom = 1.0f;
@@ -122,9 +122,9 @@ namespace videodromm {
 	//std::string VDFbo::getShaderName() {
 	//	return mShaderName;
 	//}
-	void VDFbo::setInputTexture(VDTextureList aTextureList, unsigned int aTextureIndex) {
-		mTextureList = aTextureList;
-		if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
+	void VDFbo::setInputTextureIndex(unsigned int aTextureIndex) {//VDTextureList aTextureList, 
+		//mTextureList = aTextureList;
+		//if (aTextureIndex > mTextureList.size() - 1) aTextureIndex = mTextureList.size() - 1;
 		mInputTextureIndex = aTextureIndex;
 	}
 	/*
@@ -248,9 +248,9 @@ namespace videodromm {
 		gl::ScopedFramebuffer fbScp(mFbo);
 		gl::clear(Color::black());
 
-		if (mInputTextureIndex > mTextureList.size() - 1) mInputTextureIndex = 0;
-		mTextureList[mInputTextureIndex]->getTexture()->bind(0);
-
+		//if (mInputTextureIndex > mTextureList.size() - 1) mInputTextureIndex = 0;
+		//mTextureList[mInputTextureIndex]->getTexture()->bind(0);
+		mInputTextureRef->bind(0);
 		gl::ScopedGlslProg glslScope(mFboTextureShader);
 		// TODO: test gl::ScopedViewport sVp(0, 0, mFbo->getWidth(), mFbo->getHeight());
 
@@ -281,9 +281,9 @@ namespace videodromm {
 				//gl::ScopedFramebuffer fbScp(mThumbFbo);
 				gl::clear(Color::black());
 				//gl::ScopedViewport scpVp(ivec2(0), mThumbFbo->getSize());
-				if (mInputTextureIndex > mTextureList.size() - 1) mInputTextureIndex = 0;
-				mTextureList[mInputTextureIndex]->getTexture()->bind(0);
-				
+				//if (mInputTextureIndex > mTextureList.size() - 1) mInputTextureIndex = 0;
+				//mTextureList[mInputTextureIndex]->getTexture()->bind(0);
+				mInputTextureRef->bind(0);
 				mFboTextureShader->uniform("iBlendmode", mVDSettings->iBlendmode);
 				mFboTextureShader->uniform("iTime", mVDAnimation->getFloatUniformValueByIndex(0));
 				// was vec3(mVDSettings->mFboWidth, mVDSettings->mFboHeight, 1.0)):
