@@ -199,9 +199,11 @@ VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
 		createBoolUniform("iToggle", mVDSettings->ITOGGLE); // 83
 		// invert
 		createBoolUniform("iInvert", mVDSettings->IINVERT); // 86
-		createBoolUniform("iXorY", mVDSettings->IXORY); // 101
-		createBoolUniform("iFlipH", mVDSettings->IFLIPH); // 100
-		createBoolUniform("iFlipV", mVDSettings->IFLIPV); // 103
+		createBoolUniform("iXorY", mVDSettings->IXORY); // 100
+		createBoolUniform("iFlipH", mVDSettings->IFLIPH); // 101
+		createBoolUniform("iFlipV", mVDSettings->IFLIPV); // 102
+		createBoolUniform("iFlipPostH", mVDSettings->IFLIPPOSTH); // 103
+		createBoolUniform("iFlipPostV", mVDSettings->IFLIPPOSTV); // 104
 
 		// vec2
 		createVec2Uniform("resolution", mVDSettings->RESOLUTION, vec2(1280.0f, 720.0f)); // 120
@@ -762,7 +764,10 @@ void VDAnimation::update() {
 		shaderUniforms["iTime"].floatValue = getElapsedSeconds() * mVDSettings->iSpeedMultiplier * mVDSettings->iTimeFactor;
 		shaderUniforms["iElapsed"].floatValue = getElapsedSeconds() * mVDSettings->iSpeedMultiplier * mVDSettings->iTimeFactor;
 	}
-	
+	// iResolution
+	shaderUniforms["iResolution"].vec3Value = vec3(getFloatUniformValueByName("iResolutionX"), getFloatUniformValueByName("iResolutionY"), 1.0);
+	shaderUniforms["resolution"].vec2Value = vec2(getFloatUniformValueByName("iResolutionX"), getFloatUniformValueByName("iResolutionY"));
+
 	// iDate
 	time_t now = time(0);
 	tm *   t = gmtime(&now);

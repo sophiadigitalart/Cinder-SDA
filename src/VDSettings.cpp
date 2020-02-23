@@ -163,13 +163,13 @@ bool VDSettings::save()
 	WebSocketsPort.setAttribute("value", toString(mWebSocketsPort));
 	settings.push_back(WebSocketsPort);
 
-	XmlTree FftSize("FftSize", "");
+	/*XmlTree FftSize("FftSize", "");
 	FftSize.setAttribute("value", toString(mFftSize));
 	settings.push_back(FftSize);
 
 	XmlTree WindowSize("WindowSize", "");
 	WindowSize.setAttribute("value", toString(mWindowSize));
-	settings.push_back(WindowSize);
+	settings.push_back(WindowSize);*/
 
 	XmlTree Info("Info", "");
 	Info.setAttribute("value", toString(mInfo));
@@ -303,14 +303,14 @@ bool VDSettings::restore()
 				XmlTree WebSocketsPort = settings.getChild("WebSocketsPort");
 				mWebSocketsPort = WebSocketsPort.getAttributeValue<int>("value");
 			}
-			if (settings.hasChild("FftSize")) {
+			/*if (settings.hasChild("FftSize")) {
 				XmlTree FftSize = settings.getChild("FftSize");
 				mFftSize = FftSize.getAttributeValue<int>("value");
 			}
 			if (settings.hasChild("WindowSize")) {
 				XmlTree WindowSize = settings.getChild("WindowSize");
 				mWindowSize = WindowSize.getAttributeValue<int>("value");
-			}
+			}*/
 			if (settings.hasChild("Info")) {
 				XmlTree Info = settings.getChild("Info");
 				mInfo = Info.getAttributeValue<string>("value");
@@ -498,8 +498,7 @@ void VDSettings::reset()
 	//audio
 	mIsPlaying = false;
 	iSeed = 0.1;
-	mFftSize = 512;
-	mWindowSize = 1024;
+	//mWindowSize = 1024;
 	liveMeter = 0.0f;
 
 	// shader uniforms

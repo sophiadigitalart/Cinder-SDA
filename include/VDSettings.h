@@ -93,9 +93,11 @@ namespace videodromm {
 		static const int			IVIGN = 82;
 		static const int			ITOGGLE = 83;
 		static const int			IINVERT = 86;
-		static const int			IFLIPH = 100;
-		static const int			IXORY = 101;
-		static const int			IFLIPV = 103;
+		static const int			IXORY = 100;
+		static const int			IFLIPH = 101;
+		static const int			IFLIPV = 102;
+		static const int			IFLIPPOSTH = 103;
+		static const int			IFLIPPOSTV = 104;
 		// global flip
 		bool						mFlipV;
 		bool						mFlipH;
@@ -249,8 +251,8 @@ namespace videodromm {
 		bool						mIsPlaying;
 		bool						mUseAudio;
 		bool						mUseLineIn;
-		int							mFftSize;
-		int							mWindowSize;
+		//int							mFftSize;
+		//int							mWindowSize;
 		float						iSeed;
 
 		// z EyePointZ

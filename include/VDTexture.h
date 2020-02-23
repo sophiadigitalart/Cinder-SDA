@@ -342,6 +342,7 @@ namespace videodromm
 		VDAnimationRef					mVDAnimation;
 		// init
 		bool							mLineInInitialized;
+		bool							mWaveInitialized;
 		//void							initializeLineIn();
 		//audio::Context*					audioContext;
 		// audio

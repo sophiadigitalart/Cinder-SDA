@@ -514,13 +514,13 @@ namespace videodromm {
 			if (fs::exists(fileToLoad)) {
 				// start profiling
 				auto start = Clock::now();
-				
+
 				if (mCachedTextures[fileNameToLoad]) {
 					mSequenceTextures.push_back(mCachedTextures[fileNameToLoad]);
 				}
 				else {
 					// 20190727 TODO CHECK
-					mSequenceTextures.push_back(ci::gl::Texture::create(loadImage(fileToLoad), gl::Texture::Format().loadTopDown())); 
+					mSequenceTextures.push_back(ci::gl::Texture::create(loadImage(fileToLoad), gl::Texture::Format().loadTopDown()));
 					// 20191014
 					mCachedTextures[fileNameToLoad] = ci::gl::Texture::create(loadImage(fileToLoad), gl::Texture::Format().loadTopDown());
 				}
@@ -814,6 +814,7 @@ namespace videodromm {
 		mVDAnimation = aVDAnimation;
 		mType = AUDIO;
 		mLineInInitialized = false;
+		mWaveInitialized = false;
 		mName = "audio";
 
 		auto fmt = gl::Texture2d::Format().swizzleMask(GL_RED, GL_RED, GL_RED, GL_ONE).internalFormat(GL_RED);
@@ -887,8 +888,8 @@ namespace videodromm {
 	ci::gl::Texture2dRef TextureAudio::getTexture() {
 
 		auto fmt = gl::Texture2d::Format().swizzleMask(GL_RED, GL_RED, GL_RED, GL_ONE).internalFormat(GL_RED);
+		auto ctx = audio::Context::master();
 		if (!mLineInInitialized) {
-			auto ctx = audio::Context::master();
 #if (defined( CINDER_MSW ) || defined( CINDER_MAC ))
 			if (mVDAnimation->getUseLineIn()) {
 				// linein
@@ -904,15 +905,19 @@ namespace videodromm {
 				mLineIn->enable();
 				mLineInInitialized = true;
 			}
+		}
 #endif
+		if (!mWaveInitialized) {
 			if (mVDAnimation->getUseAudio()) {
 				// also initialize wave monitor
 				auto scopeWaveFmt = audio::MonitorSpectralNode::Format().fftSize(mVDAnimation->mWindowSize * 2).windowSize(mVDAnimation->mWindowSize);
 				mMonitorWaveSpectralNode = ctx->makeNode(new audio::MonitorSpectralNode(scopeWaveFmt));
 
 				ctx->enable();
+				mWaveInitialized = true;
 			}
 		}
+
 #if (defined( CINDER_MSW ) || defined( CINDER_MAC ))
 		if (mVDAnimation->getUseLineIn()) {
 			mMagSpectrum = mMonitorLineInSpectralNode->getMagSpectrum();
