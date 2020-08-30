@@ -19,7 +19,7 @@ VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
 		iFreqs[i] = 0.0f;
 	}
 	// live json params
-	mJsonFilePath = app::getAssetPath("") / mVDSettings->mAssetsPath / "live_params.json";
+	/*mJsonFilePath = app::getAssetPath("") / mVDSettings->mAssetsPath / "live_params.json";
 	JsonBag::add(&mBackgroundColor, "background_color");
 	JsonBag::add(&mExposure, "exposure", []() {
 		app::console() << "Updated exposure" << endl;
@@ -27,9 +27,9 @@ VDAnimation::VDAnimation(VDSettingsRef aVDSettings) {
 	});
 	JsonBag::add(&mText, "text", []() {
 		app::console() << "Updated text" << endl;
-	});
+	});*/
 	mAutoBeatAnimation = true;
-	JsonBag::add(&mAutoBeatAnimation, "autobeatanimation");
+	//JsonBag::add(&mAutoBeatAnimation, "autobeatanimation");
 	currentScene = 0;
 
 	previousTime = 0.0f;
@@ -611,18 +611,18 @@ int VDAnimation::getUniformType(string aName) {
 void VDAnimation::load() {
 	// Create json file if it doesn't already exist.
 #if defined( CINDER_MSW )
-	if (fs::exists(mJsonFilePath)) {
+	/*if (fs::exists(mJsonFilePath)) {
 		bag()->load(mJsonFilePath);
 	}
 	else {
 		bag()->save(mJsonFilePath);
 		bag()->load(mJsonFilePath);
-	}
+	}*/
 #endif
 }
 void VDAnimation::save() {
 #if defined( CINDER_MSW )
-	bag()->save(mJsonFilePath);
+	//bag()->save(mJsonFilePath);
 	saveAnimation();
 	saveUniforms();
 #endif

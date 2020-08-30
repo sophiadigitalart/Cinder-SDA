@@ -7,14 +7,13 @@
 #include "cinder/Timeline.h"
 
 #include "Resources.h"
-// Logger
-#include "VDLog.h"
+
 // Settings
 #include "VDSettings.h"
 // Animation
 #include "VDAnimation.h"
 // Watchdog
-#include "Watchdog.h"
+//#include "Watchdog.h"
 // std regex
 #include <regex>
 

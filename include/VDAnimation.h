@@ -8,12 +8,12 @@
 // Settings
 #include "VDSettings.h"
 // Live json params
-#include "LiveParam.h"
+//#include "LiveParam.h"
 
 using namespace ci;
 using namespace ci::app;
 using namespace std;
-using namespace live;
+//using namespace live;
 
 namespace videodromm
 {
@@ -261,11 +261,13 @@ namespace videodromm
 		map<int, int>					freqIndexes;
 		bool							mAudioBuffered;
 		// Live json params
-		fs::path						mJsonFilePath;
-		Parameter<Color>				mBackgroundColor;
-		Parameter<float>				mExposure;
-		Parameter<string>				mText;
-		Parameter<bool>					mAutoBeatAnimation;
+		//fs::path						mJsonFilePath;
+		//Parameter <
+		Color							mBackgroundColor;
+		float							mExposure;
+		string							mText;
+		bool							mAutoBeatAnimation;
+		////Parameter >
 		// shaders
 		map<int, string>				controlIndexes;
 		map<string, VDUniform>			shaderUniforms;

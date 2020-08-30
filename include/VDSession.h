@@ -3,6 +3,7 @@
 #include "cinder/app/App.h"
 #include "cinder/gl/gl.h"
 #include "cinder/gl/GlslProg.h"
+
 // json
 #include "cinder/Json.h"
 
@@ -18,8 +19,6 @@
 #include "VDAnimation.h"
 // Fbos
 #include "VDFbo.h"
-// Logger
-#include "VDLog.h"
 
 using namespace ci;
 using namespace ci::app;
@@ -357,8 +356,6 @@ namespace videodromm {
 		VDWebsocketRef					mVDWebsocket;
 		// Animation
 		VDAnimationRef					mVDAnimation;
-		// Log
-		VDLogRef						mVDLog;
 
 		const string					sessionFileName = "session.json";
 		fs::path						sessionPath;

@@ -10,8 +10,7 @@ VDSession::VDSession(VDSettingsRef aVDSettings)
 {
 	CI_LOG_V("VDSession ctor");
 	mVDSettings = aVDSettings;
-	// allow log to file
-	mVDLog = VDLog::create();
+
 	// Utils
 	mVDUtils = VDUtils::create(mVDSettings);
 	// Animation

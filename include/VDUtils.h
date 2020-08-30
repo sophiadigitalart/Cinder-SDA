@@ -6,8 +6,7 @@
 
 // parameters
 #include "VDSettings.h"
-// logger
-#include "VDLog.h"
+
 
 using namespace ci;
 using namespace ci::app;
