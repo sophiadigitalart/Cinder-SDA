@@ -576,7 +576,7 @@ namespace videodromm {
 		if (mSequenceTextures.size() > 0) {
 			// Call on each frame to update the playhead
 			if (mPlaying) {
-				//mSpeed = mVDAnimation->getFloatUniformValueByName("speed");
+				//mSpeed = mVDAnimation->getUniformValueByName("speed");
 				playheadFrameInc += mSpeed;
 				newPosition = mPosition + (int)playheadFrameInc;
 				if (playheadFrameInc > 1.0f) playheadFrameInc = 0.0f;
@@ -588,7 +588,7 @@ namespace videodromm {
 					//newPosition = (int)(((int)(mVDAnimation->iBar / mVDAnimation->iPhaseIndex)) % mSequenceTextures.size());
 					// TODO newPosition = (int)(((int)(mVDSettings->iPhase / mVDAnimation->iPhaseIndex)) % mSequenceTextures.size());
 					//newPosition = (int)(mVDAnimation->getIntUniformValueByName("iPhase") % mSequenceTextures.size());
-					// TODO CHECK 20190803 newPosition = (int)(mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IBEAT) % mSequenceTextures.size());
+					// TODO CHECK 20190803 newPosition = (int)(mVDAnimation->getUniformValue(mVDSettings->IBEAT) % mSequenceTextures.size());
 				}
 				else {
 					newPosition = mPosition;
@@ -950,7 +950,7 @@ namespace videodromm {
 				for (size_t i = 0; i < mDataSize; i++) {
 					float f = mMagSpectrum[i];
 					db = audio::linearToDecibel(f);
-					f = db * mVDAnimation->getFloatUniformValueByName("iAudioMult");
+					f = db * mVDAnimation->getUniformValueByName("iAudioMult");
 					if (f > mVDAnimation->maxVolume)
 					{
 						mVDAnimation->maxVolume = f;

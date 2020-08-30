@@ -320,13 +320,13 @@ bool VDShader::setFragmentString(string aFragmentShaderString, string aName) {
 			CI_LOG_V(aName + ", uniform name:" + uniformName);
 			// if uniform is handled
 			if (mVDAnimation->isExistingUniform(uniformName)) {
-				int uniformType = mVDAnimation->getUniformType(uniformName);
+				int uniformType = mVDAnimation->getUniformTypeByName(uniformName);
 				switch (uniformType)
 				{
 				case 0:
 					// float
-					mShader->uniform(uniformName, mVDAnimation->getFloatUniformValueByName(uniformName));
-					mCurrentUniformsString += "uniform float " + uniformName + "; // " + toString(mVDAnimation->getFloatUniformValueByName(uniformName)) + "\n";
+					mShader->uniform(uniformName, mVDAnimation->getUniformValueByName(uniformName));
+					mCurrentUniformsString += "uniform float " + uniformName + "; // " + toString(mVDAnimation->getUniformValueByName(uniformName)) + "\n";
 					if (uniformName != "iTime") {
 						mISFUniforms += ",\n"
 							"		{\n"
@@ -334,7 +334,7 @@ bool VDShader::setFragmentString(string aFragmentShaderString, string aName) {
 							"			\"TYPE\" : \"float\", \n"
 							"			\"MIN\" : " + toString(mVDAnimation->getMinUniformValueByName(uniformName)) + ",\n"
 							"			\"MAX\" : " + toString(mVDAnimation->getMaxUniformValueByName(uniformName)) + ",\n"
-							"			\"DEFAULT\" : " + toString(mVDAnimation->getFloatUniformValueByName(uniformName)) + "\n"
+							"			\"DEFAULT\" : " + toString(mVDAnimation->getUniformValueByName(uniformName)) + "\n"
 							"		}\n";
 					}
 					break;
@@ -475,7 +475,7 @@ bool VDShader::setFragmentString(string aFragmentShaderString, string aName) {
 		mError = aName + string(e.what());
 		CI_LOG_V("setFragmentString, error on live fragment shader:" + mError + " frag:" + aFragmentShaderString);
 	}
-	mVDSettings->mNewMsg = true;
+	
 	mVDSettings->mMsg = mError;
 	return mValid;
 }

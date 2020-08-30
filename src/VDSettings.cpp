@@ -163,13 +163,13 @@ bool VDSettings::save()
 	WebSocketsPort.setAttribute("value", toString(mWebSocketsPort));
 	settings.push_back(WebSocketsPort);
 
-	/*XmlTree FftSize("FftSize", "");
-	FftSize.setAttribute("value", toString(mFftSize));
-	settings.push_back(FftSize);
+	XmlTree WebSocketsRoom("WebSocketsRoom", "");
+	WebSocketsRoom.setAttribute("value", mWebSocketsRoom);
+	settings.push_back(WebSocketsRoom);
 
-	XmlTree WindowSize("WindowSize", "");
-	WindowSize.setAttribute("value", toString(mWindowSize));
-	settings.push_back(WindowSize);*/
+	XmlTree WebSocketsNickname("WebSocketsNickname", "");
+	WebSocketsNickname.setAttribute("value", mWebSocketsNickname);
+	settings.push_back(WebSocketsNickname);
 
 	XmlTree Info("Info", "");
 	Info.setAttribute("value", toString(mInfo));
@@ -303,14 +303,15 @@ bool VDSettings::restore()
 				XmlTree WebSocketsPort = settings.getChild("WebSocketsPort");
 				mWebSocketsPort = WebSocketsPort.getAttributeValue<int>("value");
 			}
-			/*if (settings.hasChild("FftSize")) {
-				XmlTree FftSize = settings.getChild("FftSize");
-				mFftSize = FftSize.getAttributeValue<int>("value");
+			if (settings.hasChild("WebSocketsRoom")) {
+				XmlTree WebSocketsRoom = settings.getChild("WebSocketsRoom");
+				mWebSocketsRoom = WebSocketsRoom.getAttributeValue<string>("value");
 			}
-			if (settings.hasChild("WindowSize")) {
-				XmlTree WindowSize = settings.getChild("WindowSize");
-				mWindowSize = WindowSize.getAttributeValue<int>("value");
-			}*/
+			if (settings.hasChild("WebSocketsNickname")) {
+				XmlTree WebSocketsNickname = settings.getChild("WebSocketsNickname");
+				mWebSocketsNickname = WebSocketsNickname.getAttributeValue<string>("value");
+			}
+
 			if (settings.hasChild("Info")) {
 				XmlTree Info = settings.getChild("Info");
 				mInfo = Info.getAttributeValue<string>("value");
@@ -406,13 +407,9 @@ void VDSettings::resetSomeParams() {
 	maxEyePointZ = 0.0;
 	tEyePointZ = autoEyePointZ = false;
 	// unicorns
-	//iBadTv = 0.0f;
 	iAlpha = 1.0f;
 	iSpeedMultiplier = 1.0f;// = 0.0985f;// nearly ok for 160 = 0.0985f;
-	iTimeFactor = 1.0f;
-
-	iGreyScale = false;
-	iFade = mSendToOutput = iRepeat = iXorY = mFlipV = mFlipH = false;
+	iFade = mSendToOutput = iRepeat = false;
 
 	// transition
 	iTransition = 0;
@@ -420,12 +417,9 @@ void VDSettings::resetSomeParams() {
 	mTransitionDuration = 2.0f;
 	mTransitionTime = 1.0f;
 
-	//iZoomLeft = iZoomRight = 1.0f;
 	autoInvert = false;
 	// imgui
 	uiMargin = 3;
-	uiElementWidth = mPreviewFboWidth + uiMargin;
-	uiElementHeight = mPreviewFboHeight * 2.3;
 	// mPreviewFboWidth 80 mPreviewFboHeight 60 margin 10 inBetween 15 mPreviewWidth = 160;mPreviewHeight = 120;
 	uiPreviewH = mPreviewHeight + uiMargin;
 	uiLargeW = (mPreviewFboWidth + uiMargin) * 3;
@@ -434,7 +428,7 @@ void VDSettings::resetSomeParams() {
 	uiLargePreviewH = mPreviewHeight * 2.8;
 
 	uiXPosCol1 = uiLargeW + uiMargin * 2;
-	uiXPosCol2 = uiXPosCol1 + uiMargin + uiElementWidth;
+	uiXPosCol2 = uiXPosCol1 + uiMargin * 2 + mPreviewFboWidth;
 	uiXPosCol3 = uiXPosCol2 + uiMargin;
 	//uiYPos;
 	uiYPosRow1 = 18;
@@ -472,8 +466,6 @@ void VDSettings::reset()
 	mRenderXY = mTexMult = vec2(1.0f);
 	mLeftRenderXY = mRightRenderXY = mPreviewRenderXY = mWarp1RenderXY = mWarp2RenderXY = vec2(0.0f);
 	mRenderPosXY = vec2(0.0, 320.0);
-	//mRenderResoXY = vec2(mRenderWidth, mRenderHeight);
-	//mRenderResolution = ivec2(mRenderWidth, mRenderHeight);
 	mPreviewFragXY = vec2(0.0, 0.0);
 	mAspectRatio = 0.5625; // ratio 4:3 (0.75) 16:9 (0.5625)
 	mFboWidth = 1280;
@@ -487,10 +479,6 @@ void VDSettings::reset()
 	mRenderCodeEditorXY.y = 0;
 	mCodeEditorWidth = 800;
 	mCodeEditorHeight = 600;
-
-	//mWindowToCreate = NONE;
-
-	//mMode = mPreviousMode = mNewMode = 0; // Mix mode by default
 	mCurrentFilePath = "currentMix.frag";
 	mAssetsPath = "";
 	mMarginSmall = 2;
@@ -498,23 +486,17 @@ void VDSettings::reset()
 	//audio
 	mIsPlaying = false;
 	iSeed = 0.1;
-	//mWindowSize = 1024;
-	liveMeter = 0.0f;
+	//liveMeter = 0.0f;
 
 	// shader uniforms
 	for (int i = 0; i < 4; i++)
 	{
 		iChannelTime[i] = i;
 	}
-#ifdef _DEBUG
-	iDebug = true;
-#else
-	iDebug = false;
-#endif  // _DEBUG
+
 	sFps = "60";
 	iShowFps = true;
 
-	//multFactor = 126.0;
 	currentSelectedIndex = 0;
 	selectedWarp = 0;
 
@@ -526,26 +508,7 @@ void VDSettings::reset()
 	selectedChannel = 0;
 	// fbo indexes for warp (should be constants)
 	mFboResolution = 2048;
-	/*mMixFboIndex = 0;
-	mLeftFboIndex = 1;
-	mRightFboIndex = 2;
-	mWarp1FboIndex = 3;
-	mWarp2FboIndex = 4;
-	mCurrentPreviewFboIndex = 5;
-	mABPFboIndex = 6;
-	mLiveFboIndex = 7;
-	mSphereFboIndex = 8;
-	mMeshFboIndex = 9;
-	mAudioFboIndex = 10;
-	mVertexSphereFboIndex = 11;
-
-	mPreviewFragIndex = 0;
-	mPreviousFragIndex = 1;
-	mLeftFragIndex = 0;
-	mRightFragIndex = 1;
-	mWarp1FragIndex = 2;
-	mWarp2FragIndex = 3;
-	mLiveFragIndex = 7;*/
+	
 	mWarpCount = 3;
 	FPSColor = ColorA(0.0f, 1.0f, 0.0f, 1.0f);
 	ColorGreen = ColorA(0.0f, 1.0f, 0.0f, 1.0f);
@@ -554,16 +517,8 @@ void VDSettings::reset()
 	ColorPurple = ColorA(0.5f, 0.0f, 1.0f, 1.0f);
 	isUIDirty = true;
 	mLiveCode = false;
-
 	mStateTransition = 1.0;
-
 	mOptimizeUI = false;
-	// spout
-	//mOutputResolution = vec2(640, 480);
-	// meshes
-	mMeshIndex = 0;
-	// vertex sphere
-	mVertexSphereTextureIndex = 1;
 
 	// initialize our camera
 	mCamEyePointXY = vec2(0.f, 0.f);
@@ -584,13 +539,12 @@ void VDSettings::reset()
 	mOSCDestinationPort2 = 7002;
 	mOSCReceiverPort = 7000;
 	mOSCMsg = "";
-	mOSCNewMsg = false;
 	mMsg = "";
+	mErrorMsg = "";
 	mWebSocketsMsg = "";
-	mNewMsg = false;
-	mWebSocketsNewMsg = false;
 	mMidiMsg = "";
-	InfoMsg = "";
+	mShaderMsg = "";
+	mFboMsg = "";
 	mIsOSCSender = false;
 	/*xFade = 1.0f;
 	xFadeChanged = false;*/
@@ -601,10 +555,11 @@ void VDSettings::reset()
 	mWebSocketsProtocol = "ws://";
 	mWebSocketsHost = "127.0.0.1";
 	mWebSocketsPort = 8088;
+	mWebSocketsRoom = "roomtest"; 
+	mWebSocketsNickname = "bruce";
 	// Blendmode 
 	iBlendmode = 0;
-	// abp
-	mBend = 1.0f;
+	
 	mDefaultVextexShaderString = "#version 150\n"
 		"uniform mat4 ciModelViewProjection;\n"
 		"in vec4 ciPosition;\n"
@@ -646,13 +601,15 @@ void VDSettings::reset()
 		"fragColor = vec4(t0 + t1 + t2 + t3 + t4 + t5 + t6 + t7 + t8 + t9, 1.0);\n"
 		"}\n";
 	mHydraFragmentShaderString = "precision mediump float;\n"
-		"uniform float time;\n"
-		"uniform vec2 resolution;\n"
+		"uniform vec3      	iResolution;\n"
+		"uniform float TIME;\n"
 		"varying vec2 uv;\n"
-		"void main () {\n"
-		"vec2 st = gl_FragCoord.xy/resolution.xy;\n"
-		"gl_FragColor = vec4(st.x,st.y,sin(time), 1.0);\n"
+		"void main() {\n"
+		"vec2 st = gl_FragCoord.xy/iResolution.xy;\n"
+		"gl_FragColor = vec4(st.x,st.y,sin(TIME), 1.0);\n"
 		"}\n";
+	// TODO 20200830 "vec2 st = gl_FragCoord.xy/RENDERSIZE.xy;\n"
+		// TODO 20200830 "gl_FragColor = vec4(st.x,st.y,sin(TIME), 1.0);\n"
 	mMixetteFragmentShaderString = "uniform vec3      	iResolution;\n"
 		"uniform sampler2D 	iChannel0;\n"
 		"uniform sampler2D 	iChannel1;\n"
@@ -679,7 +636,7 @@ void VDSettings::reset()
 		"}";
 	//mPostFragmentShaderString;uv.y = 1.0 - uv.y;
 	mPostFragmentShaderString = "uniform vec3 iResolution;\n"
-		"uniform float iTime;\n"
+		"uniform float TIME;\n"
 		"uniform sampler2D 	iChannel0;\n"
 		"uniform sampler2D 	iChannel1;\n"
 		"uniform float		iExposure;\n"
@@ -720,7 +677,7 @@ void VDSettings::reset()
 		"uniform sampler2D iChannel0;\n"
 		"uniform sampler2D iChannel1;\n"
 		"uniform vec4      iMouse;\n"
-		"uniform float     iTime;\n"
+		"uniform float     TIME;\n"
 		"uniform vec3      iBackgroundColor;\n"
 		"uniform vec3      iColor;\n"
 		"uniform int       iSteps;\n"
@@ -751,8 +708,8 @@ void VDSettings::reset()
 		"uniform float     iRedMultiplier;\n"
 		"uniform float     iGreenMultiplier;\n"
 		"uniform float     iBlueMultiplier;\n"
-		"uniform float     pixelX; // slitscan (or other) \n"
-		"uniform float     pixelY;\n"
+		"uniform float     iPixelX; // slitscan (or other) \n"
+		"uniform float     iPixelY;\n"
 		"uniform float     iBadTv; // badtv if > 0.01\n"
 		"uniform float     iContour; // contour size if > 0.01\n"
 		"uniform bool	   iFlipH;\n"
@@ -1199,7 +1156,7 @@ void VDSettings::reset()
 		"{\n"
 		"	uv.y = 1.0 - uv.y;\n"
 		"}\n"
-		"// zoom centered\n"
+		"// zoom centered might invert flipH and V!\n"
 		"float xZ = (uv.x - 0.5)*iZoom*2.0;\n"
 		"float yZ = (uv.y - 0.5)*iZoom*2.0;\n"
 		"vec2 cZ = vec2(xZ, yZ);\n"
@@ -1213,13 +1170,13 @@ void VDSettings::reset()
 		"	float y2 = y;\n"
 		"	if (iXorY)\n"
 		"	{\n"
-		"		float z1 = floor((x / pixelX) + 0.5);     //((x/20.0) + 0.5)\n"
-		"		x2 = x + (sin(z1 + (iTime * 2.0)) * iRatio);\n"
+		"		float z1 = floor((x / iPixelX) + 0.5);     //((x/20.0) + 0.5)\n"
+		"		x2 = x + (sin(z1 + (TIME * 2.0)) * iRatio);\n"
 		"	}\n"
 		"	else\n"
 		"	{\n"
-		"		float z2 = floor((y / pixelY) + 0.5);     //((x/20.0) + 0.5)\n"
-		"		y2 = y + (sin(z2 + (iTime * 2.0)) * iRatio);\n"
+		"		float z2 = floor((y / iPixelY) + 0.5);     //((x/20.0) + 0.5)\n"
+		"		y2 = y + (sin(z2 + (TIME * 2.0)) * iRatio);\n"
 		"	}\n"
 		"\n"
 		"	vec2 uv2 = vec2(x2 / iResolution.x, y2 / iResolution.y);\n"
@@ -1268,17 +1225,17 @@ void VDSettings::reset()
 		"	float c = 1.;\n"
 		"	if (iXorY)\n"
 		"	{\n"
-		"		c += iBadTv * sin(iTime * 2. + uv.y * 100. * pixelX);\n"
-		"		c += iBadTv * sin(iTime * 1. + uv.y * 80.);\n"
-		"		c += iBadTv * sin(iTime * 5. + uv.y * 900. * pixelY);\n"
-		"		c += 1. * cos(iTime + uv.x);\n"
+		"		c += iBadTv * sin(TIME * 2. + uv.y * 100. * iPixelX);\n"
+		"		c += iBadTv * sin(TIME * 1. + uv.y * 80.);\n"
+		"		c += iBadTv * sin(TIME * 5. + uv.y * 900. * iPixelY);\n"
+		"		c += 1. * cos(TIME + uv.x);\n"
 		"	}\n"
 		"	else\n"
 		"	{\n"
-		"		c += iBadTv * sin(iTime * 2. + uv.x * 100. * pixelX);\n"
-		"		c += iBadTv * sin(iTime * 1. + uv.x * 80.);\n"
-		"		c += iBadTv * sin(iTime * 5. + uv.x * 900. * pixelY);\n"
-		"		c += 1. * cos(iTime + uv.y);\n"
+		"		c += iBadTv * sin(TIME * 2. + uv.x * 100. * iPixelX);\n"
+		"		c += iBadTv * sin(TIME * 1. + uv.x * 80.);\n"
+		"		c += iBadTv * sin(TIME * 5. + uv.x * 900. * iPixelY);\n"
+		"		c += 1. * cos(TIME + uv.y);\n"
 		"	}\n"
 
 		"	//vignetting\n"
@@ -1286,7 +1243,7 @@ void VDSettings::reset()
 		"	c *= sin(uv.y*3.);\n"
 		"	c *= .9;\n"
 
-		"	uv += iTime;\n"
+		"	uv += TIME;\n"
 
 		"	float r = BadTVResoRand(uv.x, uv.y);\n"
 		"	float g = BadTVResoRand(uv.x * 9., uv.y * 9.);\n"

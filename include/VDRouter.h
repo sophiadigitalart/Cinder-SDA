@@ -56,6 +56,7 @@ namespace videodromm
 		void						updateParams(int iarg0, float farg1);
 		// MIDI
 		void						midiSetup();
+		void						saveMidiPorts();
 		int							getMidiInPortsCount() { return mMidiInputs.size(); };
 		string						getMidiInPortName(unsigned int i) { return (i < mMidiInputs.size()) ? mMidiInputs[i].portName : "No midi in ports"; };
 		bool						isMidiInConnected(unsigned int i) { return (i < mMidiInputs.size()) ? mMidiInputs[i].isConnected : false; };

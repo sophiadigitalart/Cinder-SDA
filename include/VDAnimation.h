@@ -7,13 +7,12 @@
 #include "cinder/Json.h"
 // Settings
 #include "VDSettings.h"
-// Live json params
-//#include "LiveParam.h"
+//!  Uniforms
+#include "VDUniform.h"
 
 using namespace ci;
 using namespace ci::app;
 using namespace std;
-//using namespace live;
 
 namespace videodromm
 {
@@ -21,7 +20,7 @@ namespace videodromm
 	typedef std::shared_ptr<class VDAnimation> VDAnimationRef;
 
 	//enum class UniformTypes { FLOAT, SAMPLER2D, VEC2, VEC3, VEC4, INT, BOOL };
-
+	/*
 	struct VDUniform
 	{
 		int								uniformType;
@@ -42,8 +41,8 @@ namespace videodromm
 		bool							autotreble;
 		int								textureIndex;
 		bool							isValid;
-	};
-
+	};*/
+	
 	class VDAnimation {
 	public:
 		VDAnimation(VDSettingsRef aVDSettings);
@@ -53,7 +52,6 @@ namespace videodromm
 			return shared_ptr<VDAnimation>(new VDAnimation(aVDSettings));
 		}
 		void							update();
-		void							load();
 		void							save();
 		string							getAssetsPath() {
 			return mVDSettings->mAssetsPath;
@@ -73,16 +71,16 @@ namespace videodromm
 		bool							getUseTimeWithTempo() { return mUseTimeWithTempo; };
 		float							iTempoTimeBeatPerBar;
 		float							getBpm() {
-			return getFloatUniformValueByIndex(mVDSettings->IBPM);
+			return getUniformValue(mVDSettings->IBPM);
 		};
-		void							setBpm(float aBpm) {
+		/*void							setBpm(float aBpm) {
 			//CI_LOG_W("setBpm " + toString(aBpm));
 
 			if (aBpm > 0.0f) {
-				setFloatUniformValueByIndex(mVDSettings->IBPM, aBpm);
-				setFloatUniformValueByIndex(mVDSettings->IDELTATIME, 60 / aBpm);
+				setUniformValue(mVDSettings->IBPM, aBpm);
+				setUniformValue(mVDSettings->IDELTATIME, 60 / aBpm);
 			}
-		};
+		};*/
 		void							tapTempo();
 		void							setTimeFactor(const int &aTimeFactor);
 		int								getEndFrame() { return mEndFrame; };
@@ -116,7 +114,29 @@ namespace videodromm
 		void							toggleAudioBuffered() { mAudioBuffered = !mAudioBuffered; };
 
 		// shaders
-		bool							isExistingUniform(string aName);
+		bool							toggleValue(unsigned int aIndex) {
+			return mVDUniform->toggleValue(aIndex);
+		};
+		bool							toggleAuto(unsigned int aIndex) {
+			return mVDUniform->toggleAuto(aIndex);
+		};
+		bool							toggleTempo(unsigned int aIndex) {
+			return mVDUniform->toggleTempo(aIndex);
+		};
+		bool							toggleBass(unsigned int aIndex) {
+			return mVDUniform->toggleBass(aIndex);
+		};
+		bool							toggleMid(unsigned int aIndex) {
+			return mVDUniform->toggleMid(aIndex);
+		};
+		bool							toggleTreble(unsigned int aIndex) {
+			return mVDUniform->toggleTreble(aIndex);
+		};
+		void							resetAutoAnimation(unsigned int aIndex) {
+			mVDUniform->resetAutoAnimation(aIndex);
+		}
+		
+		/*bool							isExistingUniform(string aName);
 		int								getUniformType(string aName);
 		string							getUniformNameForIndex(int aIndex) {
 			return controlIndexes[aIndex];
@@ -124,120 +144,137 @@ namespace videodromm
 		int								getUniformIndexForName(string aName) {
 			return shaderUniforms[aName].index;
 		};
-		bool							toggleAuto(unsigned int aIndex);
-		bool							toggleValue(unsigned int aIndex);
-		bool							toggleTempo(unsigned int aIndex);
-		bool							toggleBass(unsigned int aIndex);
-		bool							toggleMid(unsigned int aIndex);
-		bool							toggleTreble(unsigned int aIndex);
-		void							resetAutoAnimation(unsigned int aIndex);
-		bool							setFloatUniformValueByIndex(unsigned int aIndex, float aValue);
 
-		bool							setBoolUniformValueByIndex(unsigned int aIndex, bool aValue) {
+		bool							setUniformValue(unsigned int aIndex, float aValue);
+*/
+		/*bool							setBoolUniformValueByIndex(unsigned int aIndex, bool aValue) {
 			shaderUniforms[getUniformNameForIndex(aIndex)].boolValue = aValue;
 			return aValue;
 		}
-		void							setIntUniformValueByName(string aName, int aValue) {
+		void							setUniformValueByName(string aName, int aValue) {
 			shaderUniforms[aName].intValue = aValue;
 		};
-		void							setIntUniformValueByIndex(unsigned int aIndex, int aValue) {
+		void							setUniformValue(unsigned int aIndex, int aValue) {
 			if (mVDSettings->IBEAT == aIndex) {
 				if (aValue != mLastBeat) {
 					mLastBeat = aValue;
-					if (aValue == 0) setIntUniformValueByIndex(mVDSettings->IBAR, getIntUniformValueByIndex(mVDSettings->IBAR) + 1);
+					if (aValue == 0) setUniformValue(mVDSettings->IBAR, getIntUniformValueByIndex(mVDSettings->IBAR) + 1);
 				}
 			}
 			shaderUniforms[getUniformNameForIndex(aIndex)].intValue = aValue;
+		}*/
+		// shaders
+		int								getUniformTypeByName(const std::string& aName) {
+			return mVDUniform->getUniformTypeByName(aName);
 		}
-		void							setFloatUniformValueByName(string aName, float aValue) {
-			shaderUniforms[aName].floatValue = aValue;
+		bool							isExistingUniform(const std::string& aName) { return true; }; // TODO
+
+		/*
+		string							getUniformNameForIndex(int aIndex) {
+			return shaderUniforms[aIndex].name; //controlIndexes[aIndex];
+		};*/
+		int								getUniformIndexForName(const std::string& aName) {
+			return mVDUniform->getUniformIndexForName(aName);
+			//return shaderUniforms[stringToIndex(aName)].index;
+		};
+
+
+		void							setAnim(unsigned int aCtrl, unsigned int aAnim) {
+			mVDUniform->setAnim(aCtrl, aAnim);
 		}
-		void setVec2UniformValueByName(string aName, vec2 aValue) {
-			shaderUniforms[aName].vec2Value = aValue;
+		bool							setUniformValue(unsigned int aIndex, float aValue) {
+			if (aIndex == mVDSettings->IBPM) {
+				if (aValue > 0.0f) {
+					mVDUniform->setUniformValue(mVDSettings->IDELTATIME, 60 / aValue);
+				}
+			}
+			return mVDUniform->setUniformValue(aIndex, aValue);
+		}
+
+		bool							setBoolUniformValueByIndex(unsigned int aIndex, bool aValue) {
+			return mVDUniform->setBoolUniformValueByIndex(aIndex, aValue);
+		}
+		/*void							setUniformValueByName(const std::string& aName, int aValue) {
+			mVDUniform->setUniformValueByName(aName, aValue);
+		};
+		void							setUniformValue(unsigned int aIndex, int aValue) {
+			mVDUniform->setUniformValue(aIndex, aValue);
+		}*/
+		void							setFloatUniformValueByName(const std::string& aName, float aValue) {
+			mVDUniform->setFloatUniformValueByName(aName, aValue);
+		}
+		void setVec2UniformValueByName(const std::string& aName, vec2 aValue) {
+			mVDUniform->setVec2UniformValueByName(aName, aValue);
 		}
 		void setVec2UniformValueByIndex(unsigned int aIndex, vec2 aValue) {
-			shaderUniforms[getUniformNameForIndex(aIndex)].vec2Value = aValue;
+			mVDUniform->setVec2UniformValueByIndex(aIndex, aValue);
 		}
-		void setVec3UniformValueByName(string aName, vec3 aValue) {
-			shaderUniforms[aName].vec3Value = aValue;
+		void setVec3UniformValueByName(const std::string& aName, vec3 aValue) {
+			mVDUniform->setVec3UniformValueByName(aName, aValue);
 		}
 		void setVec3UniformValueByIndex(unsigned int aIndex, vec3 aValue) {
-			shaderUniforms[getUniformNameForIndex(aIndex)].vec3Value = aValue;
+			mVDUniform->setVec3UniformValueByIndex(aIndex, aValue);
 		}
-		void setVec4UniformValueByName(string aName, vec4 aValue) {
-			shaderUniforms[aName].vec4Value = aValue;
+		void setVec4UniformValueByName(const std::string& aName, vec4 aValue) {
+			mVDUniform->setVec4UniformValueByName(aName, aValue);
 		}
 		void setVec4UniformValueByIndex(unsigned int aIndex, vec4 aValue) {
-			shaderUniforms[getUniformNameForIndex(aIndex)].vec4Value = aValue;
+			mVDUniform->setVec4UniformValueByIndex(aIndex, aValue);
 		}
 		bool							getBoolUniformValueByIndex(unsigned int aIndex) {
-			return shaderUniforms[getUniformNameForIndex(aIndex)].boolValue;
+			return mVDUniform->getBoolUniformValueByIndex(aIndex);
 		}
-		float							getMinUniformValueByIndex(unsigned int aIndex) {
-			return shaderUniforms[getUniformNameForIndex(aIndex)].minValue;
+		float							getMinUniformValue(unsigned int aIndex) {
+			return mVDUniform->getMinUniformValue(aIndex);
 		}
-		float							getMaxUniformValueByIndex(unsigned int aIndex) {
-			return shaderUniforms[getUniformNameForIndex(aIndex)].maxValue;
+		float							getMaxUniformValue(unsigned int aIndex) {
+			return mVDUniform->getMaxUniformValue(aIndex);
 		}
-		float							getMinUniformValueByName(string aName) {
-			return shaderUniforms[aName].minValue;
+		float							getMinUniformValueByName(const std::string& aName) {
+			return mVDUniform->getMinUniformValueByName(aName);
 		}
-		float							getMaxUniformValueByName(string aName) {
-			return shaderUniforms[aName].maxValue;
+		float							getMaxUniformValueByName(const std::string& aName) {
+			return mVDUniform->getMaxUniformValueByName(aName);
 		}
-
-
-		bool							getBoolUniformValueByName(string aName) {
-			return shaderUniforms[aName].boolValue;
+		bool							getBoolUniformValueByName(const std::string& aName) {
+			return mVDUniform->getBoolUniformValueByName(aName);
 		}
-		vec2							getVec2UniformValueByIndex(unsigned int aIndex) {
-			return shaderUniforms[getUniformNameForIndex(aIndex)].vec2Value;
-		};
-		vec3							getVec3UniformValueByIndex(unsigned int aIndex) {
-			return shaderUniforms[getUniformNameForIndex(aIndex)].vec3Value;
-		};
-		vec4							getVec4UniformValueByIndex(unsigned int aIndex) {
-			return shaderUniforms[getUniformNameForIndex(aIndex)].vec4Value;
-		};
-		float							getFloatUniformValueByIndex(unsigned int aIndex) {
-			return shaderUniforms[getUniformNameForIndex(aIndex)].floatValue;
+		float							getUniformValue(unsigned int aIndex) {
+			return mVDUniform->getUniformValue(aIndex);
+		}
+		std::string						getUniformName(unsigned int aIndex) {
+			return mVDUniform->getUniformName(aIndex);
+		}
+		int								getUniformAnim(unsigned int aIndex) {
+			return mVDUniform->getUniformAnim(aIndex);
 		}
 		float							getFloatUniformDefaultValueByIndex(unsigned int aIndex) {
-			return shaderUniforms[getUniformNameForIndex(aIndex)].defaultValue;
+			return mVDUniform->getFloatUniformDefaultValueByIndex(aIndex);
 		}
 		int								getIntUniformValueByIndex(unsigned int aIndex) {
-			return shaderUniforms[getUniformNameForIndex(aIndex)].intValue;
+			return mVDUniform->getIntUniformValueByIndex(aIndex);
 		}
-		int								getSampler2DUniformValueByName(string aName) {
-			return shaderUniforms[aName].textureIndex;
+		int								getSampler2DUniformValueByName(const std::string& aName) {
+			return mVDUniform->getSampler2DUniformValueByName(aName);
 		}
-		float							getFloatUniformValueByName(string aName) {
-			if (aName.length() > 0) {
-				return shaderUniforms[aName].floatValue;
-			}
-			else {
-				CI_LOG_V("getFloatUniformValueByName name empty");
-				return 1.0f;
-			}
+		float							getUniformValueByName(const std::string& aName) {
+			return mVDUniform->getUniformValueByName(aName);
 		}
-		vec2							getVec2UniformValueByName(string aName) {
-			return shaderUniforms[aName].vec2Value;
+
+		vec2							getVec2UniformValueByName(const std::string& aName) {
+			return mVDUniform->getVec2UniformValueByName(aName);
 		}
-		vec3							getVec3UniformValueByName(string aName) {
-			return shaderUniforms[aName].vec3Value;
+		vec3							getVec3UniformValueByName(const std::string& aName) {
+			return mVDUniform->getVec3UniformValueByName(aName);
 		}
-		vec4							getVec4UniformValueByName(string aName) {
-			return shaderUniforms[aName].vec4Value;
+		vec4							getVec4UniformValueByName(const std::string& aName) {
+			return mVDUniform->getVec4UniformValueByName(aName);
 		}
-		int								getIntUniformValueByName(string aName) {
-			return shaderUniforms[aName].intValue;
+		int								getIntUniformValueByName(const std::string& aName) {
+			return mVDUniform->getIntUniformValueByName(aName);
 		};
 
 		// mix fbo
-		/* bool							isFlipH() { return mFlipH; };
-		bool							isFlipV() { return mFlipV; };
-		void							flipH() { mFlipH = !mFlipH; };
-		void							flipV() { mFlipV = !mFlipV; };*/
 		bool							isFlipH() { return getBoolUniformValueByIndex(mVDSettings->IFLIPH); };
 		bool							isFlipV() { return getBoolUniformValueByIndex(mVDSettings->IFLIPV); };
 		void							flipH() { setBoolUniformValueByIndex(mVDSettings->IFLIPH, !getBoolUniformValueByIndex(mVDSettings->IFLIPH)); };
@@ -253,11 +290,17 @@ namespace videodromm
 		void							setFreqIndex(unsigned int aFreqIndex, unsigned int aFreq) { freqIndexes[aFreqIndex] = aFreq; };
 		//float							getFreq(unsigned int aFreqIndex) { return iFreqs[freqIndexes[aFreqIndex]]; };
 		// public for hydra
-		void							createFloatUniform(string aName, int aCtrlIndex, float aValue = 0.01f, float aMin = 0.0f, float aMax = 1.0f);
-		void							createSampler2DUniform(string aName, int aCtrlIndex, int aTextureIndex = 0);
+		void							createFloatUniform(string aName, int aCtrlIndex, float aValue = 0.01f, float aMin = 0.0f, float aMax = 1.0f) {
+			mVDUniform->createFloatUniform(aName, aCtrlIndex, aValue, aMin, aMax);
+		};
+		void							createSampler2DUniform(string aName, int aCtrlIndex, int aTextureIndex = 0) {
+			mVDUniform->createSampler2DUniform(aName, aCtrlIndex, aTextureIndex);
+		};
 	private:
 		// Settings
 		VDSettingsRef					mVDSettings;
+		//! Uniforms
+		VDUniformRef					mVDUniform;
 		map<int, int>					freqIndexes;
 		bool							mAudioBuffered;
 		// Live json params
@@ -269,29 +312,30 @@ namespace videodromm
 		bool							mAutoBeatAnimation;
 		////Parameter >
 		// shaders
-		map<int, string>				controlIndexes;
-		map<string, VDUniform>			shaderUniforms;
+		//map<int, string>				controlIndexes;
+		//map<string, VDUniform>			shaderUniforms;
 		//! read a uniforms json file 
-		void							loadUniforms(const ci::DataSourceRef &source);
+		/*void							loadUniforms(const ci::DataSourceRef &source);
 		void							floatFromJson(const ci::JsonTree &json);
 		void							sampler2dFromJson(const ci::JsonTree &json);
 		void							vec2FromJson(const ci::JsonTree &json);
 		void							vec3FromJson(const ci::JsonTree &json);
 		void							vec4FromJson(const ci::JsonTree &json);
 		void							intFromJson(const ci::JsonTree &json);
-		void							boolFromJson(const ci::JsonTree &json);
+		void							boolFromJson(const ci::JsonTree &json);*/
 		fs::path						mUniformsJson;
 
 
-
+/*
 		void							createVec2Uniform(string aName, int aCtrlIndex, vec2 aValue = vec2(0.0));
 		void							createVec3Uniform(string aName, int aCtrlIndex, vec3 aValue = vec3(0.0));
 		void							createVec4Uniform(string aName, int aCtrlIndex, vec4 aValue = vec4(0.0));
 		void							createIntUniform(string aName, int aCtrlIndex, int aValue = 1);
 		void							createBoolUniform(string aName, int aCtrlIndex, bool aValue = false);
+		
 		//! write a uniforms json file
 		void							saveUniforms();
-		ci::JsonTree					uniformToJson(int i);
+		ci::JsonTree					uniformToJson(int i);*/
 
 		// time
 		ci::Timer						mTimer;
@@ -306,7 +350,7 @@ namespace videodromm
 		JsonTree						mData;
 		void							loadAnimation();
 		void							saveAnimation();
-
+		int								mLastBar = 0;
 		std::unordered_map<int, float>	mBadTV;
 		//bool							mFlipH;
 		//bool							mFlipV;
