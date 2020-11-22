@@ -40,7 +40,7 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 				found = true;
 				i = msg[0].flt();
 				f = msg[1].flt() / 128;
-				mVDAnimation->setUniformValue(i, f);
+				mVDAnimation->setFloatUniformValueByIndex(i, f);
 				//ss << " midi from OSC " << addr << " " << i << " value " << f;
 				mVDSettings->mMidiMsg = ss.str();
 			}
@@ -63,7 +63,7 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 				{
 					found = true;
 					mVDAnimation->setAutoBeatAnimation(false);
-					mVDAnimation->setUniformValue(mVDSettings->IBPM, msg[0].flt());
+					mVDAnimation->setBpm(msg[0].flt());
 				}
 			}
 			if (!found)
@@ -86,12 +86,12 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 					found = true;
 					f = msg[0].flt();
 					mVDAnimation->useTimeWithTempo();
-					mVDAnimation->setUniformValue(mVDSettings->ITIME, f);
+					mVDAnimation->setFloatUniformValueByIndex(mVDSettings->ITIME, f);
 					//stringstream ss;
 					ss << addr << " " << f;
 					//CI_LOG_I("OSC: " << ctrl << " addr: " << addr);
 					mVDSettings->mMsg = ss.str();
-					//mVDAnimation->setUniformValue(mVDSettings->IELAPSED, msg[0].flt());
+					//mVDAnimation->setFloatUniformValueByIndex(mVDSettings->IELAPSED, msg[0].flt());
 				}
 			}
 			if (!found)
@@ -109,7 +109,7 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 					found = true;
 					mVDAnimation->useTimeWithTempo();
 					f = msg[0].flt();
-					mVDAnimation->setUniformValue(mVDSettings->IBPM, f);
+					mVDAnimation->setBpm(f);
 					//CI_LOG_I("tempo:" + toString(mVDAnimation->getBpm()));
 				}
 			}
@@ -156,22 +156,22 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 						}
 						// sos specific
 						if (i == 119) { // B7 end
-							mVDAnimation->setUniformValue(mVDSettings->ITIMEFACTOR, 0.02f);
+							mVDAnimation->setFloatUniformValueByIndex(mVDSettings->ITIMEFACTOR, 0.02f);
 						}
 						if (i == 120) { // C8 slow
-							mVDAnimation->setUniformValue(mVDSettings->ITIMEFACTOR, 0.1f);
+							mVDAnimation->setFloatUniformValueByIndex(mVDSettings->ITIMEFACTOR, 0.1f);
 						}
 						if (i == 121) { // C#8
-							mVDAnimation->setUniformValue(mVDSettings->ITIMEFACTOR, 0.18f);
+							mVDAnimation->setFloatUniformValueByIndex(mVDSettings->ITIMEFACTOR, 0.18f);
 						}
 						if (i == 122) { // D8
-							mVDAnimation->setUniformValue(mVDSettings->ITIMEFACTOR, 0.25f);
+							mVDAnimation->setFloatUniformValueByIndex(mVDSettings->ITIMEFACTOR, 0.25f);
 						}
 						if (i == 123) { // D#8
-							mVDAnimation->setUniformValue(mVDSettings->ITIMEFACTOR, 0.35f);
+							mVDAnimation->setFloatUniformValueByIndex(mVDSettings->ITIMEFACTOR, 0.35f);
 						}
 						if (i == 124) { // E8 fast
-							mVDAnimation->setUniformValue(mVDSettings->ITIMEFACTOR, 1.0f);
+							mVDAnimation->setFloatUniformValueByIndex(mVDSettings->ITIMEFACTOR, 1.0f);
 						}
 					}
 				}
@@ -184,8 +184,8 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 				if (index != std::string::npos)
 				{
 					found = true;			
-					mVDAnimation->setUniformValue(mVDSettings->IBEAT, msg[0].int32() - 1);
-					mVDAnimation->setUniformValue(
+					mVDAnimation->setIntUniformValueByIndex(mVDSettings->IBEAT, msg[0].int32() - 1);
+					mVDAnimation->setIntUniformValueByIndex(
 						mVDSettings->IBARBEAT,
 						mVDAnimation->getIntUniformValueByIndex(mVDSettings->IBAR) * 4 + mVDAnimation->getIntUniformValueByIndex(mVDSettings->IBEAT));
 
@@ -205,12 +205,12 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 					int previousBar = mVDAnimation->getIntUniformValueByIndex(mVDSettings->IBAR);
 
 					if (previousBar != msg[0].int32()) {
-						mVDSettings->iBarDuration = mVDAnimation->getUniformValue(mVDSettings->ITIME) - mBarStart;
-						mBarStart = mVDAnimation->getUniformValue(mVDSettings->ITIME);
+						mVDSettings->iBarDuration = mVDAnimation->getFloatUniformValueByIndex(mVDSettings->ITIME) - mBarStart;
+						mBarStart = mVDAnimation->getFloatUniformValueByIndex(mVDSettings->ITIME);
 					}
 					// TODO END
-					mVDAnimation->setUniformValue(mVDSettings->IBAR, msg[0].int32());
-					mVDAnimation->setUniformValue(
+					mVDAnimation->setIntUniformValueByIndex(mVDSettings->IBAR, msg[0].int32());
+					mVDAnimation->setIntUniformValueByIndex(
 						mVDSettings->IBARBEAT,
 						mVDAnimation->getIntUniformValueByIndex(mVDSettings->IBAR) * 4 + mVDAnimation->getIntUniformValueByIndex(mVDSettings->IBEAT));
 
@@ -225,7 +225,7 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 				{
 					found = true;
 					double d0 = msg[0].dbl(); // tempo
-					mVDAnimation->setUniformValue(mVDSettings->IBPM, d0);
+					mVDAnimation->setBpm(d0);
 					double d1 = msg[1].dbl();
 					int d2 = msg[2].int32();
 					mVDWebsocket->changeIntValue(mVDSettings->IBEAT, d2);
@@ -249,7 +249,7 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 							found = true;
 							f = msg[0].flt();
 							i = std::stoi(addr.substr(lastSlashIndex + 1)) + 8;
-							mVDAnimation->setUniformValue(i, f);
+							mVDAnimation->setFloatUniformValueByIndex(i, f);
 						}
 
 						if (!found)
@@ -261,7 +261,7 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 								found = true;
 								f = msg[0].flt();
 								i = std::stoi(addr.substr(lastSlashIndex + 1)) + 32; // 24 + 8
-								mVDAnimation->setUniformValue(i, f);
+								mVDAnimation->setFloatUniformValueByIndex(i, f);
 							}
 						}
 						
@@ -274,7 +274,7 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 								found = true;
 								f = msg[0].flt();
 								i = std::stoi(addr.substr(lastSlashIndex + 1)) + 56; // 48 + 8
-								mVDAnimation->setUniformValue(i, f);
+								mVDAnimation->setFloatUniformValueByIndex(i, f);
 							}
 						}
 						if (!found)
@@ -286,7 +286,7 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 								found = true;
 								f = msg[0].flt();
 								i = std::stoi(addr.substr(index + ctrl.length()));
-								mVDAnimation->setUniformValue(i, f);// starts at 1: mVDSettings->IFR G B
+								mVDAnimation->setFloatUniformValueByIndex(i, f);// starts at 1: mVDSettings->IFR G B
 							}
 						}
 						if (!found)
@@ -298,7 +298,7 @@ VDRouter::VDRouter(VDSettingsRef aVDSettings, VDAnimationRef aVDAnimation, VDWeb
 								found = true;
 								f = msg[0].flt();
 								i = std::stoi(addr.substr(index + ctrl.length())) + 10;
-								mVDAnimation->setUniformValue(i, f);
+								mVDAnimation->setFloatUniformValueByIndex(i, f);
 							}
 						}
 						if (!found)
@@ -507,7 +507,7 @@ void VDRouter::midiSetup() {
 	midiControlType = "none";
 	midiControl = midiPitch = midiVelocity = midiNormalizedValue = midiValue = midiChannel = 0;
 	ss << std::endl;
-	
+	mVDSettings->mNewMsg = true;
 	mVDSettings->mMidiMsg = ss.str() + "\n" + mVDSettings->mMidiMsg.substr(0, mVDSettings->mMsgLength);
 	CI_LOG_V(ss.str());
 }
@@ -533,7 +533,7 @@ void VDRouter::openMidiInPort(int i) {
 		ss << "Opening MIDI in port " << i << " " << mMidiInputs[i].portName << std::endl;
 		mVDSettings->mMidiMsg = ss.str() + "\n" + mVDSettings->mMidiMsg.substr(0, mVDSettings->mMsgLength);
 		CI_LOG_V(ss.str());
-		
+		mVDSettings->mNewMsg = true;
 }
 void VDRouter::closeMidiInPort(int i) {
 
@@ -606,7 +606,7 @@ void VDRouter::openMidiOutPort(int i) {
 	}
 	ss << std::endl;
 	mVDSettings->mMidiMsg = ss.str() + "\n" + mVDSettings->mMidiMsg.substr(0, mVDSettings->mMsgLength);
-
+	mVDSettings->mNewMsg = true;
 	CI_LOG_V(ss.str());
 }
 void VDRouter::closeMidiOutPort(int i) {
@@ -647,13 +647,13 @@ void VDRouter::midiListener(midi::Message msg) {
 			} 
 			if (midiControl > 40 && midiControl < 49) {
 				mSelectedFboB = midiControl - 41;
-				mVDAnimation->setUniformValue(mVDSettings->IFBOB, mSelectedFboB);
+				mVDAnimation->setIntUniformValueByIndex(mVDSettings->IFBOB, mSelectedFboB);
 			}
 			*/
 			//if (midiControl > 30 && midiControl < 39) {
 				mVDWebsocket->changeFloatValue(midiControl, midiNormalizedValue);
 				//mSelectedFboA = midiControl - 31;
-				//mVDAnimation->setUniformValue(mVDSettings->IFBOA, mSelectedFboA);
+				//mVDAnimation->setIntUniformValueByIndex(mVDSettings->IFBOA, mSelectedFboA);
 			//}
 			
 		}
@@ -670,11 +670,11 @@ void VDRouter::midiListener(midi::Message msg) {
 			}
 			if (midiControl > 30 && midiControl < 39) {
 				mSelectedFboA = midiControl - 31;
-				mVDAnimation->setUniformValue(mVDSettings->IFBOA, mSelectedFboA);
+				mVDAnimation->setIntUniformValueByIndex(mVDSettings->IFBOA, mSelectedFboA);
 			}
 			if (midiControl > 40 && midiControl < 49) {
 				mSelectedFboB = midiControl - 41;
-				mVDAnimation->setUniformValue(mVDSettings->IFBOB, mSelectedFboB);
+				mVDAnimation->setIntUniformValueByIndex(mVDSettings->IFBOB, mSelectedFboB);
 			}
 		*/
 		midiControlType = "/on";
@@ -682,7 +682,7 @@ void VDRouter::midiListener(midi::Message msg) {
 		//midiVelocity = msg.velocity;
 		//midiNormalizedValue = lmap<float>(midiVelocity, 0.0, 127.0, 0.0, 1.0);
 		//// quick hack!
-		//mVDAnimation->setUniformValue(14, 1.0f + midiNormalizedValue);
+		//mVDAnimation->setFloatUniformValueByIndex(14, 1.0f + midiNormalizedValue);
 		midiPitch = msg.pitch;
 		// midimix solo mode
 		/*if (midiPitch == 27) midiSticky = true;
@@ -738,7 +738,7 @@ void VDRouter::midiListener(midi::Message msg) {
 		midiValue = msg.value;
 		midiNormalizedValue = lmap<float>(midiValue, 0.0, 127.0, 0.0, 1.0);
 		ss << " pb Chn: " << midiChannel << " CC: " << midiControl << " Val: " << midiValue << " NVal: " << midiNormalizedValue;
-		mVDAnimation->setUniformValue(mVDSettings->IMOUSEX, midiValue);
+		mVDAnimation->setFloatUniformValueByIndex(mVDSettings->IMOUSEX, midiValue);
 		break;
 
 	default:
@@ -788,7 +788,7 @@ void VDRouter::updateParams(int iarg0, float farg1) {
 		// audio multfactor
 		if (iarg0 == 13) mVDWebsocket->changeFloatValue(iarg0, (farg1 + 0.01) * 10);
 		// exposure
-		if (iarg0 == 14) mVDWebsocket->changeFloatValue(iarg0, (farg1 + 0.01) * mVDAnimation->getMaxUniformValue(14));
+		if (iarg0 == 14) mVDWebsocket->changeFloatValue(iarg0, (farg1 + 0.01) * mVDAnimation->getMaxUniformValueByIndex(14));
 		// xfade
 		if (iarg0 == mVDSettings->IXFADE) {//18
 			mVDWebsocket->changeFloatValue(iarg0, farg1);
@@ -805,16 +805,16 @@ void VDRouter::updateParams(int iarg0, float farg1) {
 	{
 		// middle row
 		mVDWebsocket->changeFloatValue(iarg0, farg1);
-		//mVDAnimation->setUniformValue(mVDSettings->IFBOA, iarg0 - 31);
+		//mVDAnimation->setIntUniformValueByIndex(mVDSettings->IFBOA, iarg0 - 31);
 	}
 	if (iarg0 > 40 && iarg0 < 49) {
 		// low row 
 		mVDWebsocket->changeFloatValue(iarg0, farg1);
-		//mVDAnimation->setUniformValue(mVDSettings->IFBOB, iarg0 - 41);
+		//mVDAnimation->setIntUniformValueByIndex(mVDSettings->IFBOB, iarg0 - 41);
 	}
 	//if (iarg0 > 0 && iarg0 < 49) {
 		// float values 
-		//mVDWebsocket->wsWrite("{\"params\" :[{ \"name\":" + toString(iarg0) + ",\"value\":" + toString(mVDAnimation->getUniformValue(iarg0)) + "}]}");
+		//mVDWebsocket->wsWrite("{\"params\" :[{ \"name\":" + toString(iarg0) + ",\"value\":" + toString(mVDAnimation->getFloatUniformValueByIndex(iarg0)) + "}]}");
 	//}
 }
 
@@ -824,10 +824,10 @@ void VDRouter::colorWrite()
 #if defined( CINDER_MSW )
 	// lights4events
 	char col[97];
-	int r = (int)(mVDAnimation->getUniformValue(1) * 255);
-	int g = (int)(mVDAnimation->getUniformValue(2) * 255);
-	int b = (int)(mVDAnimation->getUniformValue(3) * 255);
-	int a = (int)(mVDAnimation->getUniformValue(4) * 255);
+	int r = (int)(mVDAnimation->getFloatUniformValueByIndex(1) * 255);
+	int g = (int)(mVDAnimation->getFloatUniformValueByIndex(2) * 255);
+	int b = (int)(mVDAnimation->getFloatUniformValueByIndex(3) * 255);
+	int a = (int)(mVDAnimation->getFloatUniformValueByIndex(4) * 255);
 	//sprintf(col, "#%02X%02X%02X", r, g, b);
 	sprintf(col, "{\"type\":\"action\", \"parameters\":{\"name\":\"FC\",\"parameters\":{\"color\":\"#%02X%02X%02X%02X\",\"fading\":\"NONE\"}}}", a, r, g, b);
 	mVDWebsocket->wsWrite(col);

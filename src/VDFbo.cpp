@@ -89,7 +89,7 @@ namespace videodromm {
 			mError = string(e.what());
 			CI_LOG_V("fbo, unable to load fragment shader:" + string(e.what()));
 		}
-		
+		mVDSettings->mNewMsg = true;
 		mVDSettings->mMsg = mError;
 	}
 	void VDFbo::setShaderIndex(unsigned int aShaderIndex) {
@@ -166,12 +166,12 @@ namespace videodromm {
 			name = uniform.getName();
 			//CI_LOG_V(mFboTextureShader->getLabel() + ", getShader uniform name:" + uniform.getName());
 			if (mVDAnimation->isExistingUniform(name)) {
-				int uniformType = mVDAnimation->getUniformTypeByName(name);
+				int uniformType = mVDAnimation->getUniformType(name);
 				switch (uniformType)
 				{
 				case 0:
 					// float
-					mFboTextureShader->uniform(name, mVDAnimation->getUniformValueByName(name));
+					mFboTextureShader->uniform(name, mVDAnimation->getFloatUniformValueByName(name));
 					break;
 				case 1:
 					// sampler2D
@@ -214,16 +214,14 @@ namespace videodromm {
 					{
 					case 5126:
 						mVDAnimation->createFloatUniform(name, 400 + index, 0.31f, 0.0f, 1000.0f);
-						mFboTextureShader->uniform(name, mVDAnimation->getUniformValueByName(name));
+						mFboTextureShader->uniform(name, mVDAnimation->getFloatUniformValueByName(name));
 						break;
 					case 35664:
 						//mVDAnimation->createvec2(uniform.getName(), 310 + , 0);
 						//++;	
 						break;
 					case 35678:
-						//TODO 20200830 
 						mVDAnimation->createSampler2DUniform(uniform.getName(), 310 + texIndex, 0);
-						//TODO 20200830 
 						texIndex++;
 						break;
 					default:
@@ -287,53 +285,53 @@ namespace videodromm {
 				//mTextureList[mInputTextureIndex]->getTexture()->bind(0);
 				mInputTextureRef->bind(0);
 				mFboTextureShader->uniform("iBlendmode", mVDSettings->iBlendmode);
-				mFboTextureShader->uniform("iTime", mVDAnimation->getUniformValue(0));
+				mFboTextureShader->uniform("iTime", mVDAnimation->getFloatUniformValueByIndex(0));
 				// was vec3(mVDSettings->mFboWidth, mVDSettings->mFboHeight, 1.0)):
 				mFboTextureShader->uniform("iResolution", vec3(mThumbFbo->getWidth(), mThumbFbo->getHeight(), 1.0));
 				//mFboTextureShader->uniform("iChannelResolution", mVDSettings->iChannelResolution, 4);
 				// 20180318 mFboTextureShader->uniform("iMouse", mVDAnimation->getVec4UniformValueByName("iMouse"));
-				mFboTextureShader->uniform("iMouse", vec3(mVDAnimation->getUniformValue(mVDSettings->IMOUSEX), mVDAnimation->getUniformValue(mVDSettings->IMOUSEY), mVDAnimation->getUniformValue(mVDSettings->IMOUSEZ)));
+				mFboTextureShader->uniform("iMouse", vec3(mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IMOUSEX), mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IMOUSEY), mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IMOUSEZ)));
 				mFboTextureShader->uniform("iDate", mVDAnimation->getVec4UniformValueByName("iDate"));
-				mFboTextureShader->uniform("iWeight0", mVDAnimation->getUniformValue(mVDSettings->IWEIGHT0));	// weight of channel 0
-				mFboTextureShader->uniform("iWeight1", mVDAnimation->getUniformValue(mVDSettings->IWEIGHT1));	// weight of channel 1
-				mFboTextureShader->uniform("iWeight2", mVDAnimation->getUniformValue(mVDSettings->IWEIGHT2));	// weight of channel 2
-				mFboTextureShader->uniform("iWeight3", mVDAnimation->getUniformValue(mVDSettings->IWEIGHT3)); // texture
-				mFboTextureShader->uniform("iWeight4", mVDAnimation->getUniformValue(mVDSettings->IWEIGHT4)); // texture
+				mFboTextureShader->uniform("iWeight0", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IWEIGHT0));	// weight of channel 0
+				mFboTextureShader->uniform("iWeight1", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IWEIGHT1));	// weight of channel 1
+				mFboTextureShader->uniform("iWeight2", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IWEIGHT2));	// weight of channel 2
+				mFboTextureShader->uniform("iWeight3", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IWEIGHT3)); // texture
+				mFboTextureShader->uniform("iWeight4", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IWEIGHT4)); // texture
 				mFboTextureShader->uniform("iChannel0", 0); // fbo shader 
 				mFboTextureShader->uniform("iChannel1", 1); // fbo shader
 				mFboTextureShader->uniform("iChannel2", 2); // texture 1
 				mFboTextureShader->uniform("iChannel3", 3); // texture 2
 				mFboTextureShader->uniform("iChannel4", 4); // texture 3
 
-				mFboTextureShader->uniform("iRatio", mVDAnimation->getUniformValue(mVDSettings->IRATIO));//check if needed: +1;
+				mFboTextureShader->uniform("iRatio", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IRATIO));//check if needed: +1;
 				mFboTextureShader->uniform("iRenderXY", mVDSettings->mRenderXY);
-				mFboTextureShader->uniform("iZoom", mVDAnimation->getUniformValue(mVDSettings->IZOOM));
-				mFboTextureShader->uniform("iAlpha", mVDAnimation->getUniformValue(mVDSettings->IFA) * mVDSettings->iAlpha);
-				mFboTextureShader->uniform("iChromatic", mVDAnimation->getUniformValue(mVDSettings->ICHROMATIC));
-				mFboTextureShader->uniform("iRotationSpeed", mVDAnimation->getUniformValue(mVDSettings->IROTATIONSPEED));
-				mFboTextureShader->uniform("iCrossfade", mVDAnimation->getUniformValue(mVDSettings->IXFADE));
-				mFboTextureShader->uniform("iPixelate", mVDAnimation->getUniformValue(mVDSettings->IPIXELATE));
-				mFboTextureShader->uniform("iExposure", mVDAnimation->getUniformValue(mVDSettings->IEXPOSURE));
+				mFboTextureShader->uniform("iZoom", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IZOOM));
+				mFboTextureShader->uniform("iAlpha", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IFA) * mVDSettings->iAlpha);
+				mFboTextureShader->uniform("iChromatic", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->ICHROMATIC));
+				mFboTextureShader->uniform("iRotationSpeed", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IROTATIONSPEED));
+				mFboTextureShader->uniform("iCrossfade", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IXFADE));
+				mFboTextureShader->uniform("iPixelate", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IPIXELATE));
+				mFboTextureShader->uniform("iExposure", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IEXPOSURE));
 				mFboTextureShader->uniform("iToggle", (int)mVDAnimation->getBoolUniformValueByIndex(mVDSettings->ITOGGLE));
 				mFboTextureShader->uniform("iGreyScale", (int)mVDAnimation->getBoolUniformValueByIndex(mVDSettings->IGREYSCALE));
 				mFboTextureShader->uniform("iBackgroundColor", mVDAnimation->getVec3UniformValueByName("iBackgroundColor"));
 				mFboTextureShader->uniform("iVignette", (int)mVDAnimation->getBoolUniformValueByIndex(mVDSettings->IVIGN));
 				mFboTextureShader->uniform("iInvert", (int)mVDAnimation->getBoolUniformValueByIndex(mVDSettings->IINVERT));
-				mFboTextureShader->uniform("iTempoTime", mVDAnimation->getUniformValueByName("iTempoTime"));
+				mFboTextureShader->uniform("iTempoTime", mVDAnimation->getFloatUniformValueByName("iTempoTime"));
 				mFboTextureShader->uniform("iGlitch", (int)mVDAnimation->getBoolUniformValueByIndex(mVDSettings->IGLITCH));
-				mFboTextureShader->uniform("iTrixels", mVDAnimation->getUniformValue(mVDSettings->ITRIXELS));
-				mFboTextureShader->uniform("iRedMultiplier", mVDAnimation->getUniformValueByName("iRedMultiplier"));
-				mFboTextureShader->uniform("iGreenMultiplier", mVDAnimation->getUniformValueByName("iGreenMultiplier"));
-				mFboTextureShader->uniform("iBlueMultiplier", mVDAnimation->getUniformValueByName("iBlueMultiplier"));
+				mFboTextureShader->uniform("iTrixels", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->ITRIXELS));
+				mFboTextureShader->uniform("iRedMultiplier", mVDAnimation->getFloatUniformValueByName("iRedMultiplier"));
+				mFboTextureShader->uniform("iGreenMultiplier", mVDAnimation->getFloatUniformValueByName("iGreenMultiplier"));
+				mFboTextureShader->uniform("iBlueMultiplier", mVDAnimation->getFloatUniformValueByName("iBlueMultiplier"));
 				mFboTextureShader->uniform("iFlipH", (int)mVDAnimation->getBoolUniformValueByIndex(mVDSettings->IFLIPH));
 				mFboTextureShader->uniform("iFlipV", (int)mVDAnimation->getBoolUniformValueByIndex(mVDSettings->IFLIPV));
-				mFboTextureShader->uniform("pixelX", mVDAnimation->getUniformValue(mVDSettings->IPIXELX));
-				mFboTextureShader->uniform("pixelY", mVDAnimation->getUniformValue(mVDSettings->IPIXELY));
+				mFboTextureShader->uniform("pixelX", mVDAnimation->getFloatUniformValueByName("pixelX"));
+				mFboTextureShader->uniform("pixelY", mVDAnimation->getFloatUniformValueByName("pixelY"));
 				mFboTextureShader->uniform("iXorY", (int)mVDAnimation->getBoolUniformValueByIndex(mVDSettings->IXORY));
-				mFboTextureShader->uniform("iBadTv", mVDAnimation->getUniformValue(mVDSettings->IBADTV));
-				mFboTextureShader->uniform("iFps", mVDAnimation->getUniformValue(mVDSettings->IFPS));
-				mFboTextureShader->uniform("iContour", mVDAnimation->getUniformValueByName("iContour"));
-				mFboTextureShader->uniform("iSobel", mVDAnimation->getUniformValueByName("iSobel"));
+				mFboTextureShader->uniform("iBadTv", mVDAnimation->getFloatUniformValueByName("iBadTv"));
+				mFboTextureShader->uniform("iFps", mVDAnimation->getFloatUniformValueByIndex(mVDSettings->IFPS));
+				mFboTextureShader->uniform("iContour", mVDAnimation->getFloatUniformValueByName("iContour"));
+				mFboTextureShader->uniform("iSobel", mVDAnimation->getFloatUniformValueByName("iSobel"));
 
 				gl::ScopedGlslProg glslScope(mFboTextureShader);
 				gl::drawSolidRect(Rectf(0, 0, mThumbFbo->getWidth(), mThumbFbo->getHeight()));

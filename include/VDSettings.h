@@ -22,141 +22,124 @@ namespace videodromm {
 		VDSettings(string filename);
 		static VDSettingsRef create(string filename);
 
-		enum VDParameters {
-			//! maximum number of fbos, shaders, textures
-			MAX = 14,
-			// uniform indexes
-			// float
-			ITIME = 0,
-			IFR = 1,
-			IFG = 2,
-			IFB = 3,
-			IFA = 4,
-			IFRX = 5,
-			IFGX = 6,
-			IFBX = 7,
-			ISOBEL = 8,
-			IROTATIONSPEED = 9,
-			ISTEPS = 10,
-			IRATIO = 11,
-			IZOOM = 12,
-			IAUDIOX = 13,
-			IEXPOSURE = 14,
-			IPIXELATE = 15,
-			ITRIXELS = 16,
-			ICHROMATIC = 17,
-			IXFADE = 18,
-			ITEMPOTIME = 19,
-			IFPS = 20,
+		//! maximum number of fbos, shaders, textures
+		static const int			MAX = 14;
+		// uniform indexes
+		// float
+		static const int			ITIME = 0;
+		static const int			IFR = 1;
+		static const int			IFG = 2;
+		static const int			IFB = 3;
+		static const int			IFA = 4;
+		static const int			IFRX = 5;
+		static const int			IFGX = 6;
+		static const int			IFBX = 7;
+		static const int			ISOBEL = 8;
+		static const int			IBADTV = 9;
+		static const int			ISTEPS = 10;
+		static const int			IRATIO = 11;
+		static const int			IZOOM = 12;
+		static const int			IAUDIOX = 13;
+		static const int			IEXPOSURE = 14;
+		static const int			IPIXELATE = 15;
+		static const int			ITRIXELS = 16;
+		static const int			ICHROMATIC = 17;
+		static const int			IXFADE = 18;
+		static const int			ITEMPOTIME = 19;
+		static const int			IFPS = 20;
 
-			IBPM = 21,
-			ISPEED = 22,
-			IPIXELX = 23,
-			IPIXELY = 24,
-			IDELTATIME = 25,
-			IBR = 26,
-			IBG = 27,
-			IBB = 28,
-			IMAXVOLUME = 29,
-			ICONTOUR = 30,
+		static const int			IBPM = 21;
+		static const int			ISPEED = 22;
+		static const int			IPIXELX = 23;
+		static const int			IPIXELY = 24;
+		static const int			IDELTATIME = 25;
+		static const int			IBR = 26;
+		static const int			IBG = 27;
+		static const int			IBB = 28;
+		static const int			IRESX = 29;
+		static const int			IRESY = 30;
+		static const int			IWEIGHT0 = 31;
+		static const int			IWEIGHT1 = 32;
+		static const int			IWEIGHT2 = 33;
+		static const int			IWEIGHT3 = 34;
+		static const int			IWEIGHT4 = 35;
+		static const int			IWEIGHT5 = 36;
+		static const int			IWEIGHT6 = 37;
+		static const int			IWEIGHT7 = 38;
+		static const int			IELAPSED = 39;
 
-			IWEIGHT0 = 31,
-			IWEIGHT1 = 32,
-			IWEIGHT2 = 33,
-			IWEIGHT3 = 34,
-			IWEIGHT4 = 35,
-			IWEIGHT5 = 36,
-			IWEIGHT6 = 37,
-			IWEIGHT7 = 38,
-			IWEIGHT8 = 39,
+		static const int			ICONTOUR = 40;
+		static const int			IROTATIONSPEED = 41;
+		static const int			IMOUSEX = 42;
+		static const int			IMOUSEY = 43;
+		static const int			IMOUSEZ = 44;
+		static const int			IVAMOUNT = 45;
+		static const int			IVFALLOFF = 46;
+		static const int			TIME = 47;
+		static const int			IPHASE = 48;
+		static const int			ITIMEFACTOR = 49;//iTimeFactor
 
-			IMOUSEX = 42,
-			IMOUSEY = 43,
-			IMOUSEZ = 44,
-			IVAMOUNT = 45,
-			IVFALLOFF = 46,
-			TIME = 47,
-			IBADTV = 48,
-			ITIMEFACTOR = 49,
-			// int
-			IBLENDMODE = 50,
-			IBEAT = 51,
-			IBAR = 52,
-			IBARBEAT = 53,
-			IFBOA = 54,
-			IFBOB = 55,
-			IOUTW = 56,
-			IOUTH = 57,
-			IBEATSPERBAR = 59,
-
-			ICOLOR = 61,
-			IBACKGROUNDCOLOR = 62,
-			IPHASE = 63,
-			IELAPSED = 64,
-			IMOUSE = 70,
-			// booleans 80 to 110
-			IGLITCH = 81,	// A4
-			IVIGN = 82,		// A#4
-			ITOGGLE = 83,	// B4 for sos
-			IINVERT = 86,	// D5
-			IGREYSCALE = 87,
-			ICLEAR = 88,	// 
-
-			IRESOLUTION = 120,
-			IRESOLUTIONX = 121,
-			IRESOLUTIONY = 122,
-
-			IDEBUG = 129,
-			IXORY = 130,
-			IFLIPH = 131,
-			IFLIPV = 132,
-			IFLIPPOSTH = 133,
-			IFLIPPOSTV = 134,
-
-			/*
-						IRHANDX = 110,
-						IRHANDY = 111,
-						IRHANDZ = 112,
-						ILHANDX = 113,
-						ILHANDY = 114,
-						ILHANDZ = 115,*/
-
-			IFREQ0 = 140,
-			IFREQ1 = 141,
-			IFREQ2 = 142,
-			IFREQ3 = 143,
-			// vec2
-			RESOLUTION = 150, // vec2 for hydra
-			RENDERSIZE = 151, // vec2 for ISF
-			IDATE = 152,
-			// srcarea
-			SRCXLEFT = 160,
-			SRCXRIGHT = 161,
-			SRCYLEFT = 162,
-			SRCYRIGHT = 163,
-
-		};
-		enum VDTextureModes {
-			// texture modes
-			TEXTUREMODEMIX = 0,				// mix two shaders
-			TEXTUREMODEAUDIO = 1,			// audio spectrum
-			TEXTUREMODELEFT = 2,			// left
-			TEXTUREMODERIGHT = 3,			// right
-			TEXTUREMODEINPUT = 4,			// spout
-			TEXTUREMODESHADER = 5,			// shader
-			TEXTUREMODEIMAGE = 6,			// image
-			TEXTUREMODEIMAGESEQUENCE = 7,	// image sequence
-			TEXTUREMODETHUMB = 8,			// thumb
-			TEXTUREMODEFBO = 9,				// fbo
-			TEXTUREMODETEXT = 10,			// text
-			TEXTUREMODEMOVIE = 11			// movie
-		};
+		// int
+		static const int			IBLENDMODE = 50;
+		static const int			IBEAT = 51;
+		static const int			IBAR = 52;
+		static const int			IBARBEAT = 53;
+		static const int			IFBOA = 54;
+		static const int			IFBOB = 55;
+		static const int			IOUTW = 56;
+		static const int			IOUTH = 57;	
+		static const int			IGREYSCALE = 58;
+		static const int			IBEATSPERBAR = 59;
+		// booleans 80 to 110
+		static const int			IGLITCH = 81;
+		static const int			IVIGN = 82;
+		static const int			ITOGGLE = 83;
+		static const int			IINVERT = 86;
+		static const int			IXORY = 100;
+		static const int			IFLIPH = 101;
+		static const int			IFLIPV = 102;
+		static const int			IFLIPPOSTH = 103;
+		static const int			IFLIPPOSTV = 104;
+		// global flip
+		bool						mFlipV;
+		bool						mFlipH;
+		/*static const int			IRHANDX = 110;
+		static const int			IRHANDY = 111;
+		static const int			IRHANDZ = 112;
+		static const int			ILHANDX = 113;
+		static const int			ILHANDY = 114;
+		static const int			ILHANDZ = 115;*/
+		// vec2
+		static const int			RESOLUTION = 120;
+		// srcarea
+		static const int			SRCXLEFT = 130;
+		static const int			SRCXRIGHT = 131;
+		static const int			SRCYLEFT = 132;
+		static const int			SRCYRIGHT = 133;
+		static const int			IFREQ0 = 140;
+		static const int			IFREQ1 = 141;
+		static const int			IFREQ2 = 142;
+		static const int			IFREQ3 = 143;
+		// texture modes
+		static const int			TEXTUREMODEMIX = 0;				// mix two shaders
+		static const int			TEXTUREMODEAUDIO = 1;			// audio spectrum
+		static const int			TEXTUREMODELEFT = 2;			// left
+		static const int			TEXTUREMODERIGHT = 3;			// right
+		static const int			TEXTUREMODEINPUT = 4;			// spout
+		static const int			TEXTUREMODESHADER = 5;			// shader
+		static const int			TEXTUREMODEIMAGE = 6;			// image
+		static const int			TEXTUREMODEIMAGESEQUENCE = 7;	// image sequence
+		static const int			TEXTUREMODETHUMB = 8;			// thumb
+		static const int			TEXTUREMODEFBO = 9;				// fbo
+		static const int			TEXTUREMODETEXT = 10;			// text
+		static const int			TEXTUREMODEMOVIE = 11;			// movie
 		bool						save();
 		bool						restore();
 		void						reset();
 		void						resetSomeParams();
 
 		// params
+		//int							mMode, mPreviousMode, mNewMode;
 		int							mPreviewWidth, mPreviewHeight, mPreviewFboWidth, mPreviewFboHeight;
 		float						mAspectRatio;
 		int							mMainWindowX, mMainWindowY, mMarginSmall, mMainWindowWidth, mMainWindowHeight, mFboWidth, mFboHeight;
@@ -171,10 +154,10 @@ namespace videodromm {
 		uint16_t					mOSCDestinationPort2;
 		uint16_t					mOSCReceiverPort;
 		std::string					mOSCMsg;
+		bool						mOSCNewMsg;		// log to console
 		std::string					mMsg;
-		std::string					mErrorMsg;
-		std::string					mShaderMsg;
-		std::string					mFboMsg;
+		bool						mNewMsg;
+		std::string					InfoMsg;
 		bool						mIsOSCSender;
 		static const int			mMsgLength = 150;
 
@@ -189,6 +172,7 @@ namespace videodromm {
 		int							mxRight;
 		int							myLeft;
 		int							myRight;
+		//vec2						mRenderResoXY;
 		bool						mAutoLayout;
 		bool						mStandalone;
 
@@ -206,15 +190,20 @@ namespace videodromm {
 		float						iSpeedMultiplier;   // speed multiplier
 		float						iStart = 1.0f;		// start adjustment
 		float						iBarDuration = 1.0f;// between 2 bars (seconds)
+		//obsolete replaced by uniform float						iTimeFactor;
 		float						iChannelTime[4];
 		bool						iFade;
 		bool						iRepeat;
 		int							iBlendmode;
+		//bool						iXorY;
+		//ci::Anim<float> 			iBadTv;
 		ci::Anim<float> 			iAlpha;
 
 		string						mAssetsPath;
 		bool						iShowFps;
+		//bool						iDebug;
 		string						sFps;
+		//bool						iGreyScale;
 		unsigned int				shaderEditIndex;
 		// transition
 		int							iTransition;
@@ -223,6 +212,7 @@ namespace videodromm {
 		//! Time in seconds at which the transition to the next shader starts.
 		double						mTransitionTime;
 
+		//int							multFactor;
 		// windows and params
 		int							mRenderX;
 		int							mRenderY;
@@ -233,24 +223,14 @@ namespace videodromm {
 		bool						mRenderThumbs;
 		int							currentSelectedIndex;
 
-		enum VDModes {
-			// modes, should be the same in App
-			MODE_MIX = 0,
-			MODE_IMAGE = 1,
-			MODE_SHARED = 2,
-			MODE_STREAM = 3,
-			MODE_SHADER = 4,
-			MODE_HYDRA = 5
-		};
+		// modes, should be the same in App
+		static const int			MODE_MIX = 0;
+		static const int			MODE_IMAGE = 1;
+		static const int			MODE_SHARED = 2;
+		static const int			MODE_STREAM = 3;
+		static const int			MODE_SHADER = 4;
+		static const int			MODE_HYDRA = 5;
 
-		enum VDAnims {
-			ANIM_NONE = 0,
-			ANIM_TIME = 1,
-			ANIM_AUTO = 2,
-			ANIM_BASS = 3,
-			ANIM_MID = 4,
-			ANIM_TREBLE = 5
-		};
 		/* static const int			MODE_WARP = 1;
 		static const int			MODE_AUDIO = 2;
 		static const int			MODE_SPHERE = 3;
@@ -275,6 +255,8 @@ namespace videodromm {
 		bool						mIsPlaying;
 		bool						mUseAudio;
 		bool						mUseLineIn;
+		//int							mFftSize;
+		//int							mWindowSize;
 		float						iSeed;
 
 		// z EyePointZ
@@ -292,6 +274,8 @@ namespace videodromm {
 
 		// spout
 		int							mFboResolution;
+		//int							mOutputVideoResolution;
+		//vec2						mOutputResolution;
 		// indexes for textures
 		map<int, int>				iChannels;
 		int							selectedChannel;
@@ -302,8 +286,15 @@ namespace videodromm {
 		bool						mSplitWarpV;
 		int							mUIZoom;
 		int							mCurrentPreviewFboIndex;
+		/*int							mSphereFboIndex, mMeshFboIndex, mLiveFboIndex, mMixFboIndex, mAudioFboIndex;
+		int							mLeftFboIndex, mRightFboIndex, mVertexSphereFboIndex, mWarp1FboIndex, mWarp2FboIndex, mABPFboIndex;
+		int							mLeftFragIndex, mRightFragIndex, mPreviewFragIndex, mPreviousFragIndex, mWarp1FragIndex, mWarp2FragIndex, mLiveFragIndex;
+		float						iZoomLeft, iZoomRight;*/
 		int							iTrack;
-				
+		// meshes
+		int							mMeshIndex;
+		// VertexSphere
+		int							mVertexSphereTextureIndex;
 		// camera
 		CameraPersp					mCamera;
 		vec2						mCamEyePointXY;
@@ -318,9 +309,15 @@ namespace videodromm {
 		string						mWebSocketsNickname;
 		uint16_t					mWebSocketsPort;
 		std::string					mWebSocketsMsg;
+		bool						mWebSocketsNewMsg;
 		// midi
 		std::string					mMidiMsg;
+		//float						xFade;
+		//bool						xFadeChanged;
 
+		// abp
+		float						mBend;
+		float						liveMeter;
 		// info to backup in XML
 		string						mInfo;
 		// ableton liveOSC
@@ -328,6 +325,9 @@ namespace videodromm {
 		// imgui positions and sizes
 		int							uiMargin;
 		// mPreviewFboWidth 80 mPreviewFboHeight 60 margin 10 inBetween 15
+		int							uiElementWidth;
+		int							uiElementHeight;
+
 		int							uiXPosCol1;
 		int							uiXPosCol2;
 		int							uiXPosCol3;
